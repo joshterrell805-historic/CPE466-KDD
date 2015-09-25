@@ -4,6 +4,11 @@ import os
 from vector import Vector
 
 class TestReadVectors(unittest.TestCase):
+
+  def test_parseVectorReturnsVector(self):
+    handler = csvhandler.CSVHandler()
+    vec = handler.parseVector("1,2,3")
+    self.assertIsInstance(vec, Vector)
   
   def test_parseVector(self):
     handler = csvhandler.CSVHandler()
