@@ -1,5 +1,6 @@
 import unittest
 import csvhandler
+import os
 
 class TestReadVectors(unittest.TestCase):
   
@@ -21,7 +22,7 @@ class TestReadVectors(unittest.TestCase):
     self.assertEqual(vecList, [[1,2,3,4],[5,6,7]])
 
   def test_parseFile(self):
-    fh = open("test.csv", "r")
+    fh = open(os.path.dirname(__file__) + "/test.csv", "r")
     lines = fh.readlines()
     handler = csvhandler.CSVHandler()
     vecList = handler.parseLines(lines)
