@@ -28,18 +28,18 @@ class TestReadVectors(unittest.TestCase):
     self.assertEqual(vecList, [Vector([1,2,3,4]),Vector([5,6,7])])
 
   def test_parseFile(self):
-    fh = open(os.path.dirname(__file__) + "/test.csv", "r")
-    lines = fh.readlines()
-    handler = csvhandler.CSVHandler()
-    vecList = handler.parseLines(lines)
-    self.assertEqual(vecList, [Vector([1,2,3,4]),
-                               Vector([4,5,6,7]),
-                               Vector([1.1,2.2,3.3,4.4]),
-                               Vector([1,2,3,4,5,6,7,7,8,9]),
-                               Vector([1]),
-                               Vector([None,None,None,None,None,4]),
-                               Vector([3,None,None,None,None]),
-                               Vector([None,None,None,None,None,None])])
+    with open(os.path.dirname(__file__) + "/test.csv", "r") as fh:
+      lines = fh.readlines()
+      handler = csvhandler.CSVHandler()
+      vecList = handler.parseLines(lines)
+      self.assertEqual(vecList, [Vector([1,2,3,4]),
+                                 Vector([4,5,6,7]),
+                                 Vector([1.1,2.2,3.3,4.4]),
+                                 Vector([1,2,3,4,5,6,7,7,8,9]),
+                                 Vector([1]),
+                                 Vector([None,None,None,None,None,4]),
+                                 Vector([3,None,None,None,None]),
+                                 Vector([None,None,None,None,None,None])])
     fh.close()
 
 if __name__ == '__main__':
