@@ -23,7 +23,7 @@ class TestVectorHandling(unittest.TestCase):
     def test_manhattan(self):
         vec = Vector([1,2])
         pair = Vector([3,4])
-        dist = vec.manhattanDistance(pair)
+        dist = vec.manhattanDist(pair)
         self.assertEqual(4, dist)
 
     def test_mean(self):

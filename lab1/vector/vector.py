@@ -8,4 +8,7 @@ class Vector(list):
         return sum([i * j for (i, j) in zip(self, vec)])
 
     def euclidDist(self, vec):
-        return math.sqrt(sum([(i-j)**2 for (i, j) in  zip(self, vec)]))
+        return math.sqrt(sum([(i-j)**2 for (i, j) in zip(self, vec)]))
+
+    def manhattanDist(self, vec):
+        return sum([abs(i - j) for (i, j) in zip(self, vec)])
