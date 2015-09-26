@@ -6,3 +6,6 @@ class Vector(list):
 
     def dot(self, vec):
         return sum([i * j for (i, j) in zip(self, vec)])
+
+    def euclidDist(self, vec):
+        return math.sqrt(sum([(i-j)**2 for (i, j) in  zip(self, vec)]))
