@@ -1,65 +1,65 @@
 import unittest
-import vector
+from vector import Vector
 
 class TestVectorHandling(unittest.TestCase):
 
     def test_length(self):
-        vec = vector.Vector([3,4])
+        vec = Vector([3,4])
         length = vec.length()
         self.assertEqual(length, 5)
 
     def test_dot_product(self):
-        vec = vector.Vector([1,2])
-        by = vector.Vector([3,4])
+        vec = Vector([1,2])
+        by = Vector([3,4])
         dot = vec.dot(by)
         self.assertEqual(11, dot)
 
     def test_euclidian(self):
-        vec = vector.Vector([-1,2])
-        pair = vector.Vector([3,5])
+        vec = Vector([-1,2])
+        pair = Vector([3,5])
         dist = vec.euclidDist(pair)
         self.assertEqual(5, dist)
 
     def test_manhattan(self):
-        vec = vector.Vector([1,2])
-        pair = vector.Vector([3,4])
+        vec = Vector([1,2])
+        pair = Vector([3,4])
         dist = vec.manhattanDistance(pair)
         self.assertEqual(4, dist)
 
     def test_mean(self):
-        vec = vector.Vector([1,2,3])
+        vec = Vector([1,2,3])
         mean = vec.mean()
         self.assertEqual(2, mean)
 
     def test_covariance(self):
-        vec = vector.Vector([1,2,3])
-        pair = vector.Vector([4,6,8])
+        vec = Vector([1,2,3])
+        pair = Vector([4,6,8])
         cov = vec.covariance(pair)
         self.assertEqual(4/3, cov)
 
     def test_std_dev(self):
-        vec = vector.Vector([1,2,3])
+        vec = Vector([1,2,3])
         stdDev = vec.stdDev()
         self.assertEqual(sqrt(2/3), stdDev)
 
     def test_pearson_correlation(self):
-        vec = vector.Vector([1,2,3])
-        pair = vector.Vector([4,6,8])
+        vec = Vector([1,2,3])
+        pair = Vector([4,6,8])
         dist = vec.pearsonCorrelation(pair)
         self.assertEqual((4/3)/(sqrt(2/3) * sqrt(8/3)), dist)
 
     def test_largest(self):
-        vec = vector.Vector([1,2,3])
+        vec = Vector([1,2,3])
         lrg = vec.largest()
         self.assertEqual(3, lrg)
 
     def test_smallest(self):
-        vec = vector.Vector([1,2,3])
+        vec = Vector([1,2,3])
         smallest = vec.smallest()
         self.assertEqual(1, smallest)
 
     def test_median(self):
-        vec = vector.Vector([1,2,3])
+        vec = Vector([1,2,3])
         median = vec.median()
         self.assertEqual(2, median)
 
@@ -67,7 +67,7 @@ class TestVectorHandling(unittest.TestCase):
         data = [[1,2,3],
                 [4,5,6],
                 [3,2,1]]
-        return map(vector.Vector, data)
+        return map(Vector, data)
 
 
     def test_column_largest(self):
