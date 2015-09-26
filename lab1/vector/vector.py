@@ -12,3 +12,6 @@ class Vector(list):
 
     def manhattanDist(self, vec):
         return sum([abs(i - j) for (i, j) in zip(self, vec)])
+
+    def mean(self):
+        return sum(self)/len(self)
