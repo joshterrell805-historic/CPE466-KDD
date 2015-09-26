@@ -1,4 +1,5 @@
 import unittest
+import math
 from vector import Vector
 
 class TestVectorHandling(unittest.TestCase):
@@ -40,13 +41,13 @@ class TestVectorHandling(unittest.TestCase):
     def test_std_dev(self):
         vec = Vector([1,2,3])
         stdDev = vec.stdDev()
-        self.assertEqual(sqrt(2/3), stdDev)
+        self.assertEqual(math.sqrt(2/3), stdDev)
 
     def test_pearson_correlation(self):
         vec = Vector([1,2,3])
         pair = Vector([4,6,8])
         dist = vec.pearsonCorrelation(pair)
-        self.assertEqual((4/3)/(sqrt(2/3) * sqrt(8/3)), dist)
+        self.assertEqual((4/3)/(math.sqrt(2/3) * math.sqrt(8/3)), dist)
 
     def test_largest(self):
         vec = Vector([1,2,3])
@@ -93,9 +94,9 @@ class TestVectorHandling(unittest.TestCase):
     def test_row_stddev(self):
         vectors = self.columnData()
         stddevs = Vector.rowwiseStdDev(vectors)
-        self.assertEqual([sqrt(2/3), sqrt(2/3), (1/3) * sqrt(38)], stddevs)
+        self.assertEqual([math.sqrt(2/3), math.sqrt(2/3), (1/3) * math.sqrt(38)], stddevs)
 
     def test_column_stddev(self):
         vectors = self.columnData()
         stddevs = Vector.stdDev(vectors)
-        self.assertEqual([sqrt(14)/3, sqrt(2), sqrt(38)/3], stddevs)
+        self.assertEqual([math.sqrt(14)/3, math.sqrt(2), math.sqrt(38)/3], stddevs)
