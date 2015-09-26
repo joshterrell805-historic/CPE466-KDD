@@ -40,3 +40,7 @@ class TestReadVectors(unittest.TestCase):
                                Vector([None,None,None,None,None,4]),
                                Vector([3,None,None,None,None]),
                                Vector([None,None,None,None,None,None])])
+    fh.close()
+
+if __name__ == '__main__':
+  unittest.main()
