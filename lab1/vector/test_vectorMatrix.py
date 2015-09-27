@@ -32,11 +32,10 @@ class TestVectorMatrix(unittest.TestCase):
     mean = vectors.colMean()
     self.assertEqual([8/3, 3, 10/3], mean)
 
-  @unittest.skip("unimplemented")
   def test_column_median(self):
     vectors = self.columnData()
-    median = Vector.median(vectors)
-    self.assertEqual([3,None,3], median)
+    median = vectors.colMedian()
+    self.assertEqual([3,2,3], median)
 
   @unittest.skip("unimplemented")
   def test_row_stddev(self):

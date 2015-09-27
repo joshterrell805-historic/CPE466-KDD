@@ -21,3 +21,9 @@ class VectorMatrix(list):
 
   def colMean(self):
     return self.rotate().mean()
+
+  def median(self):
+    return [v.median() for v in self]
+
+  def colMedian(self):
+    return self.rotate().median()
