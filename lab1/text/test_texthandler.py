@@ -1,5 +1,6 @@
 import unittest
 import texthandler
+import os
 from io import StringIO
 
 class TestTextHandler(unittest.TestCase):
@@ -36,9 +37,8 @@ of some one or other of their daughters.""",
 
     def test_readParagraphs(self):
         with self.getFileHandle() as fh:
-            fh = self.getFileHandle()
-            handler = TextHandler(fh)
-            reader = handler.paragraphReader()
+            reader = texthandler.Reader(fh)
+            reader = reader.paragraphReader()
             paragraphs = list(reader)
             data = ["""It's a truth' 'universally acknowledged, that a single man in possession
 of a good fortune, must be in want of a wife.""",
@@ -51,9 +51,7 @@ of some one or other of their daughters.""",
 """"My dear Mr. Bennet," said his lady to him one day. "have you heard that
 Netherfield Park is let at last?"\
 """]
-
-            self.assertEqual(data, paragraphs[0:2])
-        fh.close()
+            self.assertEqual(data, paragraphs[0:3])
 
     def test_wordList(self):
         fh = StringIO("what are words")
