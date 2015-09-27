@@ -27,10 +27,9 @@ class TestVectorMatrix(unittest.TestCase):
     smallest = vectors.colSmallest()
     self.assertEqual([1,2,1], smallest)
 
-  @unittest.skip("unimplemented")
   def test_column_mean(self):
     vectors = self.columnData()
-    mean = Vector.mean(vectors)
+    mean = vectors.colMean()
     self.assertEqual([8/3, 3, 10/3], mean)
 
   @unittest.skip("unimplemented")

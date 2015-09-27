@@ -15,3 +15,9 @@ class VectorMatrix(list):
 
   def colSmallest(self):
     return self.rotate().smallest()
+
+  def mean(self):
+    return [v.mean() for v in self]
+
+  def colMean(self):
+    return self.rotate().mean()
