@@ -70,7 +70,6 @@ class TestVectorHandling(unittest.TestCase):
                 [3,2,1]]
         return map(Vector, data)
 
-    @unittest.skip("unimplemented")
     def test_rotateMatrix(self):
         vector = self.columnData()
         vec = Vector.rotate(vector)
