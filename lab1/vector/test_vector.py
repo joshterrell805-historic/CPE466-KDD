@@ -73,9 +73,9 @@ class TestVectorHandling(unittest.TestCase):
     def test_rotateMatrix(self):
         vector = self.columnData()
         vec = Vector.rotate(vector)
-        self.assertEqual([[1,4,3],
-                          [2,5,2],
-                          [3,6,1]], vec)
+        self.assertEqual([Vector([1,4,3]),
+                          Vector([2,5,2]),
+                          Vector([3,6,1])], vec)
 
     @unittest.skip("unimplemented")
     def test_column_largest(self):
