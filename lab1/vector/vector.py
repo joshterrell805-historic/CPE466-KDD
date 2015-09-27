@@ -15,3 +15,8 @@ class Vector(list):
 
     def mean(self):
         return sum(self)/len(self)
+
+    def covariance(self, vec):
+        self_mean = self.mean()
+        vec_mean = vec.mean()
+        return Vector([(x - self_mean) * (y - vec_mean) for (x,y) in zip(self, vec)]).mean()
