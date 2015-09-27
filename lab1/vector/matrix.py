@@ -30,3 +30,6 @@ class VectorMatrix(list):
 
   def stdDev(self):
     return [v.stdDev() for v in self]
+
+  def colStdDev(self):
+    return self.rotate().stdDev()

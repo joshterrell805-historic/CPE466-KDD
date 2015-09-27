@@ -43,8 +43,9 @@ class TestVectorMatrix(unittest.TestCase):
     stddevs = vectors.stdDev()
     self.assertEqual([math.sqrt(2/3), math.sqrt(2/3), math.sqrt(2/3)], stddevs)
 
-  @unittest.skip("unimplemented")
   def test_column_stddev(self):
     vectors = self.columnData()
-    stddevs = Vector.stdDev(vectors)
-    self.assertEqual([math.sqrt(14)/3, math.sqrt(2), math.sqrt(38)/3], stddevs)
+    stddevs = vectors.colStdDev()
+    expected = [math.sqrt(14)/3, math.sqrt(2), math.sqrt(38)/3]
+    for (s, e) in zip(stddevs, expected):
+      self.assertAlmostEqual(s, e)
