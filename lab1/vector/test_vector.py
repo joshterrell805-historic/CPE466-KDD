@@ -43,7 +43,6 @@ class TestVectorHandling(unittest.TestCase):
         stdDev = vec.stdDev()
         self.assertEqual(math.sqrt(2/3), stdDev)
 
-    @unittest.skip("unimplemented")
     def test_pearson_correlation(self):
         vec = Vector([1,2,3])
         pair = Vector([4,6,8])

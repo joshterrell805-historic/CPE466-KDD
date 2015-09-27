@@ -34,3 +34,6 @@ class Vector(list):
 
         length = len(self)
         return math.sqrt(s/length)
+
+    def pearsonCorrelation(self, vec):
+        return self.covariance(vec)/(self.stdDev() * vec.stdDev())
