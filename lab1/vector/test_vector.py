@@ -43,59 +43,69 @@ class TestVectorHandling(unittest.TestCase):
         stdDev = vec.stdDev()
         self.assertEqual(math.sqrt(2/3), stdDev)
 
+    @unittest.skip("unimplemented")
     def test_pearson_correlation(self):
         vec = Vector([1,2,3])
         pair = Vector([4,6,8])
         dist = vec.pearsonCorrelation(pair)
         self.assertEqual((4/3)/(math.sqrt(2/3) * math.sqrt(8/3)), dist)
 
+    @unittest.skip("unimplemented")
     def test_largest(self):
         vec = Vector([1,2,3])
         lrg = vec.largest()
         self.assertEqual(3, lrg)
 
+    @unittest.skip("unimplemented")
     def test_smallest(self):
         vec = Vector([1,2,3])
         smallest = vec.smallest()
         self.assertEqual(1, smallest)
 
+    @unittest.skip("unimplemented")
     def test_median(self):
         vec = Vector([1,2,3])
         median = vec.median()
         self.assertEqual(2, median)
 
+    @unittest.skip("unimplemented")
     def columnData(self):
         data = [[1,2,3],
                 [4,5,6],
                 [3,2,1]]
         return map(Vector, data)
 
-
+    @unittest.skip("unimplemented")
     def test_column_largest(self):
         vector = self.columnData()
         lrg = Vector.largest()
         self.assertEqual([4,5,6], lrg)
 
+    @unittest.skip("unimplemented")
     def test_column_smallest(self):
         vectors = self.columnData()
         smallest = Vector.smallest(vectors)
         self.assertEqual([1,2,1], smallest)
 
+    @unittest.skip("unimplemented")
     def test_column_mean(self):
         vectors = self.columnData()
         mean = Vector.mean(vectors)
         self.assertEqual([8/3, 3, 10/3], mean)
 
+    @unittest.skip("unimplemented")
     def test_column_median(self):
         vectors = self.columnData()
         median = Vector.median(vectors)
         self.assertEqual([3,None,3], median)
 
+    @unittest.skip("unimplemented")
     def test_row_stddev(self):
         vectors = self.columnData()
         stddevs = Vector.rowwiseStdDev(vectors)
         self.assertEqual([math.sqrt(2/3), math.sqrt(2/3), (1/3) * math.sqrt(38)], stddevs)
 
+    @unittest.skip("unimplemented")
     def test_column_stddev(self):
         vectors = self.columnData()
         stddevs = Vector.stdDev(vectors)
