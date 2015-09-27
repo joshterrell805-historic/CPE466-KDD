@@ -27,3 +27,6 @@ class VectorMatrix(list):
 
   def colMedian(self):
     return self.rotate().median()
+
+  def stdDev(self):
+    return [v.stdDev() for v in self]

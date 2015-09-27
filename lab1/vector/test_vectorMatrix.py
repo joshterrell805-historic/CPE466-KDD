@@ -1,4 +1,5 @@
 import unittest
+import math
 from vector import Vector
 from matrix import VectorMatrix
 
@@ -37,11 +38,10 @@ class TestVectorMatrix(unittest.TestCase):
     median = vectors.colMedian()
     self.assertEqual([3,2,3], median)
 
-  @unittest.skip("unimplemented")
   def test_row_stddev(self):
     vectors = self.columnData()
-    stddevs = Vector.rowwiseStdDev(vectors)
-    self.assertEqual([math.sqrt(2/3), math.sqrt(2/3), (1/3) * math.sqrt(38)], stddevs)
+    stddevs = vectors.stdDev()
+    self.assertEqual([math.sqrt(2/3), math.sqrt(2/3), math.sqrt(2/3)], stddevs)
 
   @unittest.skip("unimplemented")
   def test_column_stddev(self):
