@@ -49,19 +49,16 @@ class TestVectorHandling(unittest.TestCase):
         dist = vec.pearsonCorrelation(pair)
         self.assertEqual((4/3)/(math.sqrt(2/3) * math.sqrt(8/3)), dist)
 
-    @unittest.skip("unimplemented")
     def test_largest(self):
         vec = Vector([1,2,3])
         lrg = vec.largest()
         self.assertEqual(3, lrg)
 
-    @unittest.skip("unimplemented")
     def test_smallest(self):
         vec = Vector([1,2,3])
         smallest = vec.smallest()
         self.assertEqual(1, smallest)
 
-    @unittest.skip("unimplemented")
     def test_median(self):
         vec = Vector([1,2,3])
         median = vec.median()

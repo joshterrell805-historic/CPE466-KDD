@@ -37,3 +37,16 @@ class Vector(list):
 
     def pearsonCorrelation(self, vec):
         return self.covariance(vec)/(self.stdDev() * vec.stdDev())
+
+    def largest(self):
+        return max(self)
+
+    def smallest(self):
+        return min(self)
+
+    def median(self):
+        sorted = self[:]
+        sorted.sort()
+        print((len(self)//2))
+        return sorted[len(self)//2]
+        return
