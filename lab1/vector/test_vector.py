@@ -64,12 +64,19 @@ class TestVectorHandling(unittest.TestCase):
         median = vec.median()
         self.assertEqual(2, median)
 
-    @unittest.skip("unimplemented")
     def columnData(self):
         data = [[1,2,3],
                 [4,5,6],
                 [3,2,1]]
         return map(Vector, data)
+
+    @unittest.skip("unimplemented")
+    def test_rotateMatrix(self):
+        vector = self.columnData()
+        vec = Vector.rotate(vector)
+        self.assertEqual([[1,4,3],
+                          [2,5,2],
+                          [3,6,1]], vec)
 
     @unittest.skip("unimplemented")
     def test_column_largest(self):
