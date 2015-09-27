@@ -45,10 +45,11 @@ class Reader:
             self.readMore()
             sep = None
             index = -1
-            for sep in self.paragraphSeparators:
-                index = self.buff.find(sep)
-                if index != -1:
-                    break
+            for s in self.paragraphSeparators:
+                idx = self.buff.find(s)
+                if idx != -1 and (index == -1 or idx < index):
+                    index = idx
+                    sep = s
             if index != -1:
                 endIndex = index + len(sep)
                 paragraph = self.buff[:index]
@@ -66,10 +67,11 @@ class Reader:
             self.readMore()
             sep = None
             index = -1
-            for sep in self.sentenceTerminators:
-                index = self.buff.find(sep)
-                if index != -1:
-                    break
+            for s in self.sentenceTerminators:
+                idx = self.buff.find(s)
+                if idx != -1 and (index == -1 or idx < index):
+                    index = idx
+                    sep = s
             if index != -1:
                 endIndex = index + len(sep)
                 sentence = self.buff[:endIndex]
