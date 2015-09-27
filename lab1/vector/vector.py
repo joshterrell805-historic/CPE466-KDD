@@ -20,3 +20,17 @@ class Vector(list):
         self_mean = self.mean()
         vec_mean = vec.mean()
         return Vector([(x - self_mean) * (y - vec_mean) for (x,y) in zip(self, vec)]).mean()
+
+    def stdDev(self):
+        # Algorithm taken from _The Art of Computer Programming_
+        # vol. 2 _Seminumerical Algorithms_ 2e. p. 232
+        m = self[0]
+        mOld = m
+        s = 0
+        for x in range(1, len(self)):
+            m = m + (self[x] - m) / (x + 1)
+            s = s + (self[x] - mOld) * (self[x] - m)
+            mOld = m
+
+        length = len(self)
+        return math.sqrt(s/length)
