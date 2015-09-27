@@ -18,6 +18,10 @@ class Reader:
                     'Call paragraphReader, sentenceReader, or wordReader first')
         return self
 
+    def __next__(self):
+        fn = getattr(self, 'next' + self.iterType)
+        return fn()
+
     def readMore(self):
         if not self.eof:
             buff = self.fileHandle.read(self.buffSize)
@@ -27,6 +31,10 @@ class Reader:
 
     def paragraphReader(self):
         self.iterType = 'Paragraph'
+        return self
+
+    def sentenceReader(self):
+        self.iterType = 'Sentence'
         return self
 
     def nextParagraph(self):
@@ -50,6 +58,24 @@ class Reader:
                 self.buff = ''
         return paragraph
 
-    def __next__(self):
-        fn = getattr(self, 'next' + self.iterType)
-        return fn()
+    def nextSentence(self):
+        if self.eof and len(self.buff) == 0:
+            raise StopIteration()
+        sentence = None
+        while sentence is None:
+            self.readMore()
+            sep = None
+            index = -1
+            for sep in self.sentenceTerminators:
+                index = self.buff.find(sep)
+                if index != -1:
+                    break
+            if index != -1:
+                endIndex = index + len(sep)
+                sentence = self.buff[:endIndex]
+                self.buff = self.buff[endIndex:]
+            elif self.eof:
+                sentence = self.buff
+                self.buff = ''
+        return sentence.lstrip()
+

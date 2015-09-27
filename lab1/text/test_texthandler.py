@@ -19,8 +19,8 @@ class TestTextHandler(unittest.TestCase):
 
     def test_readSentences(self):
         with self.getFileHandle() as fh:
-            handler = TextHandler(fh)
-            reader = handler.sentenceReader()
+            reader = texthandler.Reader(fh)
+            reader = reader.sentenceReader()
             sentences = list(reader)
             data = ["""It's a truth' 'universally acknowledged, that a single man in possession
 of a good fortune, must be in want of a wife.""",
@@ -30,9 +30,9 @@ first entering a neighbourhood, this truth is so well fixed in the minds
 of the surrounding families, that he is considered the rightful property
 of some one or other of their daughters.""",
 
-""""My dear Mr. Bennet," said his lady to him one day."""]
+""""My dear Mr Bennet," said his lady to him one day."""]
 
-            self.assertEqual(data, sentences[0:2])
+            self.assertEqual(data, sentences[0:3])
         fh.close()
 
     def test_readParagraphs(self):
@@ -48,7 +48,7 @@ first entering a neighbourhood, this truth is so well fixed in the minds
 of the surrounding families, that he is considered the rightful property
 of some one or other of their daughters.""",
 
-""""My dear Mr. Bennet," said his lady to him one day. "have you heard that
+""""My dear Mr Bennet," said his lady to him one day. "have you heard that
 Netherfield Park is let at last?"\
 """]
             self.assertEqual(data, paragraphs[0:3])
