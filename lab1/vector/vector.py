@@ -55,8 +55,5 @@ class Vector(list):
     def median(self):
         sorted = self[:]
         sorted.sort()
-        print((len(self)//2))
         return sorted[len(self)//2]
 
-    def rotate(lst):
-        return [Vector(t) for t in zip(*lst)]
