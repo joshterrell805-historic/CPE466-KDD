@@ -39,10 +39,18 @@ class Vector(list):
         return self.covariance(vec)/(self.stdDev() * vec.stdDev())
 
     def largest(self):
-        return max(self)
+        mx = self[0]
+        for x in self:
+            if x > mx:
+                mx = x
+        return mx
 
     def smallest(self):
-        return min(self)
+        mn = self[0]
+        for x in self:
+            if x < mn:
+                mn = x
+        return mn
 
     def median(self):
         sorted = self[:]
