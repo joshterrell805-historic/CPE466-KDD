@@ -1,7 +1,8 @@
 class Reader:
     sentenceTerminators = ['.', '!', '?']
-    wordSeparators = [',', '-', ':', ';', '(', ')', '\'', '"', '...', ' ']
-    innerWordChars = ['-', '\'']
+    wordSeparators = [',', '-', ':', ';', '(', ')', '\'', '"', '...', ' ', '\n']
+    wordSeparators.extend(sentenceTerminators)
+    innerWordNonBreakingPunct = ['-', '\'']
     paragraphSeparators = ['\n\n']
     buffSize = 64
 
@@ -35,6 +36,10 @@ class Reader:
 
     def sentenceReader(self):
         self.iterType = 'Sentence'
+        return self
+
+    def wordReader(self):
+        self.iterType = 'Word'
         return self
 
     def nextParagraph(self):
@@ -81,3 +86,39 @@ class Reader:
                 self.buff = ''
         return sentence.lstrip()
 
+    def nextWord(self):
+        if self.eof and len(self.buff) == 0:
+            raise StopIteration()
+        word = None
+        while word is None:
+            # TODO this should probably only be called if nothing is found
+            # (in each of the iterator funcs)
+            self.readMore()
+            sep = None
+            index = -1
+            for s in self.wordSeparators:
+                idx = self.buff.find(s)
+                if idx != -1 and (index == -1 or idx < index):
+                    if s in self.innerWordNonBreakingPunct:
+                        # "sup chief-man"
+                        #           ^
+                        self.readMore()
+                        if len(self.buff) > idx + 1:
+                            if self.buff[idx+1] == ' ':
+                                s += ' '
+                            elif idx == 0:
+                                self.buff = self.buff[1:]
+                                return self.nextWord()
+                            else:
+                                continue
+                    index = idx
+                    sep = s
+            if index != -1:
+                endIndex = index + len(sep)
+                word = self.buff[:index]
+                self.buff = self.buff[endIndex:]
+            elif self.eof:
+                word = self.buff
+                self.buff = ''
+        word = word.strip()
+        return self.nextWord() if word == '' else word

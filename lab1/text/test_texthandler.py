@@ -10,11 +10,11 @@ class TestTextHandler(unittest.TestCase):
 
     def test_readWords(self):
         with self.getFileHandle() as fh:
-            handler = TextHandler(fh)
-            reader = handler.wordReader()
+            reader = texthandler.Reader(fh)
+            reader = reader.wordReader()
             words = list(reader)
-            self.assertEqual(["It's", 'a', 'truth', 'universally', 'acknowledged'], words[0:4])
-            self.assertEqual('grown-up', words[894])
+            self.assertEqual(["It's", 'a', 'truth', 'universally', 'acknowledged'], words[0:5])
+            self.assertEqual('grown-up', words[170])
         fh.close()
 
     def test_readSentences(self):
