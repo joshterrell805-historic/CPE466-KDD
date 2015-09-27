@@ -9,3 +9,9 @@ class VectorMatrix(list):
 
   def colLargest(self):
     return self.rotate().largest()
+
+  def smallest(self):
+    return [v.smallest() for v in self]
+
+  def colSmallest(self):
+    return self.rotate().smallest()

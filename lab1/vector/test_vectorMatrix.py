@@ -17,16 +17,14 @@ class TestVectorMatrix(unittest.TestCase):
       Vector([3,6,1])]), vec)
     self.assertIsInstance(vec, VectorMatrix)
 
-  @unittest.skip("unimplemented")
   def test_column_largest(self):
     vector = self.columnData()
     lrg = vector.colLargest()
     self.assertEqual([4,5,6], lrg)
 
-  @unittest.skip("unimplemented")
   def test_column_smallest(self):
     vectors = self.columnData()
-    smallest = Vector.smallest(vectors)
+    smallest = vectors.colSmallest()
     self.assertEqual([1,2,1], smallest)
 
   @unittest.skip("unimplemented")
