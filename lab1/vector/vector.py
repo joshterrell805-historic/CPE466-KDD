@@ -57,4 +57,3 @@ class Vector(list):
         sorted.sort()
         print((len(self)//2))
         return sorted[len(self)//2]
-        return
