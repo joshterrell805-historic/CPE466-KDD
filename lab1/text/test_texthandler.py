@@ -1,5 +1,5 @@
 import unittest
-import texthandler
+from text import texthandler
 import os
 from io import StringIO
 

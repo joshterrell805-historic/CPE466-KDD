@@ -1,7 +1,7 @@
 import unittest
 import math
-from vector import Vector
-from matrix import VectorMatrix
+from vector.vector import Vector
+from vector.matrix import VectorMatrix
 
 class TestVectorMatrix(unittest.TestCase):
   def columnData(self):

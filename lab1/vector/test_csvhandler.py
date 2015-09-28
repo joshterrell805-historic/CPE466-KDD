@@ -1,7 +1,7 @@
 import unittest
-import csvhandler
+from vector import csvhandler
 import os
-from vector import Vector
+from vector.vector import Vector
 
 class TestReadVectors(unittest.TestCase):
 
