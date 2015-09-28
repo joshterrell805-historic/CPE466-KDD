@@ -6,6 +6,36 @@ class Reader:
     paragraphSeparators = ['\n\n']
     buffSize = 64
 
+    def uniqWordsRead(self):
+        pass
+
+    def freqWordsMap(self):
+        pass
+
+    def countWords(self):
+        pass
+
+    def countUniqWords(self):
+        pass
+
+    def countSentences(self):
+        pass
+
+    def countParagraphs(self):
+        pass
+
+    def mostFreqWords(self):
+        pass
+
+    def wordsWithFreq(self, freq):
+        pass
+
+    def wordsWithGreaterFreq(self, freq):
+        pass
+
+    def wordFound(self, word):
+        pass
+
     def __init__(self, fileHandle):
         """Each reader should be initialized with a unique file handle"""
         self.fileHandle = fileHandle
