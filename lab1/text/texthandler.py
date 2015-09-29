@@ -20,7 +20,7 @@ class Reader:
         raise Exception("__next__ is not implemented in Reader")
 
     def readAll(self):
-        return [] if self.eof else list(self)
+        return [] if self.eof and len(self.buff) == 0 else list(self)
 
     def readMore(self):
         if not self.eof:
@@ -142,10 +142,11 @@ class WordReader(Reader):
         pass
 
     def mostFreqWords(self):
-        pass
+        maxFreq = max(self.wordMap.values())
+        return self.wordsWithFreq(maxFreq)
 
     def wordsWithFreq(self, freq):
-        pass
+        return [w for w,f in self.wordMap.items() if f == freq]
 
     def wordsWithGreaterFreq(self, freq):
         pass

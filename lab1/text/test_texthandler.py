@@ -92,3 +92,23 @@ Netherfield Park is let at last?"\
         reader = texthandler.WordReader(fh)
         reader.readAll()
         self.assertEqual(reader.countUniqWords(), 3)
+
+    def test_mostFreqWords(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        next(reader)
+        next(reader)
+        self.assertEqual(reader.mostFreqWords().sort(), ['what', 'are'].sort())
+        next(reader)
+        self.assertEqual(reader.mostFreqWords().sort(),
+                ['what', 'are', 'words'].sort())
+        reader.readAll()
+        self.assertEqual(reader.mostFreqWords(), ['what'])
+        
+    def test_wordsWithFreq(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        reader.readAll()
+        self.assertEqual(reader.wordsWithFreq(1).sort(),
+                ['are', 'words'].sort())
+        self.assertEqual(reader.wordsWithFreq(2), ['what'])
