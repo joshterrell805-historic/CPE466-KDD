@@ -30,6 +30,10 @@ class Reader:
             self.buff += buff
 
 class ParagraphReader(Reader):
+    def __init__(self, *args):
+        super(ParagraphReader, self).__init__(*args)
+        self.paragraphs = 0
+
     def __next__(self):
         if self.eof and len(self.buff) == 0:
             raise StopIteration()
@@ -50,7 +54,11 @@ class ParagraphReader(Reader):
             elif self.eof:
                 paragraph = self.buff
                 self.buff = ''
+        self.paragraphs += 1
         return paragraph
+
+    def countParagraphs(self):
+        return self.paragraphs
 
 class SentenceReader(Reader):
     def __next__(self):
@@ -136,9 +144,6 @@ class WordReader(Reader):
         return len(self.uniqWords())
 
     def countSentences(self):
-        pass
-
-    def countParagraphs(self):
         pass
 
     def mostFreqWords(self):
