@@ -130,7 +130,7 @@ class WordReader(Reader):
         return self.wordMap.copy()
 
     def countWords(self):
-        pass
+        return sum(list(self.wordMap.values()))
 
     def countUniqWords(self):
         pass

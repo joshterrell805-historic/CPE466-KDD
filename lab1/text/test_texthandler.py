@@ -80,3 +80,9 @@ Netherfield Park is let at last?"\
         reader.readAll()
         self.assertEqual(reader.uniqWords().sort(),
                 ['what', 'are', 'words'].sort())
+
+    def test_countWords(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        reader.readAll()
+        self.assertEqual(reader.countWords(), 4)
