@@ -61,6 +61,10 @@ class ParagraphReader(Reader):
         return self.paragraphs
 
 class SentenceReader(Reader):
+    def __init__(self, *args):
+        super(SentenceReader, self).__init__(*args)
+        self.sentences = 0
+
     def __next__(self):
         if self.eof and len(self.buff) == 0:
             raise StopIteration()
@@ -81,7 +85,11 @@ class SentenceReader(Reader):
             elif self.eof:
                 sentence = self.buff
                 self.buff = ''
+        self.sentences += 1
         return sentence.lstrip()
+
+    def countSentences(self):
+        return self.sentences
 
 class WordReader(Reader):
     def __init__(self, *args):
@@ -142,9 +150,6 @@ class WordReader(Reader):
 
     def countUniqWords(self):
         return len(self.uniqWords())
-
-    def countSentences(self):
-        pass
 
     def mostFreqWords(self):
         maxFreq = max(self.wordMap.values())

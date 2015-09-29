@@ -88,6 +88,13 @@ Netherfield Park is let at last?"\
         reader.readAll()
         self.assertEqual(reader.countParagraphs(), 2)
 
+    def test_countSentences(self):
+        fh = StringIO("1.2?3 who who! yeah")
+        reader = texthandler.SentenceReader(fh)
+        reader.readAll()
+        self.assertEqual(reader.countSentences(), 4)
+
+
     def test_countWords(self):
         fh = StringIO("what are words what")
         reader = texthandler.WordReader(fh)
