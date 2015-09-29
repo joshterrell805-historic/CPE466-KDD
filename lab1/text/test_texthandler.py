@@ -55,7 +55,21 @@ Netherfield Park is let at last?"\
         reader = texthandler.WordReader(fh)
         self.assertEqual(list(reader), ['what', 'are', 'words'])
 
-    def test_wordFreqList(self):
+    def test_wordFreqMap(self):
         fh = StringIO("what are words what")
-        handler = TextHandler(fh)
-        self.assertEqual(handler.freqWords(), {'what' : 2, 'are' : 1, 'words' : 1})
+        reader = texthandler.WordReader(fh)
+        reader.readAll()
+        self.assertEqual(reader.freqWordsMap(),
+                {'what' : 2, 'are' : 1, 'words' : 1})
+
+    def test_readAll(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        self.assertEqual(reader.__next__(), 'what')
+        self.assertEqual(reader.readAll(), ['are', 'words', 'what'])
+        self.assertEqual(reader.readAll(), [])
+
+        fh = StringIO("what. are? words! what")
+        reader = texthandler.SentenceReader(fh)
+        self.assertEqual(reader.readAll(), ['what.', 'are?', 'words!', 'what'])
+        self.assertEqual(reader.readAll(), [])

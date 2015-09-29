@@ -19,6 +19,9 @@ class Reader:
     def __next__(self):
         raise Exception("__next__ is not implemented in Reader")
 
+    def readAll(self):
+        return [] if self.eof else list(self)
+
     def readMore(self):
         if not self.eof:
             buff = self.fileHandle.read(self.buffSize)
@@ -73,6 +76,10 @@ class SentenceReader(Reader):
         return sentence.lstrip()
 
 class WordReader(Reader):
+    def __init__(self, *args):
+        super(WordReader, self).__init__(*args)
+        self.wordMap = {}
+
     def __next__(self):
         if self.eof and len(self.buff) == 0:
             raise StopIteration()
@@ -107,14 +114,20 @@ class WordReader(Reader):
             elif self.eof:
                 word = self.buff
                 self.buff = ''
+
         word = word.strip()
-        return self.__next__() if word == '' else word
+        if word == '':
+            return self.__next__()
+        else:
+            val = self.wordMap.get(word, 0)
+            self.wordMap[word] = val + 1
+            return word
 
     def uniqWordsRead(self):
         pass
 
     def freqWordsMap(self):
-        pass
+        return self.wordMap.copy()
 
     def countWords(self):
         pass
