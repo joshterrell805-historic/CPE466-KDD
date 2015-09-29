@@ -16,6 +16,11 @@ class TestTextHandler(unittest.TestCase):
             self.assertEqual('grown-up', words[170])
         fh.close()
 
+        fh = StringIO("why...what do you think?")
+        reader = texthandler.WordReader(fh)
+        words = list(reader)
+        self.assertEqual(['why', 'what', 'do', 'you', 'think'], words)
+
     def test_readSentences(self):
         with self.getFileHandle() as fh:
             reader = texthandler.SentenceReader(fh)
