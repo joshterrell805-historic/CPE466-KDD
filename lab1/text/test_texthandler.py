@@ -10,8 +10,7 @@ class TestTextHandler(unittest.TestCase):
 
     def test_readWords(self):
         with self.getFileHandle() as fh:
-            reader = texthandler.Reader(fh)
-            reader = reader.wordReader()
+            reader = texthandler.WordReader(fh)
             words = list(reader)
             self.assertEqual(["It's", 'a', 'truth', 'universally', 'acknowledged'], words[0:5])
             self.assertEqual('grown-up', words[170])
@@ -19,8 +18,7 @@ class TestTextHandler(unittest.TestCase):
 
     def test_readSentences(self):
         with self.getFileHandle() as fh:
-            reader = texthandler.Reader(fh)
-            reader = reader.sentenceReader()
+            reader = texthandler.SentenceReader(fh)
             sentences = list(reader)
             data = ["""It's a truth' 'universally acknowledged, that a single man in possession
 of a good fortune, must be in want of a wife.""",
@@ -37,8 +35,7 @@ of some one or other of their daughters.""",
 
     def test_readParagraphs(self):
         with self.getFileHandle() as fh:
-            reader = texthandler.Reader(fh)
-            reader = reader.paragraphReader()
+            reader = texthandler.ParagraphReader(fh)
             paragraphs = list(reader)
             data = ["""It's a truth' 'universally acknowledged, that a single man in possession
 of a good fortune, must be in want of a wife.""",
@@ -55,7 +52,7 @@ Netherfield Park is let at last?"\
 
     def test_wordList(self):
         fh = StringIO("what are words")
-        reader = texthandler.Reader(fh).wordReader()
+        reader = texthandler.WordReader(fh)
         self.assertEqual(list(reader), ['what', 'are', 'words'])
 
     def test_wordFreqList(self):
