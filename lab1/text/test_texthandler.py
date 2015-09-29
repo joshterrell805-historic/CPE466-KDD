@@ -73,3 +73,10 @@ Netherfield Park is let at last?"\
         reader = texthandler.SentenceReader(fh)
         self.assertEqual(reader.readAll(), ['what.', 'are?', 'words!', 'what'])
         self.assertEqual(reader.readAll(), [])
+
+    def test_uniqWords(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        reader.readAll()
+        self.assertEqual(reader.uniqWords().sort(),
+                ['what', 'are', 'words'].sort())

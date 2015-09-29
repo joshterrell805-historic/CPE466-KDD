@@ -123,8 +123,8 @@ class WordReader(Reader):
             self.wordMap[word] = val + 1
             return word
 
-    def uniqWordsRead(self):
-        pass
+    def uniqWords(self):
+        return list(self.wordMap.keys())
 
     def freqWordsMap(self):
         return self.wordMap.copy()
