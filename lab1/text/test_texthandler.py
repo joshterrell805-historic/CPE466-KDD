@@ -114,7 +114,7 @@ Netherfield Park is let at last?"\
         self.assertEqual(reader.wordsWithFreq(2), ['what'])
         self.assertEqual(reader.wordsWithFreq(3), [])
 
-    def test_wordsWithFreq(self):
+    def test_wordsWithGreaterFreq(self):
         fh = StringIO("what are words what")
         reader = texthandler.WordReader(fh)
         next(reader)
@@ -124,3 +124,13 @@ Netherfield Park is let at last?"\
         reader.readAll()
         self.assertEqual(reader.wordsWithGreaterFreq(1), ['what'])
         self.assertEqual(reader.wordsWithGreaterFreq(2), [])
+
+    def test_wordFound(self):
+        fh = StringIO("what are words what")
+        reader = texthandler.WordReader(fh)
+        next(reader)
+        self.assertEqual(reader.wordFound('what'), True)
+        self.assertEqual(reader.wordFound('are'), False)
+        reader.readAll()
+        self.assertEqual(reader.wordFound('are'), True)
+        self.assertEqual(reader.wordFound('zoo'), False)

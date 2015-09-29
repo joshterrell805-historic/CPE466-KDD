@@ -152,4 +152,4 @@ class WordReader(Reader):
         return [w for w,f in self.wordMap.items() if f > freq]
 
     def wordFound(self, word):
-        pass
+        return word in self.wordMap
