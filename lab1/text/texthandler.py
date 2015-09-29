@@ -133,7 +133,7 @@ class WordReader(Reader):
         return sum(list(self.wordMap.values()))
 
     def countUniqWords(self):
-        pass
+        return len(self.uniqWords())
 
     def countSentences(self):
         pass
