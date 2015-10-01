@@ -1,26 +1,20 @@
 import unittest
-from modelbuilder import ModelBuilder
+from elements.stopword import StopwordElement
+from document import Document
 class TestModelBuilder(unittest.TestCase):
-    def basicRead(self):
-        fake = FakeElement(['thing', 'another'])
-        ret = next(fake)
-        utterances = fake.document
-        self.assertEqual('thing', ret)
-        self.assertEqual('thing', utterances)
+    def testStopwords(self):
+        doc_itr = FakeParser({'words': ['this', 'that', 'these', 'those']})
+        sw_itr = StopwordElement(doc_itr, ['these', 'those'])
+        self.assertEqual(next(sw_itr), ['this', 'that'])
 
-        ret = next(fake)
-        utterances = fake.document
-        self.assertEqual('another', ret)
-        self.assertEqual('another', utterances)
+    def testStemming(self):
 
-
-class FakeElement:
-    def __init__(self, parent):
-        self.parent = parent
+class FakeParser:
+    def __init__(self, doc):
+        self.__doc = doc
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        self.document = next(parent)
-        return self.document
+        return self.__doc
