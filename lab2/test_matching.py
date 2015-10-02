@@ -17,7 +17,7 @@ class TestMatching(unittest.TestCase):
         idf = {w: matcher.invDocFreq(w) for w in ['a', 'b', 'c']}
 
         docVec = Vector([13/13*idf['a'], 0, 9/13*idf['c']])
-        queryVec = Vector([(0.5+0.5*7)*idf['a'], (0.5+0.5*4)*idf['b'],
+        queryVec = Vector([(0.5+0.5*7/7)*idf['a'], (0.5+0.5*4/7)*idf['b'],
                 0.5*idf['c']])
 
         scoreComputed = docVec[0]*queryVec[0] + docVec[1]*queryVec[1] + \

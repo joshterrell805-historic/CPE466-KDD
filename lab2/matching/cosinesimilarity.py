@@ -12,7 +12,8 @@ class CosineSimilarity(Algorithm):
                 for i in range(len(words))])
 
         queryVec = self.wordVector(words, queryWords)
-        queryVec = Vector([(0.5 + 0.5*queryVec[i])*invDocFreqs[i]
+        maxFreq = queryVec.largest()
+        queryVec = Vector([(0.5 + 0.5*queryVec[i]/maxFreq)*invDocFreqs[i]
                 for i in range(len(words))])
 
         return queryVec.dot(docVec) / \
