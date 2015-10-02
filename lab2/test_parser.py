@@ -9,9 +9,9 @@ class TestModelBuilder(unittest.TestCase):
         self.assertEqual(next(sw_itr), {'this': 3, 'that': 2})
 
     def testStemming(self):
-        doc_itr = FakeParser({'words': {'caresses': 3, 'flies': 4, 'dies': 5, 'mules': 6, 'denied': 7}})
+        doc_itr = FakeParser({'words': {'caresses': 3, 'flies': 4, 'dies': 5, 'mules': 6, 'mule': 4, 'denied': 7}})
         stem_itr = PorterStemmerElement(doc_itr)
-        self.assertEqual(next(stem_itr), document({'caress': 3, 'fli': 4, 'die': 5, 'mule': 6, 'deni': 7}))
+        self.assertEqual(next(stem_itr), document({'caress': 3, 'fli': 4, 'die': 5, 'mule': 10, 'deni': 7}))
 
 def document(words):
     return {'words': words}
