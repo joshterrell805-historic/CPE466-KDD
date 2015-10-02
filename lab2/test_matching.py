@@ -2,6 +2,11 @@ import unittest
 import matching
 from vector.vector import Vector
 class TestMatching(unittest.TestCase):
+    epsilon = 0.0000001
+
+    def assertApproxEqual(self, valA, valB):
+        self.assertTrue(abs(valA - valB) < self.epsilon)
+
     def testCosineSimilarity(self):
         matcher = matching.CosineSimilarity({
             'docFreq': {
@@ -11,6 +16,8 @@ class TestMatching(unittest.TestCase):
             },
             'docCount': 16
         })
+
+        # ---- test one -----
         docWords = {'a': 13, 'c': 9}
         queryWords = {'a': 7, 'b': 4}
 
@@ -26,7 +33,35 @@ class TestMatching(unittest.TestCase):
         scoreComputed = scoreComputed / queryVec.length()
 
         score = matcher.match(queryWords, docWords)
-        self.assertEqual(score, scoreComputed)
+        self.assertApproxEqual(score, scoreComputed)
+
+        # ---- test two -----
+        docWords = {'a': 13, 'b': 9, 'c': 1}
+        queryWords = {'a': 7, 'b': 4}
+        docVec = Vector([13/13*idf['a'], 9/13*idf['b'], 1/13*idf['c']])
+        queryVec = Vector([(0.5+0.5*7/7)*idf['a'], (0.5+0.5*4/7)*idf['b'],
+                0.5*idf['c']])
+        scoreComputed = docVec[0]*queryVec[0] + docVec[1]*queryVec[1] + \
+                docVec[2]*queryVec[2]
+        scoreComputed = scoreComputed / docVec.length()
+        scoreComputed = scoreComputed / queryVec.length()
+
+        score = matcher.match(queryWords, docWords)
+        self.assertApproxEqual(score, scoreComputed)
+
+        # ---- test three -----
+        docWords = {'a': 13, 'b': 9}
+        queryWords = {'a': 7, 'b': 4, 'c': 1}
+        docVec = Vector([13/13*idf['a'], 9/13*idf['b'], 0])
+        queryVec = Vector([(0.5+0.5*7/7)*idf['a'], (0.5+0.5*4/7)*idf['b'],
+                (0.5+0.5*1/7)*idf['c']])
+        scoreComputed = docVec[0]*queryVec[0] + docVec[1]*queryVec[1] + \
+                docVec[2]*queryVec[2]
+        scoreComputed = scoreComputed / docVec.length()
+        scoreComputed = scoreComputed / queryVec.length()
+
+        score = matcher.match(queryWords, docWords)
+        self.assertApproxEqual(score, scoreComputed)
 
     def testAlgorithm_sharedWords(self):
         algorithm = matching.algorithm.Algorithm(None)
