@@ -9,6 +9,6 @@ class PorterStemmerElement:
 
     def __next__(self):
         document = next(self.__parent)
-        document['words'] = [self.__porter.stem(word) for word in document['words']]
+        document['words'] = {self.__porter.stem(word): count for word, count in document['words'].items()}
         return document
 

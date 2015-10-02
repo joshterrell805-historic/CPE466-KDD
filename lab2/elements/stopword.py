@@ -8,4 +8,5 @@ class StopwordElement:
 
     def __next__(self):
         document = next(self.__parent)
-        return [x for x in document['words'] if not x in self.__stopwords]
+        words = document['words']
+        return {x: count for x, count in words.items() if not x in self.__stopwords}
