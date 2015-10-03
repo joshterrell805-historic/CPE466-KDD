@@ -1,6 +1,4 @@
 import json
-def JsonReader(filename):
-    with open(filename) as fh:
-        list = json.load(fh)
-    fh.close()
+def JsonReader(fh):
+    list = json.load(fh)
     return list

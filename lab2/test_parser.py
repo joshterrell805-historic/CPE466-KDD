@@ -1,4 +1,5 @@
 import unittest
+from io import StringIO
 from document import Document
 from elements.stopword import StopwordElement
 from elements.porterstemmer import PorterStemmerElement
@@ -27,12 +28,14 @@ class TestModelBuilder(unittest.TestCase):
         self.assertEqual({'this': 0, 'that': 1, 'these': 1, 'those': 0}, summary.IDF())
 
     def testReader(self):
-        read_itr = JsonReader('elements/test.json')
-        data = [document for document in read_itr]
-        expected = [{'words': {'first' : 1}},
-                    {'things': {'second' : 2}},
-                    {'another': {'third' : 3}}]
-        self.assertEqual(expected, data)
+        with open('elements/test.json') as fh:
+            read_itr = JsonReader(fh)
+            data = [document for document in read_itr]
+            expected = [{'words': {'first' : 1}},
+                        {'things': {'second' : 2}},
+                        {'another': {'third' : 3}}]
+            self.assertEqual(expected, data)
+        fh.close()
 
     def testFreqCount(self):
         doc_itr = FakeParser({'text': "first second first second second"})
