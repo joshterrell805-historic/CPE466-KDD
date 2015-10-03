@@ -9,8 +9,8 @@ from elements.freqcounter import FreqCounter
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
-        self.assertEqual(next(sw_itr), {'this': 3, 'that': 2})
         sw_itr = iter(StopwordElement(doc_itr, ['these', 'those']))
+        self.assertEqual(next(sw_itr), document({'this': 3, 'that': 2}))
 
     def testStemming(self):
         doc_itr = FakeParser({'words': {'caresses': 3, 'flies': 4, 'dies': 5, 'mules': 6, 'mule': 4, 'denied': 7}})
