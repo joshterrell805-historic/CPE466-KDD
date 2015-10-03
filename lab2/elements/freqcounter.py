@@ -2,7 +2,7 @@ from text.texthandler import WordReader
 from io import StringIO
 class FreqCounter:
     def __init__(self, parent, key):
-        self.__parent = parent
+        self.__parent = iter(parent)
         self.__key = key
 
     def __iter__(self):

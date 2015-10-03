@@ -2,7 +2,7 @@ from nltk.stem.porter import PorterStemmer
 class PorterStemmerElement:
     def __init__(self, parent):
         self.__porter = PorterStemmer()
-        self.__parent = parent
+        self.__parent = iter(parent)
 
     def __iter__(self):
         return self

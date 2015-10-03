@@ -9,12 +9,12 @@ from elements.freqcounter import FreqCounter
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
-        sw_itr = StopwordElement(doc_itr, ['these', 'those'])
         self.assertEqual(next(sw_itr), {'this': 3, 'that': 2})
+        sw_itr = iter(StopwordElement(doc_itr, ['these', 'those']))
 
     def testStemming(self):
         doc_itr = FakeParser({'words': {'caresses': 3, 'flies': 4, 'dies': 5, 'mules': 6, 'mule': 4, 'denied': 7}})
-        stem_itr = PorterStemmerElement(doc_itr)
+        stem_itr = iter(PorterStemmerElement(doc_itr))
         self.assertEqual(next(stem_itr), document({'caress': 3, 'fli': 4, 'die': 5, 'mule': 10, 'deni': 7}))
 
     def testAccumulator(self):
@@ -39,7 +39,7 @@ class TestModelBuilder(unittest.TestCase):
 
     def testFreqCount(self):
         doc_itr = FakeParser({'text': "first second first second second"})
-        freq_itr = FreqCounter(doc_itr, 'text')
+        freq_itr = iter(FreqCounter(doc_itr, 'text'))
         data = next(freq_itr)
         expected = {'text': "first second first second second",
                     'words': {'first': 2, 'second': 3}}
@@ -53,7 +53,4 @@ class FakeParser:
         self.__doc = doc
 
     def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self.__doc
+        return iter([self.__doc])

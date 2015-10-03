@@ -1,7 +1,7 @@
 class StopwordElement:
     def __init__(self, parent, stopwords):
         self.__stopwords = stopwords
-        self.__parent = parent
+        self.__parent = iter(parent)
 
     def __iter__(self):
         return self
