@@ -4,6 +4,7 @@ from elements.stopword import StopwordElement
 from elements.porterstemmer import PorterStemmerElement
 from elements.summary import SummaryElement
 from elements.jsonreader import JsonReader
+from elements.freqcounter import FreqCounter
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
@@ -31,6 +32,14 @@ class TestModelBuilder(unittest.TestCase):
         expected = [{'words': {'first' : 1}},
                     {'things': {'second' : 2}},
                     {'another': {'third' : 3}}]
+        self.assertEqual(expected, data)
+
+    def testFreqCount(self):
+        doc_itr = FakeParser({'text': "first second first second second"})
+        freq_itr = FreqCounter(doc_itr, 'text')
+        data = next(freq_itr)
+        expected = {'text': "first second first second second",
+                    'words': {'first': 2, 'second': 3}}
         self.assertEqual(expected, data)
 
 def document(words):
