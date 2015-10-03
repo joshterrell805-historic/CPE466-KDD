@@ -3,6 +3,7 @@ from document import Document
 from elements.stopword import StopwordElement
 from elements.porterstemmer import PorterStemmerElement
 from elements.summary import SummaryElement
+from elements.jsonreader import JsonReader
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
@@ -23,6 +24,14 @@ class TestModelBuilder(unittest.TestCase):
             pass
         self.assertEqual({'this': 2, 'that': 1, 'these': 1, 'those': 2}, summary.DF())
         self.assertEqual({'this': 0, 'that': 1, 'these': 1, 'those': 0}, summary.IDF())
+
+    def testReader(self):
+        read_itr = JsonReader('elements/test.json')
+        data = [document for document in read_itr]
+        expected = [{'words': {'first' : 1}},
+                    {'things': {'second' : 2}},
+                    {'another': {'third' : 3}}]
+        self.assertEqual(expected, data)
 
 def document(words):
     return {'words': words}
