@@ -8,7 +8,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'parse_docs=scripts.parse_docs:cli'
+            'parse_docs=scripts.parse_docs:cli',
             'matcher=scripts.matcher:cli'
         ],
     }
