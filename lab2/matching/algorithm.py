@@ -26,5 +26,11 @@ class Algorithm:
         return Vector([words.get(key, 0) for key in keys])
 
     def invDocFreq(self, word):
-        return math.log(
-                self.metaData['docCount'] / self.metaData['docFreq'][word], 2)
+        # lets just assume that if the word doesn't exist in any document,
+        # it has a document frequency and inverse document of 0
+        # (it's irrelevant)
+        if word in self.metaData['docFreq']:
+            N = self.metaData['docCount']
+            return math.log(N / self.metaData['docFreq'][word], 2)
+        else:
+            return 0
