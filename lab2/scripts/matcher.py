@@ -2,6 +2,7 @@ import click
 from elements.queryparser import QueryParser
 from elements.freqcounter import FreqCounter
 from elements.stopword import StopwordElement
+from elements.lowercaser import LowerCaser
 from elements.porterstemmer import PorterStemmerElement
 import pickle
 from collections import deque
@@ -17,7 +18,8 @@ import heapq
 def cli(query, docspath, metapath):
     query_itr = QueryParser(query, 'query')
     freq_itr = FreqCounter(query_itr, 'query')
-    stop_itr = StopwordElement(freq_itr, ['a', 'an', 'the'])
+    lowr_itr = LowerCaser(freq_itr)
+    stop_itr = StopwordElement(lowr_itr, ['a', 'an', 'the'])
     stem_itr = PorterStemmerElement(stop_itr)
     parsed_query = list(stem_itr)[0]
 
