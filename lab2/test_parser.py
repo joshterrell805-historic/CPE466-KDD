@@ -6,6 +6,7 @@ from elements.porterstemmer import PorterStemmerElement
 from elements.summary import SummaryElement
 from elements.jsonreader import JsonReader
 from elements.freqcounter import FreqCounter
+from elements.queryparser import QueryParser
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
@@ -44,6 +45,11 @@ class TestModelBuilder(unittest.TestCase):
         expected = {'text': "first second first second second",
                     'words': {'first': 2, 'second': 3}}
         self.assertEqual(expected, data)
+
+    def testQueryParser(self):
+        query_itr = iter(QueryParser("abc def"))
+        query = next(query_itr)
+        self.assertEqual({'text': "abc def"}, query)
 
 def document(words):
     return {'words': words}
