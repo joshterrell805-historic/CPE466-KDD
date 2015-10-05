@@ -12,11 +12,12 @@ from matching.cosinesimilarity import CosineSimilarity
 import heapq
 
 @click.command()
+@click.option('--debug', default=False)
 @click.option('--docspath', type=click.File('rb'),
               default='data/parsed-docs.pkl')
 @click.option('--metapath', type=click.File('rb'),
               default='data/doc-meta.pkl')
-def cli(docspath, metapath):
+def cli(debug, docspath, metapath):
     print("""Query the utterance database by specifying a query at the prompt.
 Specify no query to exit.
 
@@ -41,8 +42,6 @@ Meta data filters may be provided at the start of the query. Example query:
         query_itr = QueryParser(query, 'query')
         subs_itr.setParent(query_itr)
         parsed_query = list(stem_itr)[0]
-        print(meta_itr.metaData)
-        print(parsed_query['query'])
 
         documents = [d for d in indexList if docHasMeta(d, meta_itr.metaData)]
         for document in documents:
@@ -52,7 +51,12 @@ Meta data filters may be provided at the start of the query. Example query:
         winners = heapq.nlargest(10, documents, key=lambda doc: doc['match'])
 
         for doc in winners:
-            click.echo('\n' + str(doc['text']))
+            click.echo("")
+            if debug:
+                click.echo(str(doc['match']))
+            click.echo("%s, %s (%s) %s" % (doc['last'], \
+                    doc['first'], doc['PersonType'], doc['house']))
+            click.echo(doc['text'])
 
         click.echo('\n' + '-' * 80)
 
