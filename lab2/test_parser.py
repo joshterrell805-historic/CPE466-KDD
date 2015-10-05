@@ -7,6 +7,8 @@ from elements.summary import SummaryElement
 from elements.jsonreader import JsonReader
 from elements.freqcounter import FreqCounter
 from elements.queryparser import QueryParser
+from elements.querymetadataparser import QueryMetadataParser
+
 class TestModelBuilder(unittest.TestCase):
     def testStopwords(self):
         doc_itr = FakeParser({'words': {'this': 3, 'that': 2, 'these': 4, 'those': 5}})
@@ -50,6 +52,19 @@ class TestModelBuilder(unittest.TestCase):
         query_itr = iter(QueryParser("abc def"))
         query = next(query_itr)
         self.assertEqual({'text': "abc def"}, query)
+
+    def testQueryMetadataParser(self):
+        p = QueryMetadataParser(
+                [{'query': '<a:2,b:3,b:z> apples'}])
+        doc = next(p)
+        self.assertEqual(doc['query'], ' apples')
+        self.assertEqual(p.metaData, {'a': ['2'], 'b': ['3', 'z']})
+
+        p = QueryMetadataParser(
+                [{'query': 'apples are good'}])
+        doc = next(p)
+        self.assertEqual(doc['query'], 'apples are good')
+        self.assertEqual(p.metaData, {})
 
 def document(words):
     return {'words': words}
