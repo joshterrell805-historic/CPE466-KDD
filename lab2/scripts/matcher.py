@@ -54,6 +54,10 @@ Meta data filters may be provided at the start of the query. Example query:
             click.echo("")
             if debug:
                 click.echo(str(doc['match']))
+                words = parsed_query['words']
+                click.echo(["%s: %s" % (key, words[key]) for key in sorted(words.keys())])
+                words = doc['words']
+                click.echo(["%s: %s" % (key, words[key]) for key in sorted(words.keys())])
             click.echo("%s, %s (%s) %s" % (doc['last'], \
                     doc['first'], doc['PersonType'], doc['house']))
             click.echo(doc['text'])
