@@ -13,12 +13,13 @@ from matching.okapi import Okapi
 import heapq
 
 @click.command()
-@click.option('--debug', default=False)
+@click.option('--debug', is_flag=True)
 @click.option('--docspath', type=click.File('rb'),
               default='data/parsed-docs.pkl')
 @click.option('--metapath', type=click.File('rb'),
               default='data/doc-meta.pkl')
-def cli(debug, docspath, metapath):
+@click.option('--algorithm', default='okapi', help='okapi or cosine')
+def cli(debug, docspath, metapath, algorithm):
     print("""Query the utterance database by specifying a query at the prompt.
 Specify no query to exit.
 
@@ -34,7 +35,12 @@ Meta data filters may be provided at the start of the query. Example query:
 
     indexList = pickle.load(docspath)
     metadata = pickle.load(metapath)
-    matcher = CosineSimilarity(metadata)
+    if algorithm == 'okapi':
+        matcher = Okapi(metadata)
+    elif algorithm == 'cosine':
+        matcher = CosineSimilarity(metadata)
+    else:
+        raise Exception('invalid matching algorithm')
 
     while True:
         query = input('\nEnter a query >> ')
@@ -46,8 +52,12 @@ Meta data filters may be provided at the start of the query. Example query:
 
         documents = [d for d in indexList if docHasMeta(d, meta_itr.metaData)]
         for document in documents:
-            document['match'] = matcher.match(parsed_query['words'],
-                    document['words'])
+            if algorithm == 'okapi':
+                document['match'] = matcher.match(parsed_query['words'],
+                        document['words'], len(document['text']))
+            else:
+                document['match'] = matcher.match(parsed_query['words'],
+                        document['words'])
 
         winners = heapq.nlargest(10, documents, key=lambda doc: doc['match'])
 
