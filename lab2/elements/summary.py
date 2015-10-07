@@ -4,6 +4,7 @@ class SummaryElement:
         self.__parent = parent
         self.__df = {}
         self.__idf = None
+        self.__totalLength = 0
         self.N = 0
 
     def DF(self):
