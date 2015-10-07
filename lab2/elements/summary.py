@@ -15,6 +15,8 @@ class SummaryElement:
         else:
             self.__idf = {word: math.log2(self.N/dfi) for word, dfi in self.__df.items()}
             return self.__idf
+    def averageLength(self):
+        return self.__totalLength/self.N
 
     def __iter__(self):
         return self
@@ -22,6 +24,7 @@ class SummaryElement:
     def __next__(self):
         document = next(self.__parent)
         self.N += 1
+        self.__totalLength += len(document['text'])
         for word in document['words'].keys():
             if word in self.__df:
                 self.__df[word] += 1
