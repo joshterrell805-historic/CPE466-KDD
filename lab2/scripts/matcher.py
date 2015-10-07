@@ -9,6 +9,7 @@ from elements.porterstemmer import PorterStemmerElement
 import pickle
 from collections import deque
 from matching.cosinesimilarity import CosineSimilarity
+from matching.okapi import Okapi
 import heapq
 
 @click.command()

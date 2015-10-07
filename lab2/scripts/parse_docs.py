@@ -27,6 +27,7 @@ def cli(input, docspath, metapath):
         meta = {
             'docFreq': sumr_itr.DF(),
             'docCount': sumr_itr.N,
+            'avgLength': sumr_itr.averageLength()
         }
         pickle.dump(docs, docspath)
         pickle.dump(meta, metapath)
