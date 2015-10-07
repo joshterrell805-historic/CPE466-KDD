@@ -23,15 +23,15 @@ class TestModelBuilder(unittest.TestCase):
     def testAccumulator(self):
         documents = [document({'this': 3, 'that': 2, 'these': 4, 'those': 5}),
                      document({'this': 2, 'those': 2})]
-        for doc in documents:
-            doc['text'] = "abc def ghi" # 11 characters
+        documents[0]['text'] = "abc def ghi" # 11 characters
+        documents[1]['text'] = "lpq 345" # 7 characters
         # Run all the documents through the summary filter
         summary = SummaryElement(x for x in documents)
         for doc in summary:
             pass
         self.assertEqual({'this': 2, 'that': 1, 'these': 1, 'those': 2}, summary.DF())
         self.assertEqual({'this': 0, 'that': 1, 'these': 1, 'those': 0}, summary.IDF())
-        self.assertEqual(11, summary.averageLength())
+        self.assertEqual(9, summary.averageLength())
 
     def testReader(self):
         with open('elements/test.json') as fh:
