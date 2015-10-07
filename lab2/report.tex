@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{cpe466-lab2}
+\author{jmterrel and apgilber}
+\date{October 2015}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+A basic IR system was implemented. It was used to produce a collection of vector-space models for the utterances in the \textsc{Vaccination-Discussion} dataset. It was then used to collect matching utterances for the queries provided. Additional queries were developed in order to fulfil the information needs provided.
+
+\section{System Design and Implementation}
+The system consists of two primary components: parsing and query matching.
+The parsing component reads in and parses the JSON document containing the utterances which will be searched. It does stopword removal and stemming on the document text, meanwhile keeping the metadata with each document. The resulting document vectors are written to a file along with the full document information parsed from the JSON file. This eases later retrieval of the documents.
+
+\section{Query Answering}
+We executed the queries provided using both the \textit{cosine similarity} and \textit{okapi} matching algorithms. For each query, both algorithms were evaluated on their ability to produce relevant documents in the top ten results (excluding Q4, which only examined the first result).
+
+To determine how well the queries produced relevant documents, we defined an explicit yes/no question per query. The questions we asked are paired below with each query.
+
+\hfill
+
+\noindent
+\textit{Q1: Disneyland incident measles people sick}
+\\
+Is the document about a Disneyland measles incident?
+
+\noindent
+\textit{Q2: Centers for Disease Control chance of a serious allergic reaction}
+\\
+Is the document relevant to both the Centers for Disease Control and allergic reactions?
+
+\noindent
+\textit{Q3: requiring parents to jump through hoops}
+\\
+Is the document about jumping through hoops?
+
+\noindent
+\textit{Q4: Nearly everyone, from my father's generation and generations older than him, when I'd go and speak to groups, talk about the stories that they have both from their own childhood, from friends, personal stories of near-death experiences, friends they had who were maimed by communicable diseases.}
+\\
+Does the first result contain the exact match searched for?
+
+\noindent
+\textit{Q5: parents' right to make healthcare decisions for their child}
+\\
+Is the document about parents' rights to make decisions for their children?
+
+\begin{table}[]
+\centering
+\begin{tabular}{c | c | c}
+Query & Cosine Similarity &  Okapi\\
+1 & 0 & 10 \\
+2 & 1 & 2 \\
+3 & 2 & 2 \\
+4 & y & y \\
+5 & 5 & 8
+\end{tabular}
+\caption{Relevant documents per algorithm in top ten results}
+\label{tab:my_label}
+\end{table}
+
+\hfill
+
+When running the queries through the system, we observed patterns in the documents that were irrelevant to the queries. One prevailing observed pattern is that the \textit{cosine similarity} algorithm tended to produce many large irrelevant documents in the top ten results. For many of the queries, the same large documents were listed in the results. On the other hand, the \textit{okapi} algorithm produced half way relevant documents. For instance, the results for Q2 returned many documents about the Centers for Disease Control or allergic reaction, but had only two documents relevant to both things.
+
+\section{Information Need Matching}
+
+\section{Analysis and Conclusions}
+We initially implemented the basic cosine matching, but we discovered that 
+\end{document}
