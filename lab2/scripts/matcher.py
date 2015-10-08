@@ -19,7 +19,8 @@ import heapq
 @click.option('--metapath', type=click.File('rb'),
               default='data/doc-meta.pkl')
 @click.option('--algorithm', default='okapi', help='okapi or cosine')
-def cli(debug, docspath, metapath, algorithm):
+@click.option('--count', default=10)
+def cli(debug, docspath, metapath, algorithm, count):
     print("""Query the utterance database by specifying a query at the prompt.
 Specify no query to exit.
 
@@ -59,7 +60,7 @@ Meta data filters may be provided at the start of the query. Example query:
                 document['match'] = matcher.match(parsed_query['words'],
                         document['words'])
 
-        winners = heapq.nlargest(10, documents, key=lambda doc: doc['match'])
+        winners = heapq.nlargest(count, documents, key=lambda doc: doc['match'])
 
         for doc in winners:
             click.echo("")
