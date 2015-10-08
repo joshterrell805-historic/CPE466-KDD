@@ -49,10 +49,11 @@ switch between the two implemented matching algorithms, \textit{cosine
 similarity} and \textit{okapi}.
 
 \section{Query Answering}
+% I think we might want to get rid of the italics on the algorithm names.
 We executed the queries provided using both the \textit{cosine
   similarity} and \textit{okapi} matching algorithms. For each query,
 both algorithms were evaluated on their ability to produce relevant
-documents in the top ten results (excluding Q4 and Q10, for which we only
+documents in the top ten results (excluding Q4, for which we only
 examined the first result). The results are displayed in
 \cref{document-relevance}.
 
@@ -153,7 +154,7 @@ through hoops'' occurring close together and in the correct order.
 
 Ultimately, we learned some details about IR systems that might have
 been much more difficult to learn without the hands-on experience. For
-instance, we had no idea that iterating over four-thousand documents
+instance, we had no idea that iterating over four thousand documents
 per query would take more than a second, as it did. Using an inverted
 index would help dramatically with this performance issue.
 \end{document}
