@@ -80,6 +80,23 @@ exact match searched for?}
   \query{parents' right to make healthcare decisions for their
 child}{Is the document about parents' rights to make decisions for
 their children?}
+
+  \query{disabled kids children exceptional needs right to
+education}{Is the document about disabled children or children with
+exceptional needs having a right to education?}
+
+  \query{can a licensed physician in the state of California provide
+an exemption from immunization?}{Is the document about licensed
+physicians providing immunization exemptions?}
+
+  \query{association oppose bill}{Is the document about an association
+which opposes the bill?}
+
+  \query{mercury in vaccines}{Is the document about murcury in
+vaccines?}
+
+  \query{disease exposure sustained transmission opt-out personal
+belief exemption preventable}{Is the document about how sustained transmission after disease exposure would be preventable without the personal belief exemption?}
 \end{enumerate}
 
 \begin{table}
@@ -93,6 +110,11 @@ their children?}
       3 & 2 & 2\\
       4 & y & y\\
       5 & 5 & 8\\
+      6 & 2 & 7\\
+      7 & 4 & 8\\
+      8 & 4 & 2\\
+      9 & 6 & 8\\
+      10 & 1 & 0\\
       \bottomrule
     \end{tabu}
   \end{center}
@@ -109,6 +131,11 @@ in the results. On the other hand, the \textit{okapi} algorithm
 produced half way relevant documents. For instance, the results for Q2
 returned many documents about the Centers for Disease Control or
 allergic reaction, but had only two documents relevant to both things.
+
+It also seems worth noting that it is difficult to tell what the user
+is trying to find with Q10. The question given was a guess at the
+intended goal. In reality, the results are often related to parts of
+the query but not the stated question for Q10.
 
 \section{Information Need Matching}
 
