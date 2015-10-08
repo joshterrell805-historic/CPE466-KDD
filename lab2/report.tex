@@ -26,7 +26,13 @@ We built a basic IR system to retrieve relevant documents for a given query. The
 \section{System Design and Implementation}
 The system consists of two primary components: parsing and query matching. The parsing component prepares a database of document vectors and document collection meta data. The query matching component uses the prepared database for finding the most relevant documents to the given query.
 
-The parsing component reads in and parses words from the provided JSON document which serves as the raw document collection. The parsing phase also does stopword removal and stemming on the document text. A vector of inner-document word occurrences is appended to each document and the whole collection is saved to a database. Meta-information about the collection as a whole, for instance the number of documents and the document word frequency, is also saved to the database.
+The parsing component reads in and parses words from the provided JSON
+document which serves as the raw document collection. The parsing
+phase also does stopword removal and stemming on the document text. A
+vector of inner-document word occurrences is appended to each document
+and the whole collection is saved to a file. Meta-information
+about the collection as a whole, for instance the number of documents
+and the document word frequency, is also saved to a file.
 
 The query matching component of the system uses the databases built by the parsing component to more efficiently find relevant documents to a given query. It returns the top ten relevant documents, by default. The query matching component also has command-line flags to switch between the two implemented matching algorithms, cosine similarity and okapi.
 
