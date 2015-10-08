@@ -1,7 +1,6 @@
-\documentclass{article}
-\usepackage{fontspec}
-\setmainfont{Linux Libertine O}
+\documentclass{report}
 
+\newcommand{\query}[2]{\item\textit{#1}\\#2}
 \title{cpe466-lab2}
 \author{jmterrel and apgilber}
 \date{October 2015}
@@ -21,10 +20,18 @@ result set of relevant documents for a given query.
 \end{abstract}
 
 \section{Introduction}
-We built a basic IR system to retrieve relevant documents for a given query. The system includes a component for building vector-space models for word occurences in documents, and a matching component to digest these models and ultimatley determine the most relevant documents to a given query.
+We built a basic IR system to retrieve relevant documents for a given
+query. The system includes a component for building vector-space
+models for word occurences in documents, and a matching component to
+digest these models and ultimatley determine the most relevant
+documents to a given query.
 
 \section{System Design and Implementation}
-The system consists of two primary components: parsing and query matching. The parsing component prepares a database of document vectors and document collection meta data. The query matching component uses the prepared database for finding the most relevant documents to the given query.
+The system consists of two primary components: parsing and query
+matching. The parsing component prepares a database of document
+vectors and document collection meta data. The query matching
+component uses the prepared database for finding the most relevant
+documents to the given query.
 
 The parsing component reads in and parses words from the provided JSON
 document which serves as the raw document collection. The parsing
@@ -34,66 +41,91 @@ and the whole collection is saved to a file. Meta-information
 about the collection as a whole, for instance the number of documents
 and the document word frequency, is also saved to a file.
 
-The query matching component of the system uses the databases built by the parsing component to more efficiently find relevant documents to a given query. It returns the top ten relevant documents, by default. The query matching component also has command-line flags to switch between the two implemented matching algorithms, cosine similarity and okapi.
-
-
+The query matching component of the system uses the databases built by
+the parsing component to more efficiently find relevant documents to a
+given query. It returns the top ten relevant documents, by
+default. The query matching component also has command-line flags to
+switch between the two implemented matching algorithms, \textit{cosine
+similarity} and \textit{okapi}.
 
 \section{Query Answering}
-We executed the queries provided using both the \textit{cosine similarity} and \textit{okapi} matching algorithms. For each query, both algorithms were evaluated on their ability to produce relevant documents in the top ten results (excluding Q4, which only examined the first result). The results are displayed in Table 1.
+We executed the queries provided using both the \textit{cosine
+  similarity} and \textit{okapi} matching algorithms. For each query,
+both algorithms were evaluated on their ability to produce relevant
+documents in the top ten results (excluding Q4 and Q10, for which we only
+examined the first result). The results are displayed in Table 1.
 
-To determine how well the queries produced relevant documents, we defined an explicit yes/no question per query. The questions we asked are paired below with each query.
+To determine how well the queries produced relevant documents, we
+defined an explicit yes/no question per query. The questions we asked
+are paired below with each query.
 
-\hfill
+\begin{enumerate}[Q1:]
+  \query{Disneyland incident measles people sick}{Is the document
+about a Disneyland measles incident?}
 
-\noindent
-\textit{Q1: Disneyland incident measles people sick}
-\\
-Is the document about a Disneyland measles incident?
+  \query{Centers for Disease Control chance of a serious allergic
+reaction}{Is the document relevant to both the Centers for Disease
+Control and allergic reactions?}
 
-\noindent
-\textit{Q2: Centers for Disease Control chance of a serious allergic reaction}
-\\
-Is the document relevant to both the Centers for Disease Control and allergic reactions?
+  \query{requiring parents to jump through hoops}{Is the document
+about jumping through hoops?}
 
-\noindent
-\textit{Q3: requiring parents to jump through hoops}
-\\
-Is the document about jumping through hoops?
+  \query{Nearly everyone, from my father's generation and generations
+older than him, when I'd go and speak to groups, talk about the
+stories that they have both from their own childhood, from friends,
+personal stories of near-death experiences, friends they had who were
+maimed by communicable diseases.}{Does the first result contain the
+exact match searched for?}
 
-\noindent
-\textit{Q4: Nearly everyone, from my father's generation and generations older than him, when I'd go and speak to groups, talk about the stories that they have both from their own childhood, from friends, personal stories of near-death experiences, friends they had who were maimed by communicable diseases.}
-\\
-Does the first result contain the exact match searched for?
+  \query{parents' right to make healthcare decisions for their
+child}{Is the document about parents' rights to make decisions for
+their children?}
+\end{enumerate}
 
-\noindent
-\textit{Q5: parents' right to make healthcare decisions for their child}
-\\
-Is the document about parents' rights to make decisions for their children?
-
-\begin{table}[]
-\centering
-\begin{tabular}{c | c | c}
-Query & Cosine Similarity &  Okapi\\
-1 & 0 & 10 \\
-2 & 1 & 2 \\
-3 & 2 & 2 \\
-4 & y & y \\
-5 & 5 & 8
-\end{tabular}
-\caption{Relevant documents in top ten results}
-\label{tab:my_label}
+\begin{table}
+  \begin{center}
+    \begin{tabu}{c c c}
+      \toprule
+      Query & Cosine Similarity &  Okapi\\
+      \midrule
+      1 & 0 & 10\\
+      2 & 1 & 2\\
+      3 & 2 & 2\\
+      4 & y & y\\
+      5 & 5 & 8\\
+      \bottomrule
+    \end{tabu}
+  \end{center}
+  \caption{Relevant documents in top ten results}
+  \label{tab:my_label}
 \end{table}
 
-\hfill
-
-When running the queries through the system, we observed patterns in the documents that were irrelevant to the queries. One prevailing observed pattern is that the \textit{cosine similarity} algorithm tended to produce many large irrelevant documents in the top ten results. For many of the queries, the same large documents were listed in the results. On the other hand, the \textit{okapi} algorithm produced half way relevant documents. For instance, the results for Q2 returned many documents about the Centers for Disease Control or allergic reaction, but had only two documents relevant to both things.
+When running the queries through the system, we observed patterns in
+the documents that were irrelevant to the queries. One prevailing
+observed pattern is that the \textit{cosine similarity} algorithm
+tended to produce many large irrelevant documents in the top ten
+results. For many of the queries, the same large documents were listed
+in the results. On the other hand, the \textit{okapi} algorithm
+produced half way relevant documents. For instance, the results for Q2
+returned many documents about the Centers for Disease Control or
+allergic reaction, but had only two documents relevant to both things.
 
 \section{Information Need Matching}
 
 \section{Analysis and Conclusions}
-We initially implemented the basic cosine matching, but we discovered that it gave too much weight to large documents with many words. We then implemented Okapi and noticed that our results tended to be much more relevant.
+We initially implemented the basic cosine matching, but we discovered
+that it gave too much weight to large documents with many words. We
+then implemented Okapi and noticed that our results tended to be much
+more relevant.
 
-For both algorithms, we hypothesized that word proximity may also help in computing more relevant results. For instance, in Q3, having proximity may give more weight to the words in the phrase ``jump through hoops'' occurring close together and in the correct order.
+For both algorithms, we hypothesized that word proximity may also help
+in computing more relevant results. For instance, in Q3, having
+proximity may give more weight to the words in the phrase ``jump
+through hoops'' occurring close together and in the correct order.
 
-Ultimately, we learned some details about IR systems that might have been much more difficult to learn without the hands-on experience. For instance, we had no idea that iterating over four-thousand documents per query would take more than a second, as it did. Using an inverted index would help dramatically with this performance issue.
+Ultimately, we learned some details about IR systems that might have
+been much more difficult to learn without the hands-on experience. For
+instance, we had no idea that iterating over four-thousand documents
+per query would take more than a second, as it did. Using an inverted
+index would help dramatically with this performance issue.
 \end{document}
