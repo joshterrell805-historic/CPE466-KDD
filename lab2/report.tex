@@ -9,15 +9,23 @@
 
 \maketitle
 
+\section{Abstract}
+Given some need for information, information retrieval systems are used to find a relevant subset of documents in a large collection of documents. To demonstrate and solidify our understanding, we implemented a simple IR system to query for utterences from the \textsc{Vaccination-Discussion} dataset. We implemented two matching algorithms, \textit{cosine similarity} and \textit{okapi}, to build a result set of relevant documents for a given query.
+
 \section{Introduction}
-A basic IR system was implemented. It was used to produce a collection of vector-space models for the utterances in the \textsc{Vaccination-Discussion} dataset. It was then used to collect matching utterances for the queries provided. Additional queries were developed in order to fulfil the information needs provided.
+We built a basic IR system to retrieve relevant documents for a given query. The system includes a component for building vector-space models for word occurences in documents, and a matching component to digest these models and ultimatley determine the most relevant documents to a given query.
 
 \section{System Design and Implementation}
-The system consists of two primary components: parsing and query matching.
-The parsing component reads in and parses the JSON document containing the utterances which will be searched. It does stopword removal and stemming on the document text, meanwhile keeping the metadata with each document. The resulting document vectors are written to a file along with the full document information parsed from the JSON file. This eases later retrieval of the documents.
+The system consists of two primary components: parsing and query matching. The parsing component prepares a database of document vectors and document collection meta data. The query matching component uses the prepared database for finding the most relevant documents to the given query.
+
+The parsing component reads in and parses words from the provided JSON document which serves as the raw document collection. The parsing phase also does stopword removal and stemming on the document text. A vector of inner-document word occurrences is appended to each document and the whole collection is saved to a database. Meta-information about the collection as a whole, for instance the number of documents and the document word frequency, is also saved to the database.
+
+The query matching component of the system uses the databases built by the parsing component to more efficiently find relevant documents to a given query. It returns the top ten relevant documents, by default. The query matching component also has command-line flags to switch between the two implemented matching algorithms, cosine similarity and okapi.
+
+
 
 \section{Query Answering}
-We executed the queries provided using both the \textit{cosine similarity} and \textit{okapi} matching algorithms. For each query, both algorithms were evaluated on their ability to produce relevant documents in the top ten results (excluding Q4, which only examined the first result).
+We executed the queries provided using both the \textit{cosine similarity} and \textit{okapi} matching algorithms. For each query, both algorithms were evaluated on their ability to produce relevant documents in the top ten results (excluding Q4, which only examined the first result). The results are displayed in Table 1.
 
 To determine how well the queries produced relevant documents, we defined an explicit yes/no question per query. The questions we asked are paired below with each query.
 
@@ -58,7 +66,7 @@ Query & Cosine Similarity &  Okapi\\
 4 & y & y \\
 5 & 5 & 8
 \end{tabular}
-\caption{Relevant documents per algorithm in top ten results}
+\caption{Relevant documents in top ten results}
 \label{tab:my_label}
 \end{table}
 
@@ -69,5 +77,9 @@ When running the queries through the system, we observed patterns in the documen
 \section{Information Need Matching}
 
 \section{Analysis and Conclusions}
-We initially implemented the basic cosine matching, but we discovered that 
+We initially implemented the basic cosine matching, but we discovered that it gave too much weight to large documents with many words. We then implemented Okapi and noticed that our results tended to be much more relevant.
+
+For both algorithms, we hypothesized that word proximity may also help in computing more relevant results. For instance, in Q3, having proximity may give more weight to the words in the phrase ``jump through hoops'' occurring close together and in the correct order.
+
+Ultimately, we learned some details about IR systems that might have been much more difficult to learn without the hands-on experience. For instance, we had no idea that iterating over four-thousand documents per query would take more than a second, as it did. Using an inverted index would help dramatically with this performance issue.
 \end{document}
