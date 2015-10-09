@@ -1,15 +1,42 @@
 \documentclass{report}
 
+\usepackage{siunitx}
+\sisetup{
+  round-mode = places,
+  round-precision = 3
+}
+% Format a query and the question the results should answer
 \newcommand{\query}[2]{\item\textit{#1}\\#2}
-\newcommand{\infoneed}[2]{\item #1\\\textit{#2}}
-\newenvironment{result}[2]{\item #2 \hfill{\small (#1)}\begin{quote}}{\end{quote}}
+
+% Format an information need
+\newcommand{\infoneed}[2]{
+\item \begin{list}{}{}
+  \item #1
+
+  \item \itshape#2
+  \end{list}
+}
+
+% Import a query results file
 \newcommand{\results}[2]{\subsection{Query #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
+% Format each result record
+\newenvironment{result}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
+% Import an info need results file
 \newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
-\newcommand{\okapi}{\textit{okapi} }
-\newcommand{\cosine}{\textit{cosine similarity} }
-\title{cpe466-lab2}
-\author{jmterrel and apgilber}
-\date{October 2015}
+
+% Allow customizing algorithm names
+\newcommand{\okapi}{okapi }
+\newcommand{\cosine}{cosine similarity }
+
+\title{CPE466\\Lab2}
+\author{
+  Gilbert, Andrew\\
+  \texttt{apgilber@calpoly.edu}
+  \and
+  Terrell, Josh\\
+  \texttt{jmterrel@calpoly.edu}
+}
+\date{}
 
 \begin{document}
 
@@ -148,15 +175,38 @@ the query but not the stated question for Q10.
 \section{Information Need Matching}
 We developed a query for each information need and executed each query
 using only the \okapi matching algorithm. % is this correct?
-The information needs are shown below with their respective queries.
-The full lists of results are available in \Vref{need-responses}.
-\begin{enumerate}[{Information Need} 1:]
-\item \begin{list}{}{}
-  \item[Name:] I would like to know who among the legislators have been strongly opposed to the vaccination bill, and specifically, I would like to see what their arguments were
+The information needs are shown in \vref{needs-and-queries} with their respective queries.
+We then counted the number of results for each query which answered
+the information need requested. \Vref{need-results} summarizes the
+precision of the results.
+The full lists of results for each query are available in \vref{need-responses}.
 
-  \item[Query:] \itshape<PersonType:Legislator> freedom choice against oppose
-  \end{list}
+\begin{table}
+  \begin{center}
+    \begin{tabu}{c c c}
+      \toprule
+      Query & Okapi\\
+      \midrule
+      1 & 3\\
+      2 & 6\\
+      3 & 9\\
+      4 & 2\\
+      5 & 2\\
+      \bottomrule
+    \end{tabu}
+  \end{center}
+  \caption{Relevant documents in top ten results}
+  \label{need-results}
+\end{table}
 
+\subsection{Information Needs and Associated Queries}
+\label{needs-and-queries}
+\begin{enumerate}[{I}1:]
+\infoneed{I would like to know who among the legislators have been strongly opposed to the vaccination bill, and specifically, I would like to see what their arguments were}{<PersonType:Legislator> freedom choice against oppose}
+\infoneed{I would like to find out the chief arguments of the proponents of the legislation. Why did they think it was important to require the vaccination of every child attending school in the state?}{reason sick danger disease}
+\infoneed{The need for vaccination, as well as the opposition to it is often gauged in terms of medical necessity and/or medical needs of children. I am interested in finding the instances of such justifications, both for and against the vaccination.}{need against support oppose sick death danger vulnerable children}
+\infoneed{The SB 277 bill has gone through a series of modifications and amendments during the timeframe of the dataset (the committee hearings took place on different dates). I am interested in finding out more about any specific changes the bill, amendments that the authors wound up including, or any amendments that might have been discussed regardless of whether or not they made it into the future versions of the bill.}{amend change previous last before bill}
+\infoneed{The proponents of the SB277 bill often cite scientific evidence to back their case for the bill. I am interested in finding utternaces in which the speaker expressed doubt in the science supporting vaccination.}{evidence research science doubt not false actually proof claim faulty poor adequate contrary belief oppose against}
 \end{enumerate}
 
 \section{Analysis and Conclusions}
