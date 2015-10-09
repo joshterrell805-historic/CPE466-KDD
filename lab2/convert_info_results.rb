@@ -52,7 +52,12 @@ class ResultReader
 
   def readNeed line
     if /^\s+$/ =~ line
-      @state = :query
+      # skip the number of relevant results
+      if @foundResults
+        @state = :query
+      else
+        @foundResults = true
+      end
     end
   end
 
