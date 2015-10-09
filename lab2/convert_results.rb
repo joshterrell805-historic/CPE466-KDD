@@ -11,6 +11,7 @@ class ResultReader
     # meta
     # text
     $<.each_line do |line|
+      line.gsub!(/%/, '\%')
       case @state
       when :score
         readScore line
@@ -23,6 +24,7 @@ class ResultReader
       end
     end
 
+    @results << @current
     @results.each {|r| r.render}
   end
 
