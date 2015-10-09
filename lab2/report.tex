@@ -1,6 +1,12 @@
 \documentclass{report}
 
 \newcommand{\query}[2]{\item\textit{#1}\\#2}
+\newcommand{\infoneed}[2]{\item #1\\\textit{#2}}
+\newenvironment{result}[2]{\item #2 \hfill{\small (#1)}\begin{quote}}{\end{quote}}
+\newcommand{\results}[2]{\subsection{Query #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
+\newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
+\newcommand{\okapi}{\textit{okapi} }
+\newcommand{\cosine}{\textit{cosine similarity} }
 \title{cpe466-lab2}
 \author{jmterrel and apgilber}
 \date{October 2015}
@@ -15,7 +21,7 @@ used to find a relevant subset of documents in a large collection of
 documents. To demonstrate and solidify our understanding, we
 implemented a simple IR system to query for utterences from the
 \textsc{Vaccination-Discussion} dataset. We implemented two matching
-algorithms, \textit{cosine similarity} and \textit{okapi}, to build a
+algorithms, \cosine and \okapi, to build a
 result set of relevant documents for a given query.
 \end{abstract}
 
@@ -45,17 +51,17 @@ The query matching component of the system uses the databases built by
 the parsing component to more efficiently find relevant documents to a
 given query. It returns the top ten relevant documents, by
 default. The query matching component also has command-line flags to
-switch between the two implemented matching algorithms, \textit{cosine
-similarity} and \textit{okapi}.
+switch between the two implemented matching algorithms, \cosine and
+\okapi.
 
 \section{Query Answering}
 % I think we might want to get rid of the italics on the algorithm names.
-We executed the queries provided using both the \textit{cosine
-  similarity} and \textit{okapi} matching algorithms. For each query,
-both algorithms were evaluated on their ability to produce relevant
-documents in the top ten results (excluding Q4, for which we only
-examined the first result). The results are displayed in
-\Vref{document-relevance}.
+We executed the queries provided using both the \cosine and \okapi
+matching algorithms. For each query, both algorithms were evaluated on
+their ability to produce relevant documents in the top ten results
+(excluding Q4, for which we only examined the first result). The
+results are displayed in \Vref{document-relevance}. The full query
+responses are provided in \vref{query-responses}.
 
 To determine how well the queries produced relevant documents, we
 defined an explicit yes/no question per query. The questions we asked
@@ -126,10 +132,10 @@ belief exemption preventable}{Is the document about how sustained transmission a
 
 When running the queries through the system, we observed patterns in
 the documents that were irrelevant to the queries. One prevailing
-observed pattern is that the \textit{cosine similarity} algorithm
+observed pattern is that the \cosine algorithm
 tended to produce many large irrelevant documents in the top ten
 results. For many of the queries, the same large documents were listed
-in the results. On the other hand, the \textit{okapi} algorithm
+in the results. On the other hand, the \okapi algorithm
 produced half way relevant documents. For instance, the results for Q2
 returned many documents about the Centers for Disease Control or
 allergic reaction, but had only two documents relevant to both things.
@@ -140,11 +146,23 @@ intended goal. In reality, the results are often related to parts of
 the query but not the stated question for Q10.
 
 \section{Information Need Matching}
+We developed a query for each information need and executed each query
+using only the \okapi matching algorithm. % is this correct?
+The information needs are shown below with their respective queries.
+The full lists of results are available in \Vref{need-responses}.
+\begin{enumerate}[{Information Need} 1:]
+\item \begin{list}{}{}
+  \item[Name:] I would like to know who among the legislators have been strongly opposed to the vaccination bill, and specifically, I would like to see what their arguments were
+
+  \item[Query:] \itshape<PersonType:Legislator> freedom choice against oppose
+  \end{list}
+
+\end{enumerate}
 
 \section{Analysis and Conclusions}
-We initially implemented the basic cosine matching, but we discovered
+We initially implemented the basic \cosine matching, but we discovered
 that it gave too much weight to large documents with many words. We
-then implemented Okapi and noticed that our results tended to be much
+then implemented \okapi and noticed that our results tended to be much
 more relevant.
 
 For both algorithms, we hypothesized that word proximity may also help
@@ -157,4 +175,25 @@ been much more difficult to learn without the hands-on experience. For
 instance, we had no idea that iterating over four thousand documents
 per query would take more than a second, as it did. Using an inverted
 index would help dramatically with this performance issue.
+
+\appendix
+\section{Query Results}
+\label{query-responses}
+\results{1}{queryresults01.txt.tex}
+\results{2}{queryresults02.txt.tex}
+\results{3}{queryresults03.txt.tex}
+\results{4}{queryresults04.txt.tex}
+\results{5}{queryresults05.txt.tex}
+\results{6}{queryresults06.txt.tex}
+\results{7}{queryresults07.txt.tex}
+\results{8}{queryresults08.txt.tex}
+\results{9}{queryresults09.txt.tex}
+\results{10}{queryresults10.txt.tex}
+\section{Info Needs Query Results}
+\label{need-responses}
+\needresults{1}{InfoNeed01.txt.tex}
+\needresults{2}{InfoNeed02.txt.tex}
+\needresults{3}{InfoNeed03.txt.tex}
+\needresults{4}{InfoNeed04.txt.tex}
+\needresults{5}{InfoNeed05.txt.tex}
 \end{document}
