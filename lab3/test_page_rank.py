@@ -36,22 +36,22 @@ class TestPageRank(unittest.TestCase):
 
         # nodes have correct data
         n = lib.findNodeByName(b"a")
-        self.assertEqual(lib.strcmp(n.name, b"a"), 0)
+        self.assertNode(n, b"a")
         self.assertEqual(n.outDegree, 2)
         self.assertLLValues(n.inNodes, [])
 
         n = lib.findNodeByName(b"b")
-        self.assertEqual(lib.strcmp(n.name, b"b"), 0)
+        self.assertNode(n, b"b")
         self.assertEqual(n.outDegree, 1)
         self.assertLLValues(n.inNodes, [b"a"])
 
         n = lib.findNodeByName(b"c")
-        self.assertEqual(lib.strcmp(n.name, b"c"), 0)
+        self.assertNode(n, b"c")
         self.assertEqual(n.outDegree, 0)
         self.assertLLValues(n.inNodes, [b"b", b"a", b"d"])
 
         n = lib.findNodeByName(b"d")
-        self.assertEqual(lib.strcmp(n.name, b"d"), 0)
+        self.assertNode(n, b"d")
         self.assertEqual(n.outDegree, 1)
         self.assertLLValues(n.inNodes, [])
 
@@ -78,19 +78,19 @@ class TestPageRank(unittest.TestCase):
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"a"), 0)
+        self.assertNode(ppNode[0], b"a")
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"c"), 0)
+        self.assertNode(ppNode[0], b"c")
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"e"), 0)
+        self.assertNode(ppNode[0], b"e")
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 1)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"g"), 0)
+        self.assertNode(ppNode[0], b"g")
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 0)
@@ -99,11 +99,11 @@ class TestPageRank(unittest.TestCase):
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"a"), 0)
+        self.assertNode(ppNode[0], b"a")
 
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
-        self.assertEqual(lib.strcmp(ppNode[0][0].name, b"c"), 0)
+        self.assertNode(ppNode[0], b"c")
 
         lib.cleanup()
 
@@ -111,8 +111,11 @@ class TestPageRank(unittest.TestCase):
         lln = ffi.cast('LLNode*', lln)
 
         for i in range(len(values)):
-            n = ffi.cast('Node*', lln.self)
-            self.assertEqual(lib.strcmp(n.name, values[i]), 0)
+            self.assertNode(lln.self, values[i])
             lln = ffi.cast('LLNode*', lln.next)
 
         self.assertEqual(lln, ffi.NULL)
+
+    def assertNode(self, node, name):
+        node = ffi.cast('Node*', node)
+        self.assertEqual(lib.strcmp(node.name, name), 0)
