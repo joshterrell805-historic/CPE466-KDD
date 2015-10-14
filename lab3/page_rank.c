@@ -2,6 +2,8 @@ int converged = 0;
 Node *nodes = 0;
 Node *nextUnusedNode = 0;
 int maxNodeCount = -1;
+int iterationBatchSize = -1;
+Node *nextUnusedNodeForIteration = 0;
 
 Node *createNode(char *name);
 Node *findOrCreateNode(char *name);
@@ -10,7 +12,7 @@ void createLLNode(LLNode **llNode, Node *self);
 void freeNodeData(Node *node);
 void freeLLNodes(LLNode *llNode);
 
-void init(int maxNodes) {
+void init(int maxNodes, int batchSize) {
   if (nodes) {
     cleanup();
   }
@@ -18,6 +20,8 @@ void init(int maxNodes) {
   nodes = malloc(sizeof(Node) * maxNodes);
   nextUnusedNode = nodes;
   maxNodeCount = maxNodes;
+  iterationBatchSize = batchSize;
+  nextUnusedNodeForIteration = 0;
 
   converged = 0;
 }
@@ -31,6 +35,8 @@ void cleanup(void) {
   nodes = 0;
   nextUnusedNode = 0;
   maxNodeCount = -1;
+  iterationBatchSize = -1;
+  nextUnusedNodeForIteration = 0;
 }
 
 int addEdge(char *fromName, char *toName) {
@@ -45,6 +51,20 @@ int addEdge(char *fromName, char *toName) {
   createLLNode(&to->inNodes, from);
 
   return 0;
+}
+
+void startIteration(void) {
+  converged = 0;
+  nextUnusedNodeForIteration = nodes;
+}
+
+void getNextBatchInIteration(Node **retStart, int *count) {
+  int a = iterationBatchSize;
+  int b = nextUnusedNode - nextUnusedNodeForIteration;
+
+  *count = a < b ? a : b;
+  *retStart = nextUnusedNodeForIteration;
+  nextUnusedNodeForIteration += *count;
 }
 
 void computePageRank(int sourceIsA) {

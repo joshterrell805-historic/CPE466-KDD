@@ -23,20 +23,35 @@ typedef struct {
   struct LLNode *next;
 } LLNode;
 
-void init(int);
+// create an empty graph
+// maxNodes: maximum number of nodes to be stored in the graph
+// iterationBatchSize: batch size of how many nodes each thread gets at
+//  a time when computing the page rank for a given iteration
+void init(int maxNodes, int iterationBatchSize);
 
+// destroy the graph
 void cleanup(void);
 
-/**
- * return 0 if successful.
- */
+// add an edge to the graph from the node with `fromName` to `toName`
+// creates missing nodes, if any
+// return 0 if successful.
 int addEdge(char *fromName, char *toName);
 
-/**
- * Compute page rank. Returns when this iteration has completed.
- */
+// set converged flag to 0
+// set internal clockwork necessary for
+// threading computePageRank
+void startIteration(void);
+
+// Compute page rank. Returns when this iteration has completed.
 void computePageRank(int sourceIsA);
 
 int hasConverged(void);
 
 Node *findNodeByName(char *name);
+
+/////////////////////// exposed for testing only ///////////////////////////////
+
+// in this iteration, get `iterationBatchSize` of the next unprocessed elements
+// and claim them as being processed (used in computePageRank)
+// return count of 0 when there are no elements remaining
+void getNextBatchInIteration(Node **retStart, int *count);
