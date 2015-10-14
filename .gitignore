@@ -6,3 +6,5 @@ virtual/
 *.fdb_latexmk
 *.fls
 *.log
+*.so
+*.o
