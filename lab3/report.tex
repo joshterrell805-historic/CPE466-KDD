@@ -75,6 +75,7 @@ worker threads have completed their work, if the ``unconverged'' flag
 is set, the master thread starts the workers again, this time telling
 them to read from the field they were just writing to and to write to
 the field they were reading from.
+
 \section{Results}
 \subsection{STATES}
 \subsection{NCAA-FOOTBALL}
@@ -84,8 +85,12 @@ the field they were reading from.
 \subsection{POLITICAL-BLOGS}
 \subsection{WIKI-VOTE}
 \subsection{P2P-GNUTELLA05}
+\subsection{SLASHDOT-ZOO-NOV6-2008}
+\subsection{AMAZON-MAY03}
+\subsection{LIVEJOURNAL1}
 
 \section{Overall Summary}
+
 \section{Performance Evaluation}
 \begin{table}
   \centering
@@ -106,4 +111,27 @@ the field they were reading from.
 \end{figure}
 \appendix
 \section{README}
+\lstset{lang=bash}
+\textbf{Important: Run everything from the project's root directory}
+
+\subsection{Setup environment}
+\begin{lstlisting}
+pyvenv virtual
+source virtual/bin/activate
+pip install --upgrade -e .
+\end{lstlisting}
+
+\subsection{Run all the tests}
+Run \verb+python3 -m unittest discover+ from the directory containing
+this file
+
+\subsection{Calculate and print PageRank for all the data}
+\begin{lstlisting}
+pagerank data/<dataset>.csv
+\end{lstlisting}
+
+\subsection{Deactivate environment}
+\begin{lstlisting}
+deactivate
+\end{lstlisting}
 \end{document}
