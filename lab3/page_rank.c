@@ -106,12 +106,12 @@ void createLLNode(LLNode **llNode, Node *self) {
 }
 
 void freeNodeData(Node *node) {
-    if (node->name) {
-      free(node->name);
-      node->name = 0;
-    }
+  if (node->name) {
+    free(node->name);
+    node->name = 0;
+  }
 
-    free(node->inNodes);
+  free(node->inNodes);
 }
 
 void freeLLNodes(LLNode *llNode) {
