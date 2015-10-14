@@ -4,7 +4,7 @@
 // pageRank_i+1(node) = (1-d) / #nodeCount    +
 //    d * SUM(1/outdegree(incommingNode) * pageRank_i(incommingNode))
 
-typedef struct {
+typedef struct Node {
   // make sure to copy this on creation!
   // cffi will destroy it's copy when the variable is garbage collected
   // http://cffi.readthedocs.org/en/latest/using.html
@@ -18,7 +18,7 @@ typedef struct {
 } Node;
 
 // a wrapper around a node so we can create a linked list of nodes
-typedef struct {
+typedef struct LLNode {
   struct Node *self;
   struct LLNode *next;
 } LLNode;
