@@ -38,35 +38,32 @@ class TestPageRank(unittest.TestCase):
         n = lib.findNodeByName(b"a")
         self.assertEqual(lib.strcmp(n.name, b"a"), 0)
         self.assertEqual(n.outDegree, 2)
-        self.assertEqual(n.inNodes, ffi.NULL)
+        self.assertLLValues(n.inNodes, [])
 
         n = lib.findNodeByName(b"b")
         self.assertEqual(lib.strcmp(n.name, b"b"), 0)
         self.assertEqual(n.outDegree, 1)
-        llNode = ffi.cast('LLNode*', n.inNodes)
-        n = ffi.cast('Node*', llNode.self)
-        self.assertEqual(lib.strcmp(n.name, b"a"), 0)
-        llNode = ffi.cast('LLNode*', llNode.next)
-        self.assertEqual(llNode, ffi.NULL)
+        self.assertLLValues(n.inNodes, [b"a"])
 
         n = lib.findNodeByName(b"c")
         self.assertEqual(lib.strcmp(n.name, b"c"), 0)
         self.assertEqual(n.outDegree, 0)
-        llNode = ffi.cast('LLNode*', n.inNodes)
-        n = ffi.cast('Node*', llNode.self)
-        self.assertEqual(lib.strcmp(n.name, b"b"), 0)
-        llNode = ffi.cast('LLNode*', llNode.next)
-        n = ffi.cast('Node*', llNode.self)
-        self.assertEqual(lib.strcmp(n.name, b"a"), 0)
-        llNode = ffi.cast('LLNode*', llNode.next)
-        n = ffi.cast('Node*', llNode.self)
-        self.assertEqual(lib.strcmp(n.name, b"d"), 0)
-        llNode = ffi.cast('LLNode*', llNode.next)
-        self.assertEqual(llNode, ffi.NULL)
+        self.assertLLValues(n.inNodes, [b"b", b"a", b"d"])
 
         n = lib.findNodeByName(b"d")
         self.assertEqual(lib.strcmp(n.name, b"d"), 0)
         self.assertEqual(n.outDegree, 1)
-        self.assertEqual(n.inNodes, ffi.NULL)
+        self.assertLLValues(n.inNodes, [])
+
 
         lib.cleanup()
+
+    def assertLLValues(self, lln, values):
+        lln = ffi.cast('LLNode*', lln)
+
+        for i in range(len(values)):
+            n = ffi.cast('Node*', lln.self)
+            self.assertEqual(lib.strcmp(n.name, values[i]), 0)
+            lln = ffi.cast('LLNode*', lln.next)
+
+        self.assertEqual(lln, ffi.NULL)
