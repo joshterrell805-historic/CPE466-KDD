@@ -54,4 +54,4 @@ Node *findNodeByName(char *name);
 // in this iteration, get `iterationBatchSize` of the next unprocessed elements
 // and claim them as being processed (used in computePageRank)
 // return count of 0 when there are no elements remaining
-void getNextBatchInIteration(Node **retStart, int *count);
+void getNextBatchInIteration(Node **retStart, int *retCount);
