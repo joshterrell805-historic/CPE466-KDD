@@ -6,7 +6,7 @@
 
 typedef struct Node {
   // make sure to copy this on creation!
-  // cffi will destroy it's copy when the variable is garbage collected
+  // cffi will destroy its copy when the variable is garbage collected
   // http://cffi.readthedocs.org/en/latest/using.html
   // "the returned pointer object has ownership"
   char *name;

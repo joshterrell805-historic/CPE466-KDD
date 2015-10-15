@@ -4,6 +4,7 @@ setup(
     version = "0.1",
     install_requires=[
         'cffi',
+        'click'
     ],
     setup_requires=[
         'cffi'
@@ -11,4 +12,9 @@ setup(
     cffi_modules=[
         "build_page_rank.py:ffi"
     ],
+    entry_points={
+        'console_scripts': [
+            'ranker = scripts.ranker:rank'
+        ]
+    }
 )
