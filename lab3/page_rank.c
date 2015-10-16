@@ -1,3 +1,4 @@
+
 int converged = -1;
 Node *nodes = 0;
 Node *nextUnusedNode = 0;
@@ -10,6 +11,14 @@ double epsilonConverge = -1.0;
 // also used in computePageRank for prob of random link
 double initPageRank = -1.0;
 int iterationCount = 0;
+int threadCount = -1;
+
+// this is some superrrr shinanigans, but cffi wont let us #include.
+size_t *pthreads = 0;
+void *iterationStartSem;
+void *iterationEndSem;
+void *getBatchLock;
+int isSourceA = 0;
 
 Node *createNode(char *name);
 Node *findOrCreateNode(char *name);
@@ -17,10 +26,12 @@ Node *findOrCreateNode(char *name);
 void createLLNode(LLNode **llNode, Node *self);
 void freeNodeData(Node *node);
 void freeLLNodes(LLNode *llNode);
+void threadMain(void);
 
-void init(int maxNodes, int batchSize, double d, double epsilon) {
+void init(int maxNodes, int batchSize, double d, double epsilon, int threads) {
   if (nodes) {
-    cleanup();
+    printf("ERROR: already inited!\n");
+    exit(-1);
   }
 
   nodes = malloc(sizeof(Node) * maxNodes);
@@ -31,15 +42,65 @@ void init(int maxNodes, int batchSize, double d, double epsilon) {
   dVal = d;
   epsilonConverge = epsilon;
   iterationCount = 0;
+  threadCount = threads;
+  isSourceA = 0;
+
+  // this is some superrrr shinanigans, but cffi wont let us #include.
+  iterationStartSem = malloc(sizeof(size_t) * 4);
+  iterationEndSem = malloc(sizeof(size_t) * 4);
+  getBatchLock = malloc(sizeof(size_t) * 5);
+
+  sem_init(iterationStartSem, 0, 0);
+  sem_init(iterationEndSem, 0, 0);
+  pthread_mutex_init(getBatchLock, 0);
+
+  pthreads = malloc(sizeof(size_t) * threadCount);
+  for (size_t* pth = pthreads; pth - pthreads < threadCount; ++pth) {
+    int ret = pthread_create(pth, 0, threadMain, 0);
+    if (ret) {
+      printf("ERROR: failed to create thread! (%d)\n", ret);
+      exit(-1);
+    }
+  }
 }
 
 void cleanup(void) {
+  if (!nodes) {
+    printf("ERROR: already cleaned up!\n");
+    exit(-1);
+  }
+
   for (Node *n = nodes; n != nextUnusedNode; ++n) {
     freeNodeData(n);
   }
 
   free(nodes);
   nodes = 0;
+
+  // free the threads
+  for (int i = 0; i < threadCount; ++i) {
+    if (pthreads[i]) {
+      if (pthread_cancel(pthreads[i])) {
+        printf("ERROR: failed to kill thread\n");
+        exit(-1);
+      }
+      pthread_join(pthreads[i], 0);
+      pthreads[i] = 0;
+    }
+  } 
+  free(pthreads);
+  pthreads = 0;
+
+  sem_destroy(iterationStartSem);
+  sem_destroy(iterationEndSem);
+  pthread_mutex_destroy(getBatchLock);
+  free(iterationStartSem);
+  free(iterationEndSem);
+  free(getBatchLock);
+  iterationStartSem = 0;
+  iterationEndSem = 0;
+  getBatchLock = 0;
+
   nextUnusedNode = 0;
   maxNodeCount = -1;
   iterationBatchSize = -1;
@@ -49,6 +110,8 @@ void cleanup(void) {
   epsilonConverge = -1.0;
   initPageRank = -1.0;
   iterationCount = 0;
+  threadCount = -1;
+  isSourceA = 0;
 }
 
 int addEdge(char *fromName, char *toName) {
@@ -65,34 +128,64 @@ int addEdge(char *fromName, char *toName) {
   return 0;
 }
 
-void startIteration(void) {
+// called by main (python) thread only
+void computeIteration(void) {
   converged = 1;
   nextUnusedNodeForIteration = nodes;
   initPageRank = (double)1 / (nextUnusedNode - nodes);
   ++iterationCount;
+  isSourceA = !isSourceA;
+
+  // unlock all the threads
+  for (int i = 0; i < threadCount; ++i) {
+    sem_post(iterationStartSem);
+  }
+
+  // wait for all threads to finish
+  for (int i = 0; i < threadCount; ++i) {
+    sem_wait(iterationEndSem);
+  }
+
+  if (converged) {
+    // free the threads
+    for (int i = 0; i < threadCount; ++i) {
+      if (pthreads[i]) {
+        if (pthread_cancel(pthreads[i])) {
+          printf("ERROR: failed to kill thread\n");
+          exit(-1);
+        }
+        pthread_join(pthreads[i], 0);
+        pthreads[i] = 0;
+      }
+    } 
+  }
 }
 
 void getNextBatchInIteration(Node **retStart, int *count) {
+  pthread_mutex_lock(getBatchLock); 
+
   int a = iterationBatchSize;
   int b = nextUnusedNode - nextUnusedNodeForIteration;
 
   *count = a < b ? a : b;
   *retStart = nextUnusedNodeForIteration;
   nextUnusedNodeForIteration += *count;
+
+  pthread_mutex_unlock(getBatchLock);
 }
 
-void computePageRank(int isSourceA) {
+void computePageRank(void) {
   int length;
   Node *node;
 
   while (getNextBatchInIteration(&node, &length), length) {
     while (length--) {
-      computePageRankN(node++, isSourceA);
+      computePageRankN(node++);
     }
   }
 }
 
-void computePageRankN(Node *node, int isSourceA) {
+void computePageRankN(Node *node) {
   if (iterationCount == 1) {
     node->pageRank_b = node->pageRank_a = initPageRank;
   }
@@ -194,5 +287,13 @@ void freeLLNodes(LLNode *llNode) {
     }
 
     free(last);
+  }
+}
+
+void threadMain(void) {
+  while (1) {
+    sem_wait(iterationStartSem);
+    computePageRank();
+    sem_post(iterationEndSem);
   }
 }

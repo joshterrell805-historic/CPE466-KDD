@@ -33,7 +33,7 @@ typedef struct LLNode {
 //  if any node has change in pageRank >= epsilonConverged, set converged
 //  flag to false
 void init(int maxNodes, int iterationBatchSize, double dVal,
-    double epsilonConverge);
+    double epsilonConverge, int threadCount);
 
 // destroy the graph
 void cleanup(void);
@@ -43,13 +43,9 @@ void cleanup(void);
 // return 0 if successful.
 int addEdge(char *fromName, char *toName);
 
-// set converged flag to 0
-// set internal clockwork necessary for
-// threading computePageRank
-void startIteration(void);
-
-// Compute page rank. Returns when this iteration has completed.
-void computePageRank(int isSourceA);
+// called by main (python) thread only
+// compute one iteration
+void computeIteration(void);
 
 int hasConverged(void);
 
@@ -64,6 +60,9 @@ Node *findNodeByName(char *name);
 // return count of 0 when there are no elements remaining
 void getNextBatchInIteration(Node **retStart, int *retCount);
 
+// Compute page rank. Returns when this iteration has completed.
+void computePageRank(void);
+
 // compute page rank for a node
 // using pageRank_a to compute pageRank_b if isSourceA, else visa-versa
-void computePageRankN(Node* node, int isSourceA);
+void computePageRankN(Node* node);

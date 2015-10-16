@@ -3,7 +3,7 @@ import unittest
 
 class TestPageRank(unittest.TestCase):
     def test_graphCreation(self):
-        lib.init(4, -1, -1, -1)
+        lib.init(4, -1, -1, -1, 1)
 
         ret = lib.addEdge(b"a", b"b")
         self.assertEqual(ret, 0)
@@ -45,83 +45,32 @@ class TestPageRank(unittest.TestCase):
 
         lib.cleanup()
 
-    def test_getNextNodesInIteration(self):
-        lib.init(7, 2, -1, -1)
-        lib.addEdge(b"a", b"a")
-        lib.addEdge(b"b", b"a")
-        lib.addEdge(b"c", b"a")
-        lib.addEdge(b"d", b"a")
-        lib.addEdge(b"e", b"a")
-        lib.addEdge(b"f", b"a")
-        lib.addEdge(b"g", b"a")
-
-        head = ffi.cast('LLNode*', lib.findNodeByName(b"a"))
-        pNode = ffi.new('Node [1]')
-        pCount = ffi.new('int [1]')
-        ppNode = ffi.addressof(pNode)
-        ppNode = ffi.cast('Node **', ppNode)
-
-        lib.startIteration()
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 2)
-        self.assertNode(ppNode[0], b"a")
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 2)
-        self.assertNode(ppNode[0], b"c")
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 2)
-        self.assertNode(ppNode[0], b"e")
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 1)
-        self.assertNode(ppNode[0], b"g")
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 0)
-
-        lib.startIteration()
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 2)
-        self.assertNode(ppNode[0], b"a")
-
-        lib.getNextBatchInIteration(ppNode, pCount)
-        self.assertEqual(pCount[0], 2)
-        self.assertNode(ppNode[0], b"c")
-
-        lib.cleanup()
-
     def test_computePageRank(self):
         epsilon = 0.00001
         nodeCount = 3
-        lib.init(nodeCount+10, 1, 0.5, epsilon)
+        lib.init(nodeCount+10, 1, 0.5, epsilon, 2)
         lib.addEdge(b"a", b"b")
         lib.addEdge(b"a", b"c")
         lib.addEdge(b"b", b"c")
         lib.addEdge(b"c", b"a")
 
-        lib.startIteration()
-        lib.computePageRank(1)
+        lib.computeIteration()
 
         n = lib.findNodeByName(b"c")
         # initial pageRank
         self.assertTrue(abs(n.pageRank_a - 1.0/nodeCount) < epsilon)
 
-        isA = False
         while lib.hasConverged() == 0:
-            lib.startIteration()
-            lib.computePageRank(1 if isA else 0)
-            isA = not isA
+            lib.computeIteration()
 
         # if next is A, the converged must be B
-        attrName = 'pageRank_b' if isA else 'pageRank_b'
+        attrName = 'pageRank_b' if lib.getIterationCount() % 2 == 0 \
+                else 'pageRank_b'
 
         a = lib.findNodeByName(b"a")
         b = lib.findNodeByName(b"b")
         c = lib.findNodeByName(b"c")
+
         #print(
         #    a.pageRank_a*nodeCount, b.pageRank_a*nodeCount,
         #    c.pageRank_a*nodeCount)
