@@ -1,9 +1,15 @@
-int converged = 0;
+int converged = -1;
 Node *nodes = 0;
 Node *nextUnusedNode = 0;
 int maxNodeCount = -1;
 int iterationBatchSize = -1;
 Node *nextUnusedNodeForIteration = 0;
+double dVal = -1.0;
+double epsilonConverge = -1.0;
+// the initial page rank
+// also used in computePageRank for prob of random link
+double initPageRank = -1.0;
+int iterationCount = 0;
 
 Node *createNode(char *name);
 Node *findOrCreateNode(char *name);
@@ -12,7 +18,7 @@ void createLLNode(LLNode **llNode, Node *self);
 void freeNodeData(Node *node);
 void freeLLNodes(LLNode *llNode);
 
-void init(int maxNodes, int batchSize) {
+void init(int maxNodes, int batchSize, double d, double epsilon) {
   if (nodes) {
     cleanup();
   }
@@ -22,8 +28,9 @@ void init(int maxNodes, int batchSize) {
   maxNodeCount = maxNodes;
   iterationBatchSize = batchSize;
   nextUnusedNodeForIteration = 0;
-
-  converged = 0;
+  dVal = d;
+  epsilonConverge = epsilon;
+  iterationCount = 0;
 }
 
 void cleanup(void) {
@@ -37,6 +44,11 @@ void cleanup(void) {
   maxNodeCount = -1;
   iterationBatchSize = -1;
   nextUnusedNodeForIteration = 0;
+  dVal = -1.0;
+  converged = -1;
+  epsilonConverge = -1.0;
+  initPageRank = -1.0;
+  iterationCount = 0;
 }
 
 int addEdge(char *fromName, char *toName) {
@@ -54,8 +66,10 @@ int addEdge(char *fromName, char *toName) {
 }
 
 void startIteration(void) {
-  converged = 0;
+  converged = 1;
   nextUnusedNodeForIteration = nodes;
+  initPageRank = (double)1 / (nextUnusedNode - nodes);
+  ++iterationCount;
 }
 
 void getNextBatchInIteration(Node **retStart, int *count) {
@@ -67,15 +81,48 @@ void getNextBatchInIteration(Node **retStart, int *count) {
   nextUnusedNodeForIteration += *count;
 }
 
-void computePageRank(int sourceIsA) {
-  if (sourceIsA) {
-    converged = sourceIsA;
+void computePageRank(int isSourceA) {
+  int length;
+  Node *node;
+
+  while (getNextBatchInIteration(&node, &length), length) {
+    while (length--) {
+      computePageRankN(node++, isSourceA);
+    }
+  }
+}
+
+void computePageRankN(Node *node, int isSourceA) {
+  if (iterationCount == 1) {
+    node->pageRank_b = node->pageRank_a = initPageRank;
+  }
+
+  double *dstRank = isSourceA ? &node->pageRank_b : &node->pageRank_a;
+  LLNode *llNode = node->inNodes;
+  *dstRank = 0.0;
+
+  while (llNode) {
+    *dstRank +=
+      (isSourceA ? llNode->self->pageRank_a : llNode->self->pageRank_b) /
+      llNode->self->outDegree;
+    llNode = llNode->next;
+  }
+  *dstRank = *dstRank * dVal + (1 - dVal) * initPageRank;
+
+  // thread-safe! :)
+  if (converged &&
+      fabs(node->pageRank_b - node->pageRank_a) >= epsilonConverge) {
+    converged = 0;
   }
 }
 
 
 int hasConverged(void) {
   return converged;
+}
+
+int getIterationCount(void) {
+  return iterationCount;
 }
 
 Node *findNodeByName(char *name) {

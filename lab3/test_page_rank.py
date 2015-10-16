@@ -2,20 +2,8 @@ from _page_rank import ffi, lib
 import unittest
 
 class TestPageRank(unittest.TestCase):
-    def test_sample_cffi(self):
-        self.assertFalse(lib.hasConverged())
-
-        lib.computePageRank(False)
-        self.assertFalse(lib.hasConverged())
-
-        lib.computePageRank(True)
-        self.assertTrue(lib.hasConverged())
-
-        lib.computePageRank(False)
-        self.assertTrue(lib.hasConverged())
-
     def test_graphCreation(self):
-        lib.init(4, -1)
+        lib.init(4, -1, -1, -1)
 
         ret = lib.addEdge(b"a", b"b")
         self.assertEqual(ret, 0)
@@ -55,11 +43,10 @@ class TestPageRank(unittest.TestCase):
         self.assertEqual(n.outDegree, 1)
         self.assertLLValues(n.inNodes, [])
 
-
         lib.cleanup()
 
     def test_getNextNodesInIteration(self):
-        lib.init(7, 2)
+        lib.init(7, 2, -1, -1)
         lib.addEdge(b"a", b"a")
         lib.addEdge(b"b", b"a")
         lib.addEdge(b"c", b"a")
@@ -104,6 +91,46 @@ class TestPageRank(unittest.TestCase):
         lib.getNextBatchInIteration(ppNode, pCount)
         self.assertEqual(pCount[0], 2)
         self.assertNode(ppNode[0], b"c")
+
+        lib.cleanup()
+
+    def test_computePageRank(self):
+        epsilon = 0.00001
+        nodeCount = 3
+        lib.init(nodeCount+10, 1, 0.5, epsilon)
+        lib.addEdge(b"a", b"b")
+        lib.addEdge(b"a", b"c")
+        lib.addEdge(b"b", b"c")
+        lib.addEdge(b"c", b"a")
+
+        lib.startIteration()
+        lib.computePageRank(1)
+
+        n = lib.findNodeByName(b"c")
+        # initial pageRank
+        self.assertTrue(abs(n.pageRank_a - 1.0/nodeCount) < epsilon)
+
+        isA = False
+        while lib.hasConverged() == 0:
+            lib.startIteration()
+            lib.computePageRank(1 if isA else 0)
+            isA = not isA
+
+        # if next is A, the converged must be B
+        attrName = 'pageRank_b' if isA else 'pageRank_b'
+
+        a = lib.findNodeByName(b"a")
+        b = lib.findNodeByName(b"b")
+        c = lib.findNodeByName(b"c")
+        #print(
+        #    a.pageRank_a*nodeCount, b.pageRank_a*nodeCount,
+        #    c.pageRank_a*nodeCount)
+
+        # the examples are not normalized so we must divide by nodeCount
+        # http://pr.efactory.de/e-pagerank-algorithm.shtml
+        self.assertTrue(abs(a.pageRank_a - 1.07692308 / nodeCount) < epsilon*10)
+        self.assertTrue(abs(b.pageRank_a - 0.76923077 / nodeCount) < epsilon*10)
+        self.assertTrue(abs(c.pageRank_a - 1.15384615 / nodeCount) < epsilon*10)
 
         lib.cleanup()
 

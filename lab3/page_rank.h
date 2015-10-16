@@ -27,7 +27,13 @@ typedef struct LLNode {
 // maxNodes: maximum number of nodes to be stored in the graph
 // iterationBatchSize: batch size of how many nodes each thread gets at
 //  a time when computing the page rank for a given iteration
-void init(int maxNodes, int iterationBatchSize);
+// dVal: the "d" in the page rank equation specifying the probability of
+//  going to a new page vs following a link
+// epsilonConverged: init converged flag to true on every iteration
+//  if any node has change in pageRank >= epsilonConverged, set converged
+//  flag to false
+void init(int maxNodes, int iterationBatchSize, double dVal,
+    double epsilonConverge);
 
 // destroy the graph
 void cleanup(void);
@@ -43,9 +49,11 @@ int addEdge(char *fromName, char *toName);
 void startIteration(void);
 
 // Compute page rank. Returns when this iteration has completed.
-void computePageRank(int sourceIsA);
+void computePageRank(int isSourceA);
 
 int hasConverged(void);
+
+int getIterationCount(void);
 
 Node *findNodeByName(char *name);
 
@@ -55,3 +63,7 @@ Node *findNodeByName(char *name);
 // and claim them as being processed (used in computePageRank)
 // return count of 0 when there are no elements remaining
 void getNextBatchInIteration(Node **retStart, int *retCount);
+
+// compute page rank for a node
+// using pageRank_a to compute pageRank_b if isSourceA, else visa-versa
+void computePageRankN(Node* node, int isSourceA);
