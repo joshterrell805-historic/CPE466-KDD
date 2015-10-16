@@ -21,7 +21,8 @@ Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
   graph->pthreads = malloc(sizeof(size_t) * threadCount);
 
   for (int i = 0; i < threadCount; ++i) {
-    int ret = pthread_create(graph->pthreads+i, 0, threadMain, graph);
+    int ret = pthread_create(graph->pthreads+i, 0,
+        (void *(*)(void *))&threadMain, graph);
     if (ret) {
       printf("ERROR: failed to create thread! (%d)\n", ret);
       exit(-1);
@@ -218,7 +219,7 @@ void freeLLNodes(LLNode *llNode) {
   }
 }
 
-void threadMain(Graph *graph) {
+void *threadMain(Graph *graph) {
   while (1) {
     sem_wait(graph->iterationStartSem);
     computePageRank(graph);

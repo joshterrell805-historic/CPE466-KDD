@@ -37,6 +37,8 @@ typedef struct Graph {
   struct Node *nextUnusedNode;
   Node *nextUnusedNodeForIteration;
 
+  // cffi can't #include
+  // These should really be pthread_t, sem_t, and pthread_mutex_t
   size_t *pthreads;
   void *iterationStartSem;
   void *iterationEndSem;
@@ -91,4 +93,22 @@ Node *findOrCreateNode(Graph*, char *name);
 void createLLNode(LLNode **llNode, Node *self);
 void freeNodeData(Node *node);
 void freeLLNodes(LLNode *llNode);
-void threadMain(Graph*);
+void *threadMain(Graph*);
+
+/////////////////////// because we cant #include ///////////////////////////////
+
+int sem_init(void *sem, int pshared, unsigned int value);
+int sem_destroy(void *sem);
+int sem_wait(void *sem);
+int sem_post(void *sem);
+int sem_getvalue(void *sem, int *sval);
+
+int pthread_mutex_init(void *mutex, const void *mutexattr);
+int pthread_mutex_lock(void *mutex);
+int pthread_mutex_unlock(void *mutex);
+int pthread_mutex_destroy(void *mutex);
+
+int pthread_create(void *thread, void *attr,
+    void *(*start_routine)(void *), void * arg);
+int pthread_cancel(size_t thread);
+int pthread_join(size_t th, void **thread_return);
