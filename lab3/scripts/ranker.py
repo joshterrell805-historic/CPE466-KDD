@@ -3,6 +3,20 @@ import click
 import time
 import vector
 
+def newGraph(maxNodes):
+    threads = 4
+    if maxNodes / (threads * 10) < 5:
+        # too little nodes? just do |threads| batches per iteration dividing
+        # the nodes up equally amongst the threads
+        batchSize = (int) (maxNodes / threads) + 1
+    else:
+        batchSize = (int)(maxNodes / (threads * 10))
+
+    dVal = 0.85
+    epsilon = 0.00001
+
+    return lib.newGraph(maxNodes, batchSize, dVal, epsilon, threads)
+
 @click.command()
 @click.argument('datafile', type=click.File('r'))
 def rank(datafile):
@@ -13,7 +27,9 @@ def rank(datafile):
         lines.append(line)
     setuptime = time.clock() - start
     print(setuptime)
-    lib.init(len(lines), 1, 0.85, 0.001)
+
+    graph = newGraph(len(lines))
+
     nodes = set()
 #    import pdb; pdb.set_trace()
     print("Adding lines")
@@ -28,38 +44,37 @@ def rank(datafile):
         nodes.add(right)
         num += 1
         print("{0}->{1}^{2}".format(num, left, right))
-        lib.addEdge(left.encode(encoding="ascii"), right.encode(encoding="ascii"))
+        lib.addEdge(
+                graph, left.encode(encoding="ascii"),
+                right.encode(encoding="ascii"))
         
     print("Added lines")
 
-    isSourceA = 1
     for i in range(1000):
-        lib.startIteration()
+        lib.computeIteration(graph)
         # thread = threading.Thread(target= args=(isSourceA))
-        lib.computePageRank(isSourceA)
         # thread.run()
-        print("Iterating...")
+        #print("Iterating...")
         # thread.join()
-        isSourceA ^= 1
-        if lib.hasConverged() == 1:
+        if graph.converged == 1:
             break
 
     # This is basically a lambda
     def getRank(node):
-        struct = lib.findNodeByName(node.encode())
-        return struct.pageRank_a if isSourceA == 0 else struct.pageRank_b
+        struct = lib.findNodeByName(graph, node.encode())
+        return struct.pageRank_b if graph.isSourceA == 1 else struct.pageRank_a
 
     ordered = sorted(nodes, key=getRank)
-    if lib.hasConverged():
-        print("Converged!")
+    if graph.converged:
+        print("Converged! after %s iterations" % graph.iterationCount)
     else:
         print("Didn't converge.")
 
     print("Outdegree:")
     for node in ordered:
-        struct = lib.findNodeByName(node.encode())
+        struct = lib.findNodeByName(graph, node.encode())
         if struct:
             print("{0!s}\t{1}\t({2})".format(node, getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
 
-    lib.cleanup()
+    lib.cleanup(graph)
 
