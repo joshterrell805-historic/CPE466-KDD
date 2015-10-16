@@ -1,8 +1,6 @@
 //#include <string>
-
-// p(i) = (1-d) * 1 / |V| + d * SUM(1->k, 1/|Ojk| * p(jk)
-// pageRank_i+1(node) = (1-d) / #nodeCount    +
-//    d * SUM(1/outdegree(incommingNode) * pageRank_i(incommingNode))
+//#include <pthread.h>
+//#include <semaphore.h>
 
 typedef struct Node {
   // make sure to copy this on creation!
@@ -23,6 +21,28 @@ typedef struct LLNode {
   struct LLNode *next;
 } LLNode;
 
+typedef struct Graph {
+  int iterationBatchSize;
+  double dVal;
+  double epsilonConverge;
+  int maxNodeCount;
+  int threadCount;
+
+  int converged;
+  int isSourceA;
+  int iterationCount;
+  double initPageRank;
+
+  struct Node *nodes;
+  struct Node *nextUnusedNode;
+  Node *nextUnusedNodeForIteration;
+
+  size_t *pthreads;
+  void *iterationStartSem;
+  void *iterationEndSem;
+  void *getBatchLock;
+} Graph;
+
 // create an empty graph
 // maxNodes: maximum number of nodes to be stored in the graph
 // iterationBatchSize: batch size of how many nodes each thread gets at
@@ -32,37 +52,43 @@ typedef struct LLNode {
 // epsilonConverged: init converged flag to true on every iteration
 //  if any node has change in pageRank >= epsilonConverged, set converged
 //  flag to false
-void init(int maxNodes, int iterationBatchSize, double dVal,
+Graph *newGraph(int maxNodes, int iterationBatchSize, double dVal,
     double epsilonConverge, int threadCount);
 
 // destroy the graph
-void cleanup(void);
+void cleanup(Graph*);
 
 // add an edge to the graph from the node with `fromName` to `toName`
 // creates missing nodes, if any
 // return 0 if successful.
-int addEdge(char *fromName, char *toName);
+int addEdge(Graph*, char *fromName, char *toName);
 
 // called by main (python) thread only
 // compute one iteration
-void computeIteration(void);
+void computeIteration(Graph*);
 
-int hasConverged(void);
-
-int getIterationCount(void);
-
-Node *findNodeByName(char *name);
+Node *findNodeByName(Graph*, char *name);
 
 /////////////////////// exposed for testing only ///////////////////////////////
 
 // in this iteration, get `iterationBatchSize` of the next unprocessed elements
 // and claim them as being processed (used in computePageRank)
 // return count of 0 when there are no elements remaining
-void getNextBatchInIteration(Node **retStart, int *retCount);
+void getNextBatchInIteration(Graph*, Node **retStart, int *retCount);
 
-// Compute page rank. Returns when this iteration has completed.
-void computePageRank(void);
+// Keep chipping away at the remaining nodes in this iteration
+// until all page ranks have been computed
+void computePageRank(Graph*);
 
-// compute page rank for a node
+// Compute page rank for a node
 // using pageRank_a to compute pageRank_b if isSourceA, else visa-versa
-void computePageRankN(Node* node);
+void computePageRankN(Graph*, Node* node);
+
+////////////////////// exposed, but really shouldn't be used ///////////////////
+Node *createNode(Graph*, char *name);
+Node *findOrCreateNode(Graph*, char *name);
+// add Node to end of LLNode linked list
+void createLLNode(LLNode **llNode, Node *self);
+void freeNodeData(Node *node);
+void freeLLNodes(LLNode *llNode);
+void threadMain(Graph*);

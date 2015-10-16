@@ -1,122 +1,73 @@
+Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
+    double epsilonConverge, int threadCount) {
+  Graph *graph = calloc(sizeof(Graph), 1);
 
-int converged = -1;
-Node *nodes = 0;
-Node *nextUnusedNode = 0;
-int maxNodeCount = -1;
-int iterationBatchSize = -1;
-Node *nextUnusedNodeForIteration = 0;
-double dVal = -1.0;
-double epsilonConverge = -1.0;
-// the initial page rank
-// also used in computePageRank for prob of random link
-double initPageRank = -1.0;
-int iterationCount = 0;
-int threadCount = -1;
+  graph->nodes = calloc(sizeof(Node), maxNodeCount);
+  graph->nextUnusedNode = graph->nodes;
+  graph->maxNodeCount = maxNodeCount;
+  graph->iterationBatchSize = iterationBatchSize;
+  graph->dVal = dVal;
+  graph->epsilonConverge = epsilonConverge;
+  graph->threadCount = threadCount;
 
-// this is some superrrr shinanigans, but cffi wont let us #include.
-size_t *pthreads = 0;
-void *iterationStartSem;
-void *iterationEndSem;
-void *getBatchLock;
-int isSourceA = 0;
+  graph->iterationStartSem = malloc(sizeof(size_t) * 4);
+  graph->iterationEndSem = malloc(sizeof(size_t) * 4);
+  graph->getBatchLock = malloc(sizeof(size_t) * 5);
 
-Node *createNode(char *name);
-Node *findOrCreateNode(char *name);
-// add Node to end of LLNode linked list
-void createLLNode(LLNode **llNode, Node *self);
-void freeNodeData(Node *node);
-void freeLLNodes(LLNode *llNode);
-void threadMain(void);
+  sem_init(graph->iterationStartSem, 0, 0);
+  sem_init(graph->iterationEndSem, 0, 0);
+  pthread_mutex_init(graph->getBatchLock, 0);
 
-void init(int maxNodes, int batchSize, double d, double epsilon, int threads) {
-  if (nodes) {
-    printf("ERROR: already inited!\n");
-    exit(-1);
-  }
+  graph->pthreads = malloc(sizeof(size_t) * threadCount);
 
-  nodes = malloc(sizeof(Node) * maxNodes);
-  nextUnusedNode = nodes;
-  maxNodeCount = maxNodes;
-  iterationBatchSize = batchSize;
-  nextUnusedNodeForIteration = 0;
-  dVal = d;
-  epsilonConverge = epsilon;
-  iterationCount = 0;
-  threadCount = threads;
-  isSourceA = 0;
-
-  // this is some superrrr shinanigans, but cffi wont let us #include.
-  iterationStartSem = malloc(sizeof(size_t) * 4);
-  iterationEndSem = malloc(sizeof(size_t) * 4);
-  getBatchLock = malloc(sizeof(size_t) * 5);
-
-  sem_init(iterationStartSem, 0, 0);
-  sem_init(iterationEndSem, 0, 0);
-  pthread_mutex_init(getBatchLock, 0);
-
-  pthreads = malloc(sizeof(size_t) * threadCount);
-  for (size_t* pth = pthreads; pth - pthreads < threadCount; ++pth) {
-    int ret = pthread_create(pth, 0, threadMain, 0);
+  for (int i = 0; i < threadCount; ++i) {
+    int ret = pthread_create(graph->pthreads+i, 0, threadMain, graph);
     if (ret) {
       printf("ERROR: failed to create thread! (%d)\n", ret);
       exit(-1);
     }
   }
+
+  return graph;
 }
 
-void cleanup(void) {
-  if (!nodes) {
+void cleanup(Graph *graph) {
+  if (!graph->nodes) {
     printf("ERROR: already cleaned up!\n");
     exit(-1);
   }
 
-  for (Node *n = nodes; n != nextUnusedNode; ++n) {
+  for (Node *n = graph->nodes; n != graph->nextUnusedNode; ++n) {
     freeNodeData(n);
   }
 
-  free(nodes);
-  nodes = 0;
+  free(graph->nodes);
+  graph->nodes = 0;
 
-  // free the threads
-  for (int i = 0; i < threadCount; ++i) {
-    if (pthreads[i]) {
-      if (pthread_cancel(pthreads[i])) {
+  // kill the threads
+  for (int i = 0; i < graph->threadCount; ++i) {
+    if (graph->pthreads[i]) {
+      if (pthread_cancel(graph->pthreads[i])) {
         printf("ERROR: failed to kill thread\n");
         exit(-1);
       }
-      pthread_join(pthreads[i], 0);
-      pthreads[i] = 0;
+      pthread_join(graph->pthreads[i], 0);
+      graph->pthreads[i] = 0;
     }
   } 
-  free(pthreads);
-  pthreads = 0;
+  free(graph->pthreads);
+  graph->pthreads = 0;
 
-  sem_destroy(iterationStartSem);
-  sem_destroy(iterationEndSem);
-  pthread_mutex_destroy(getBatchLock);
-  free(iterationStartSem);
-  free(iterationEndSem);
-  free(getBatchLock);
-  iterationStartSem = 0;
-  iterationEndSem = 0;
-  getBatchLock = 0;
+  sem_destroy(graph->iterationStartSem);
+  sem_destroy(graph->iterationEndSem);
+  pthread_mutex_destroy(graph->getBatchLock);
 
-  nextUnusedNode = 0;
-  maxNodeCount = -1;
-  iterationBatchSize = -1;
-  nextUnusedNodeForIteration = 0;
-  dVal = -1.0;
-  converged = -1;
-  epsilonConverge = -1.0;
-  initPageRank = -1.0;
-  iterationCount = 0;
-  threadCount = -1;
-  isSourceA = 0;
+  free(graph);
 }
 
-int addEdge(char *fromName, char *toName) {
-  Node* from = findOrCreateNode(fromName);
-  Node* to = findOrCreateNode(toName);
+int addEdge(Graph* graph, char *fromName, char *toName) {
+  Node* from = findOrCreateNode(graph, fromName);
+  Node* to = findOrCreateNode(graph, toName);
 
   if (!(from && to)) {
     return -1;
@@ -129,97 +80,77 @@ int addEdge(char *fromName, char *toName) {
 }
 
 // called by main (python) thread only
-void computeIteration(void) {
-  converged = 1;
-  nextUnusedNodeForIteration = nodes;
-  initPageRank = (double)1 / (nextUnusedNode - nodes);
-  ++iterationCount;
-  isSourceA = !isSourceA;
+void computeIteration(Graph *graph) {
+  graph->converged = 1;
+  graph->nextUnusedNodeForIteration = graph->nodes;
+  graph->initPageRank = 1.0 / (graph->nextUnusedNode - graph->nodes);
+  ++graph->iterationCount;
+  graph->isSourceA = !graph->isSourceA;
 
-  // unlock all the threads
-  for (int i = 0; i < threadCount; ++i) {
-    sem_post(iterationStartSem);
+  // unlock all the threads so they can start computing
+  for (int i = 0; i < graph->threadCount; ++i) {
+    sem_post(graph->iterationStartSem);
   }
 
-  // wait for all threads to finish
-  for (int i = 0; i < threadCount; ++i) {
-    sem_wait(iterationEndSem);
-  }
-
-  if (converged) {
-    // free the threads
-    for (int i = 0; i < threadCount; ++i) {
-      if (pthreads[i]) {
-        if (pthread_cancel(pthreads[i])) {
-          printf("ERROR: failed to kill thread\n");
-          exit(-1);
-        }
-        pthread_join(pthreads[i], 0);
-        pthreads[i] = 0;
-      }
-    } 
+  // wait for all threads to finish computing
+  for (int i = 0; i < graph->threadCount; ++i) {
+    sem_wait(graph->iterationEndSem);
   }
 }
 
-void getNextBatchInIteration(Node **retStart, int *count) {
-  pthread_mutex_lock(getBatchLock); 
+void getNextBatchInIteration(Graph *graph, Node **retStart, int *count) {
+  pthread_mutex_lock(graph->getBatchLock); 
 
-  int a = iterationBatchSize;
-  int b = nextUnusedNode - nextUnusedNodeForIteration;
+  int a = graph->iterationBatchSize;
+  int b = graph->nextUnusedNode - graph->nextUnusedNodeForIteration;
 
   *count = a < b ? a : b;
-  *retStart = nextUnusedNodeForIteration;
-  nextUnusedNodeForIteration += *count;
+  *retStart = graph->nextUnusedNodeForIteration;
+  graph->nextUnusedNodeForIteration += *count;
 
-  pthread_mutex_unlock(getBatchLock);
+  pthread_mutex_unlock(graph->getBatchLock);
 }
 
-void computePageRank(void) {
+void computePageRank(Graph *graph) {
   int length;
   Node *node;
 
-  while (getNextBatchInIteration(&node, &length), length) {
+  while (getNextBatchInIteration(graph, &node, &length), length) {
     while (length--) {
-      computePageRankN(node++);
+      computePageRankN(graph, node++);
     }
   }
 }
 
-void computePageRankN(Node *node) {
-  if (iterationCount == 1) {
-    node->pageRank_b = node->pageRank_a = initPageRank;
+// p(i) = (1-d) * 1 / |V| + d * SUM(1->k, 1/|Ojk| * p(jk)
+// pageRank_i+1(node) = (1-d) / #nodeCount    +
+//    d * SUM(1/outdegree(incommingNode) * pageRank_i(incommingNode))
+void computePageRankN(Graph* graph, Node *node) {
+  if (graph->iterationCount == 1) {
+    node->pageRank_b = node->pageRank_a = graph->initPageRank;
   }
 
-  double *dstRank = isSourceA ? &node->pageRank_b : &node->pageRank_a;
+  double *dstRank = graph->isSourceA ? &node->pageRank_b : &node->pageRank_a;
   LLNode *llNode = node->inNodes;
   *dstRank = 0.0;
 
   while (llNode) {
     *dstRank +=
-      (isSourceA ? llNode->self->pageRank_a : llNode->self->pageRank_b) /
+      (graph->isSourceA ? llNode->self->pageRank_a : llNode->self->pageRank_b) /
       llNode->self->outDegree;
     llNode = llNode->next;
   }
-  *dstRank = *dstRank * dVal + (1 - dVal) * initPageRank;
+  *dstRank = *dstRank * graph->dVal + (1 - graph->dVal) * graph->initPageRank;
 
   // thread-safe! :)
-  if (converged &&
-      fabs(node->pageRank_b - node->pageRank_a) >= epsilonConverge) {
-    converged = 0;
+  if (graph->converged &&
+      fabs(node->pageRank_b - node->pageRank_a) >= graph->epsilonConverge) {
+    graph->converged = 0;
   }
 }
 
-
-int hasConverged(void) {
-  return converged;
-}
-
-int getIterationCount(void) {
-  return iterationCount;
-}
-
-Node *findNodeByName(char *name) {
-  for (Node *n = nodes; n != nextUnusedNode; ++n) {
+Node *findNodeByName(Graph *graph, char *name) {
+  for (Node *n = graph->nodes; n != graph->nextUnusedNode; ++n) {
     if (strcmp(n->name, name) == 0) {
       return n;
     }
@@ -231,26 +162,22 @@ Node *findNodeByName(char *name) {
 
 // ----------- helper functions, not exposed to cffi -----------------
 
-Node *createNode(char *name) {
-  if (nextUnusedNode - nodes == maxNodeCount) {
+Node *createNode(Graph *graph, char *name) {
+  if (graph->nextUnusedNode - graph->nodes == graph->maxNodeCount) {
     return 0;
   }
 
-  nextUnusedNode->name = malloc(sizeof(char) * (strlen(name) + 1));
-  strcpy(nextUnusedNode->name, name);
-  nextUnusedNode->pageRank_a = 0.0;
-  nextUnusedNode->pageRank_b = 0.0;
-  nextUnusedNode->outDegree = 0;
-  nextUnusedNode->inNodes = 0;
+  graph->nextUnusedNode->name = calloc(sizeof(char), strlen(name) + 1);
+  strcpy(graph->nextUnusedNode->name, name);
 
-  return nextUnusedNode++;
+  return graph->nextUnusedNode++;
 }
 
-Node *findOrCreateNode(char *name) {
-  Node *n = findNodeByName(name);
+Node *findOrCreateNode(Graph *graph, char *name) {
+  Node *n = findNodeByName(graph, name);
 
   if (!n) {
-    n = createNode(name);
+    n = createNode(graph, name);
   }
 
   return n;
@@ -271,7 +198,8 @@ void freeNodeData(Node *node) {
     node->name = 0;
   }
 
-  free(node->inNodes);
+  freeLLNodes(node->inNodes);
+  node->inNodes = 0;
 }
 
 void freeLLNodes(LLNode *llNode) {
@@ -290,10 +218,10 @@ void freeLLNodes(LLNode *llNode) {
   }
 }
 
-void threadMain(void) {
+void threadMain(Graph *graph) {
   while (1) {
-    sem_wait(iterationStartSem);
-    computePageRank();
-    sem_post(iterationEndSem);
+    sem_wait(graph->iterationStartSem);
+    computePageRank(graph);
+    sem_post(graph->iterationEndSem);
   }
 }
