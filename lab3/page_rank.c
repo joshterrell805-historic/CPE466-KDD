@@ -143,7 +143,7 @@ Node *createNode(char *name) {
     return 0;
   }
 
-  nextUnusedNode->name = malloc(sizeof(char) * strlen(name));
+  nextUnusedNode->name = malloc(sizeof(char) * (strlen(name) + 1));
   strcpy(nextUnusedNode->name, name);
   nextUnusedNode->pageRank_a = 0.0;
   nextUnusedNode->pageRank_b = 0.0;
