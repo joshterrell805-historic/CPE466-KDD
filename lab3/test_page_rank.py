@@ -63,23 +63,21 @@ class TestPageRank(unittest.TestCase):
         while graph.converged == 0:
             lib.computeIteration(graph)
 
-        # if next is A, the converged must be B
-        attrName = 'pageRank_b' if graph.iterationCount % 2 == 0 \
-                else 'pageRank_b'
+        # one more so both a and b have the converged page rank
+        lib.computeIteration(graph)
 
         a = lib.findNodeByName(graph, b"a")
         b = lib.findNodeByName(graph, b"b")
         c = lib.findNodeByName(graph, b"c")
 
-        #print(
-        #    a.pageRank_a*nodeCount, b.pageRank_a*nodeCount,
-        #    c.pageRank_a*nodeCount)
-
         # the examples are not normalized so we must divide by nodeCount
         # http://pr.efactory.de/e-pagerank-algorithm.shtml
         self.assertTrue(abs(a.pageRank_a - 1.07692308 / nodeCount) < epsilon*10)
+        self.assertTrue(abs(a.pageRank_b - 1.07692308 / nodeCount) < epsilon*10)
         self.assertTrue(abs(b.pageRank_a - 0.76923077 / nodeCount) < epsilon*10)
+        self.assertTrue(abs(b.pageRank_b - 0.76923077 / nodeCount) < epsilon*10)
         self.assertTrue(abs(c.pageRank_a - 1.15384615 / nodeCount) < epsilon*10)
+        self.assertTrue(abs(c.pageRank_b - 1.15384615 / nodeCount) < epsilon*10)
 
         lib.cleanup(graph)
 
