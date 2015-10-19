@@ -3,8 +3,7 @@ import click
 import time
 import vector
 
-def newGraph(maxNodes):
-    threads = 4
+def newGraph(maxNodes, epsilon, dVal, threads):
     if maxNodes / (threads * 10) < 5:
         # too little nodes? just do |threads| batches per iteration dividing
         # the nodes up equally amongst the threads
@@ -12,14 +11,15 @@ def newGraph(maxNodes):
     else:
         batchSize = (int)(maxNodes / (threads * 10))
 
-    dVal = 0.85
-    epsilon = 0.00001
-
     return lib.newGraph(maxNodes, batchSize, dVal, epsilon, threads)
 
 @click.command()
+@click.option('--epsilon', help='If every node changes less than epsilon in an iteration, consider pagerank of the network to have converged.', default=0.00001)
+@click.option('--maxiterations', default=100)
+@click.option('--dval', help='Probability of following a link in pagerank algorithm.', default=0.85)
+@click.option('--threads', help='number of threads computing pagerank.', default=4)
 @click.argument('datafile', type=click.File('r'))
-def rank(datafile):
+def rank(epsilon, maxiterations, dval, threads, datafile):
     nameToIndex = {}
     lines = []
     start = time.clock()
@@ -28,7 +28,7 @@ def rank(datafile):
     setuptime = time.clock() - start
     print(setuptime)
 
-    graph = newGraph(len(lines))
+    graph = newGraph(len(lines), epsilon, dval, threads)
 
     nodes = set()
 #    import pdb; pdb.set_trace()
@@ -50,7 +50,7 @@ def rank(datafile):
         
     print("Added lines")
 
-    for i in range(1000):
+    for i in range(maxiterations):
         lib.computeIteration(graph)
         # thread = threading.Thread(target= args=(isSourceA))
         # thread.run()
