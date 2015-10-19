@@ -62,7 +62,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected):
         struct = lib.findNodeByName(graph, node.encode())
         return struct.pageRank_b if graph.isSourceA == 1 else struct.pageRank_a
 
-    ordered = sorted(nodes, key=getRank)
+    ordered = sorted(nodes, key=getRank, reverse=True)
     if graph.converged:
         print("Converged! after %s iterations" % graph.iterationCount)
     else:
