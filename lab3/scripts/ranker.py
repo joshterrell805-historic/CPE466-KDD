@@ -23,6 +23,10 @@ def rank(epsilon, maxiterations, dval, threads, datafile):
     nameToIndex = {}
     lines = []
     start = time.clock()
+    size = 0
+    for line in datafile:
+        size += 1
+    datafile.seek(0)
     for line in datafile:
         lines.append(line)
     setuptime = time.clock() - start
