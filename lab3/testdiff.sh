@@ -2,6 +2,7 @@
 runranker() {
     mkdir -p "$(dirname "$2")"
     ranker "$1" | sed '0,/Outdegree:/d' > "$2"
+    sort "$2" > "$2.sorted"
 }
 
 if [ "$1" == "--help" -o "$1" == "-h" ]
@@ -28,9 +29,16 @@ then
 else
     for i in data/*
     do
+        if [ "$1" == "--sort" ]
+        then
+            ext=".sorted"
+        else
+            ext=""
+        fi
+        
         runranker "$i" "temp/tempResults/$i"
-        echo diff "testResults/$i" "temp/tempResults/$i"
-        if diff -q "testResults/$i" "temp/tempResults/$i"
+        echo diff "testResults/$i$ext" "temp/tempResults/$i$ext"
+        if diff -q "testResults/$i$ext" "temp/tempResults/$i$ext"
         then
             echo "[32mPass $i[0m"
         else
