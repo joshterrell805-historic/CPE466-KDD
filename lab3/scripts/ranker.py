@@ -2,6 +2,7 @@ from _page_rank import ffi, lib
 import click
 import time
 import vector
+import math
 
 def newGraph(maxNodes, epsilon, dVal, threads):
     if maxNodes / (threads * 10) < 5:
@@ -28,11 +29,12 @@ def addEdge(graph, line):
 @click.command()
 @click.option('--epsilon', help='If every node changes less than epsilon in an iteration, consider pagerank of the network to have converged.', default=0.00001)
 @click.option('--maxiterations', default=100)
+@click.option('--limit/--no-limit', default=False)
 @click.option('--dval', help='Probability of following a link in pagerank algorithm.', default=0.85)
 @click.option('--threads', help='number of threads computing pagerank.', default=4)
 @click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
 @click.argument('datafile', type=click.File('r'))
-def rank(epsilon, maxiterations, dval, threads, datafile, undirected):
+def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit):
 
     start = time.clock()
 
@@ -69,10 +71,16 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected):
         print("Didn't converge.")
 
     print("Outdegree:")
+    if limit:
+        precision = str(math.floor(-math.log10(epsilon) - 1))
+        fmt = "{0!s}\t{1:." + precision + "f}\t({2:." + precision + "f})"
+    else:
+        fmt = "{0!s}\t{1}\t({2})"
+
     for node in ordered:
         struct = lib.findNodeByName(graph, node.encode())
         if struct:
-            print("{0!s}\t{1}\t({2})".format(node, getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
+            print(fmt.format(node, getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
 
     lib.cleanup(graph)
 
