@@ -1,8 +1,13 @@
 #!/bin/bash
+runranker() {
+    mkdir -p "$(dirname "$2")"
+    ranker "$1" | sed '0,/Outdegree:/d' > "$2"
+}
+
 if [ "$1" == "--help" -o "$1" == "-h" ]
 then
     cat <<EOF
-testdiff [--help|--update]
+testdiff [--help|--update|--diff filepath]
 EOF
     exit
 fi
@@ -12,16 +17,20 @@ then
     for i in data/*
     do
         echo "Computing results for $i"
-        mkdir -p "$(dirname "testResults/$i")"
-        ranker "$i" | sed '0,/Outdegree:/d' > "testResults/$i"
+        runranker "$i" "testResults/$i"
     done
 elif [ "$1" == "--diff" ]
 then
-    diff -q "testResults/$i" <(ranker "$i" | sed '0,/Outdegree:/d')
+    file="$2"
+    shift
+    shift
+    diff "$@" "testResults/$file" <(ranker "$file" | sed '0,/Outdegree:/d')
 else
     for i in data/*
     do
-        if diff -q "testResults/$i" <(ranker "$i" | sed '0,/Outdegree:/d')
+        runranker "$i" "temp/tempResults/$i"
+        echo diff "testResults/$i" "temp/tempResults/$i"
+        if diff -q "testResults/$i" "temp/tempResults/$i"
         then
             echo "[32mPass $i[0m"
         else
