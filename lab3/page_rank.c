@@ -1,5 +1,5 @@
 Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
-    double epsilonConverge, int threadCount) {
+    double epsilonConverge, int threadCount, int normalize) {
   Graph *graph = calloc(sizeof(Graph), 1);
 
   graph->nodes = calloc(sizeof(Node), maxNodeCount);
@@ -9,6 +9,7 @@ Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
   graph->dVal = dVal;
   graph->epsilonConverge = epsilonConverge;
   graph->threadCount = threadCount;
+  graph->normalize = normalize;
 
   graph->iterationStartSem = malloc(sizeof(size_t) * 4);
   graph->iterationEndSem = malloc(sizeof(size_t) * 4);
@@ -98,9 +99,13 @@ int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId) {
 void computeIteration(Graph *graph) {
   graph->converged = 1;
   graph->nextUnusedNodeForIteration = graph->nodes;
-  graph->initPageRank = 1.0 / (graph->nextUnusedNode - graph->nodes);
   ++graph->iterationCount;
   graph->isSourceA = !graph->isSourceA;
+  if (graph->normalize) {
+    graph->initPageRank = 1.0 / (graph->nextUnusedNode - graph->nodes);
+  } else {
+    graph->initPageRank = 1.0;
+  }
 
   // unlock all the threads so they can start computing
   for (int i = 0; i < graph->threadCount; ++i) {

@@ -27,6 +27,7 @@ typedef struct Graph {
   int iterationBatchSize;
   double dVal;
   double epsilonConverge;
+  int normalize;
   int maxNodeCount;
   int threadCount;
 
@@ -57,7 +58,7 @@ typedef struct Graph {
 //  if any node has change in pageRank >= epsilonConverged, set converged
 //  flag to false
 Graph *newGraph(int maxNodes, int iterationBatchSize, double dVal,
-    double epsilonConverge, int threadCount);
+    double epsilonConverge, int threadCount, int normalize);
 
 // destroy the graph
 void cleanup(Graph*);

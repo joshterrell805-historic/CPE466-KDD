@@ -2,8 +2,9 @@ from _page_rank import ffi, lib
 import sys
 
 class PageRank:
-    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize):
-        self.graph = lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads)
+    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize, normalize):
+        self.graph = lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads,
+                1 if normalize else 0)
         self.mapping = {}
         self.index = 0
 
