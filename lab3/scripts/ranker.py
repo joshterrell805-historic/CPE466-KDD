@@ -27,9 +27,9 @@ def addEdge(graph, line):
     return [left, right]
 
 @click.command()
-@click.option('--epsilon', help='If every node changes less than epsilon in an iteration, consider pagerank of the network to have converged.', default=0.00001)
+@click.option('--epsilon', help='If every node changes less than epsilon in an iteration, consider pagerank of the network to have converged. Should contain exactly one non-zero digit, with the value of one.', default=0.00001)
 @click.option('--maxiterations', default=100)
-@click.option('--limit/--no-limit', default=False)
+@click.option('--limit/--no-limit', help='Limit precision of printed page rank to precision specified by epsilon option', default=False)
 @click.option('--dval', help='Probability of following a link in pagerank algorithm.', default=0.85)
 @click.option('--threads', help='number of threads computing pagerank.', default=4)
 @click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
