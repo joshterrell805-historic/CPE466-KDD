@@ -4,21 +4,6 @@ import time
 import vector
 import math
 
-def newGraph(maxNodes, epsilon, dVal, threads, batchsize):
-    return lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads)
-
-def addEdge(graph, line):
-    parts = line.split(',')
-
-    left = parts[0].strip().strip('"')
-    right = parts[2].strip().strip('"')
-
-    lib.addEdge(
-            graph, left.encode(encoding="ascii"),
-            right.encode(encoding="ascii"))
-
-    return [left, right]
-
 @click.command()
 @click.option('--epsilon', help='If every node changes less than epsilon in an iteration, consider pagerank of the network to have converged. Should contain exactly one non-zero digit, with the value of one.', default=0.00001)
 @click.option('--maxiterations', default=100)
@@ -28,40 +13,42 @@ def addEdge(graph, line):
 @click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
 @click.argument('datafile', type=click.File('r'))
 @click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
+@click.option('--format', type=click.Choice(['csv', 'snap']))
 def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
-        batchsize):
-
+         batchsize, format):
+    ranker = Ranker()
     start = time.clock()
 
-    maxNodes = 0
-    for line in datafile:
-        maxNodes += 1
+    maxNodes = Ranker.countNodes(datafile)
 
     maxNodes = maxNodes * 2 if undirected else maxNodes
-    graph = newGraph(maxNodes, epsilon, dval, threads, batchsize)
-    datafile.seek(0)
+    ranker.newGraph(maxNodes, epsilon, dval, threads, batchsize)
     nodes = set()
-
     for line in datafile:
-        nodes.update(addEdge(graph, line))
+        nodes.update(ranker.addEdge(line))
 
     loadtime = time.clock() - start
     print("Load Time:", loadtime)
 
     # todo undirected stuff
     for i in range(maxiterations):
-        lib.computeIteration(graph)
-        if graph.converged == 1:
+        ranker.computeIteration()
+        if ranker.graph.converged == 1:
             break
 
     # This is basically a lambda
     def getRank(node):
-        struct = lib.findNodeByName(graph, node.encode())
-        return struct.pageRank_b if graph.isSourceA == 1 else struct.pageRank_a
+        struct = ranker.findNode(node.encode())
+        return struct.pageRank_b if ranker.graph.isSourceA == 1 else struct.pageRank_a
 
-    ordered = sorted(nodes, key=getRank, reverse=True)
-    if graph.converged:
-        print("Converged! after %s iterations" % graph.iterationCount)
+    def getName(node):
+        struct = ranker.findNode(node.encode())
+        return ffi.string(struct.name)
+
+    name_ordered = sorted(nodes, key=getName)
+    ordered = sorted(name_ordered, key=getRank, reverse=True)
+    if ranker.isConverged:
+        print("Converged! after %s iterations" % ranker.graph.iterationCount)
     else:
         print("Didn't converge.")
 
@@ -73,9 +60,46 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
         fmt = "{0!s}\t{1}\t({2})"
 
     for node in ordered:
-        struct = lib.findNodeByName(graph, node.encode())
+        struct = ranker.findNode(node.encode())
         if struct:
             print(fmt.format(node, getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
 
-    lib.cleanup(graph)
+    ranker.cleanup()
+
+
+class Ranker:
+    def countNodes(datafile):
+        maxNodes = 0
+        for line in datafile:
+            maxNodes += 1
+
+        datafile.seek(0)
+        return maxNodes
+
+    def newGraph(self, maxNodes, epsilon, dVal, threads, batchsize):
+        self.graph = lib.newGraph(maxNodes, batchSize, dVal, epsilon, threads)
+
+    def addEdge(self, line):
+        parts = line.split(',')
+
+        left = parts[0].strip().strip('"')
+        right = parts[2].strip().strip('"')
+
+        lib.addEdge(
+                self.graph, left.encode(encoding="ascii"),
+                right.encode(encoding="ascii"))
+
+        return [left, right]
+
+    def findNode(self, name):
+        return lib.findNodeByName(self.graph, name)
+
+    def isConverged(self):
+        return self.graph.converged
+
+    def computeIteration(self):
+        lib.computeIteration(self.graph)
+
+    def cleanup(self):
+        lib.cleanup(self.graph)
 
