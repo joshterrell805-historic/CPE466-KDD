@@ -71,8 +71,8 @@ def parseCSVLine(line):
 
 def parseSNAPLine(line):
     parts = line.split("\t")
-    left = int(parts[0].strip())
-    right = int(parts[1].strip())
+    left = parts[0].strip()
+    right = parts[1].strip()
     return (left, right)
 
 def parse_file(fmt, datafile):
