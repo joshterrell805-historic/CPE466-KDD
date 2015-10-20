@@ -4,15 +4,8 @@ import time
 import vector
 import math
 
-def newGraph(maxNodes, epsilon, dVal, threads):
-    if maxNodes / (threads * 10) < 5:
-        # too little nodes? just do |threads| batches per iteration dividing
-        # the nodes up equally amongst the threads
-        batchSize = (int) (maxNodes / threads) + 1
-    else:
-        batchSize = (int)(maxNodes / (threads * 10))
-
-    return lib.newGraph(maxNodes, batchSize, dVal, epsilon, threads)
+def newGraph(maxNodes, epsilon, dVal, threads, batchsize):
+    return lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads)
 
 def addEdge(graph, line):
     parts = line.split(',')
@@ -34,7 +27,9 @@ def addEdge(graph, line):
 @click.option('--threads', help='number of threads computing pagerank.', default=4)
 @click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
 @click.argument('datafile', type=click.File('r'))
-def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit):
+@click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
+def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
+        batchsize):
 
     start = time.clock()
 
@@ -43,7 +38,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit):
         maxNodes += 1
 
     maxNodes = maxNodes * 2 if undirected else maxNodes
-    graph = newGraph(maxNodes, epsilon, dval, threads)
+    graph = newGraph(maxNodes, epsilon, dval, threads, batchsize)
     datafile.seek(0)
     nodes = set()
 
