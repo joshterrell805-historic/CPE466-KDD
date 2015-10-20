@@ -48,7 +48,7 @@ class PageRank:
         # todo undirected stuff
         for i in range(maxiterations):
             self.computeIteration()
-            if self.isConverged() == 1:
+            if self.isConverged():
                 break
 
     def findNode(self, name):
@@ -59,7 +59,7 @@ class PageRank:
         return lib.findNodeById(self.graph, id)
 
     def isConverged(self):
-        return self.graph.converged
+        return self.graph.converged == 1
 
     def computeIteration(self):
         lib.computeIteration(self.graph)

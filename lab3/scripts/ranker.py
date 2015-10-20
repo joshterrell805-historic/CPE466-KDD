@@ -42,7 +42,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     while True:
         ranker.computeRanking(iterations)
 
-        if ranker.isConverged() == 1:
+        if ranker.isConverged():
             print("Converged! after %s iterations" % ranker.graph.iterationCount)
             break
         else:
