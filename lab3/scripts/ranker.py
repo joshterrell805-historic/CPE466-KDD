@@ -22,21 +22,36 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     # Time loading the data into the graph
     start = time.clock()
     maxNodes = countNodes(datafile)
+    print("Nodes: {0}".format(maxNodes))
     maxNodes = maxNodes * 2 if undirected else maxNodes
     ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize)
     nodes = set()
+    loaded = 0
     for line in parse_file(fmt, datafile):
         nodes.update(ranker.addEdge(line))
+        loaded += 1
+        if maxNodes > 1000 and (loaded % 100000) == 0:
+            print("Loaded {0} nodes...".format(loaded))
 
     loadtime = time.clock() - start
     print("Load Time:", loadtime)
 
-    ranker.computeRanking(maxiterations)
+    # Run algorithm
+    retries = 0
+    iterations = maxiterations
+    while True:
+        ranker.computeRanking(iterations)
 
-    if ranker.isConverged() == 1:
-        print("Converged! after %s iterations" % ranker.graph.iterationCount)
-    else:
-        print("Didn't converge.")
+        if ranker.isConverged() == 1:
+            print("Converged! after %s iterations" % ranker.graph.iterationCount)
+            break
+        else:
+            retries += 1
+            # Increase the number of iterations exponentially
+            olditerations = iterations
+            iterations = int(math.pow(2, retries)) * maxiterations
+            if not click.confirm("We've run {0} iterations and it's not converged. Keep running for {1} iterations?".format(olditerations, iterations), default=True):
+                break
 
     print("Outdegree:")
 
