@@ -77,7 +77,7 @@ class Ranker:
         return maxNodes
 
     def newGraph(self, maxNodes, epsilon, dVal, threads, batchsize):
-        self.graph = lib.newGraph(maxNodes, batchSize, dVal, epsilon, threads)
+        self.graph = lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads)
 
     def addEdge(self, line):
         parts = line.split(',')
