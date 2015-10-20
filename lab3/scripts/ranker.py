@@ -50,7 +50,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
         fmt = "{0!s}\t{1}\t({2})"
 
     for node in ordered:
-        struct = ranker.findNode(node.encode())
+        struct = ranker.findNode(node)
         if struct:
             print(fmt.format(node, ranker.getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
 
@@ -71,8 +71,8 @@ def parseCSVLine(line):
 
 def parseSNAPLine(line):
     parts = line.split("\t")
-    left = parts[0].strip()
-    right = parts[1].strip()
+    left = int(parts[0].strip())
+    right = int(parts[1].strip())
     return (left, right)
 
 def parse_file(fmt, datafile):

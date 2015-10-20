@@ -8,6 +8,8 @@ typedef struct Node {
   // http://cffi.readthedocs.org/en/latest/using.html
   // "the returned pointer object has ownership"
   char *name;
+  unsigned int id;
+  char active;
   double pageRank_a;
   double pageRank_b;
   int outDegree;
@@ -65,11 +67,15 @@ void cleanup(Graph*);
 // return 0 if successful.
 int addEdge(Graph*, char *fromName, char *toName);
 
+// Same as addEdge, but with ids instead
+int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId);
+
 // called by main (python) thread only
 // compute one iteration
 void computeIteration(Graph*);
 
 Node *findNodeByName(Graph*, char *name);
+Node *findNodeById(Graph*, int id);
 
 /////////////////////// exposed for testing only ///////////////////////////////
 
@@ -89,6 +95,7 @@ void computePageRankN(Graph*, Node* node);
 ////////////////////// exposed, but really shouldn't be used ///////////////////
 Node *createNode(Graph*, char *name);
 Node *findOrCreateNode(Graph*, char *name);
+Node *findOrCreateNodeById(Graph *graph, int id);
 // add Node to end of LLNode linked list
 void createLLNode(LLNode **llNode, Node *self);
 void freeNodeData(Node *node);

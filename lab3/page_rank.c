@@ -80,6 +80,20 @@ int addEdge(Graph* graph, char *fromName, char *toName) {
   return 0;
 }
 
+int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId) {
+  Node* from = findOrCreateNodeById(graph, fromId);
+  Node* to = findOrCreateNodeById(graph, toId);
+
+  if (!(from && to)) {
+    return -1;
+  }
+
+  ++from->outDegree;
+  createLLNode(&to->inNodes, from);
+
+  return 0;
+}
+
 // called by main (python) thread only
 void computeIteration(Graph *graph) {
   graph->converged = 1;
@@ -160,6 +174,14 @@ Node *findNodeByName(Graph *graph, char *name) {
   return 0;
 }
 
+Node *findNodeById(Graph *graph, int id) {
+  if (id < graph->maxNodeCount) {
+    return graph->nodes + id;
+  } else {
+    return 0;
+  }
+}
+
 
 // ----------- helper functions, not exposed to cffi -----------------
 
@@ -174,11 +196,30 @@ Node *createNode(Graph *graph, char *name) {
   return graph->nextUnusedNode++;
 }
 
+void initializeNode(Graph *graph, Node *node, unsigned int id) {
+  if (node >= graph->nextUnusedNode) {
+    graph->nextUnusedNode = node + 1;
+  }
+
+  node->id = id;
+  node->active = 1;
+}
+
 Node *findOrCreateNode(Graph *graph, char *name) {
   Node *n = findNodeByName(graph, name);
 
   if (!n) {
     n = createNode(graph, name);
+  }
+
+  return n;
+}
+
+Node *findOrCreateNodeById(Graph *graph, int id) {
+  Node *n = findNodeById(graph, id);
+
+  if (n && !n->active) {
+    initializeNode(graph, n, id);
   }
 
   return n;
