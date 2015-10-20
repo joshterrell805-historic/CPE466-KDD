@@ -14,9 +14,9 @@ from pagerank import PageRank
 @click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
 @click.argument('datafile', type=click.File('r'))
 @click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
-@click.option('--format', type=click.Choice(['csv', 'snap']))
+@click.option('--fmt', type=click.Choice(['csv', 'snap']), default='csv')
 def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
-         batchsize, format):
+         batchsize, fmt):
     # Create Ranker
 
     # Time loading the data into the graph
@@ -25,7 +25,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     maxNodes = maxNodes * 2 if undirected else maxNodes
     ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize)
     nodes = set()
-    for line in datafile:
+    for line in parse_file(fmt, datafile):
         nodes.update(ranker.addEdge(line))
 
     loadtime = time.clock() - start
@@ -62,4 +62,22 @@ def countNodes(datafile):
     datafile.seek(0)
     return maxNodes
 
+def parseCSVLine(line):
+    parts = line.split(',')
 
+    left = parts[0].strip().strip('"')
+    right = parts[2].strip().strip('"')
+    return (left, right)
+
+def parseSNAPLine(line):
+    parts = line.split("\t")
+    left = int(parts[0].strip())
+    right = int(parts[1].strip())
+    return (left, right)
+
+def parse_file(fmt, datafile):
+    if fmt == 'csv':
+        parse = parseCSVLine
+    else:
+        parse = parseSNAPLine
+    return (parse(line) for line in datafile if not line.startswith('#'))

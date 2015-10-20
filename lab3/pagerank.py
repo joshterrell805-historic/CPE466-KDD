@@ -9,16 +9,21 @@ class PageRank:
         lib.cleanup(self.graph)
 
     def addEdge(self, line):
-        parts = line.split(',')
-
-        left = parts[0].strip().strip('"')
-        right = parts[2].strip().strip('"')
+        (left, right) = line
 
         lib.addEdge(
                 self.graph, left.encode(encoding="ascii"),
                 right.encode(encoding="ascii"))
 
         return [left, right]
+
+    def parseLine(line):
+        parts = line.split(',')
+
+        left = parts[0].strip().strip('"')
+        right = parts[2].strip().strip('"')
+        return (left, right)
+        
 
     def computeRanking(self, maxiterations):
         # todo undirected stuff
