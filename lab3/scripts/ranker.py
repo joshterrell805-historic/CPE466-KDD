@@ -15,9 +15,9 @@ from pagerank import PageRank
 @click.argument('datafile', type=click.File('r'))
 @click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
 @click.option('--fmt', type=click.Choice(['csv', 'snap']), default='csv')
-@click.option('--no-normalize', help='By default, the pagerank algorithm normalizes computed pageranks such that the sum of page ranks is 1. Specify this flag to compute page ranks such that the average page rank is closer to 1.', is_flag=True)
+@click.option('--scale/--no-scale', help='Scales epsilon comparision and printed page ranks by size of graph.', default=True)
 def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
-         batchsize, fmt, no_normalize):
+         batchsize, fmt, scale):
     # Create Ranker
 
     # Time loading the data into the graph
@@ -25,8 +25,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     maxNodes = countNodes(datafile)
     print("Nodes: {0}".format(maxNodes))
     maxNodes = maxNodes * 2 if undirected else maxNodes
-    ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize,
-            not no_normalize)
+    ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize, scale)
     nodes = set()
     loaded = 0
     for line in parse_file(fmt, datafile):
@@ -70,7 +69,10 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     for node in ordered:
         struct = ranker.findNode(node)
         if struct:
-            print(fmt.format(node, ranker.getRank(node), abs(struct.pageRank_a - struct.pageRank_b)))
+            delta = abs(struct.pageRank_a - struct.pageRank_b)
+            if scale:
+                delta = delta * len(ordered)
+            print(fmt.format(node, ranker.getRank(node), delta))
             thesum += ranker.getRank(node)
 
     # print('sum: %s\navg %s' % (thesum, thesum / len(ordered)))

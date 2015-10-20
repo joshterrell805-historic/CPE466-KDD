@@ -2,11 +2,12 @@ from _page_rank import ffi, lib
 import sys
 
 class PageRank:
-    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize, normalize):
+    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize, scale):
         self.graph = lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads,
-                1 if normalize else 0)
+                1 if scale else 0)
         self.mapping = {}
         self.index = 0
+        self.scale = scale
 
     def __del__(self):
         lib.cleanup(self.graph)
@@ -71,4 +72,7 @@ class PageRank:
 
     def getRank(self, node):
         struct = self.findNode(node)
-        return struct.pageRank_b if self.graph.isSourceA == 1 else struct.pageRank_a
+        rank = struct.pageRank_b if self.graph.isSourceA == 1 else struct.pageRank_a
+        if self.scale:
+            rank = rank * self.graph.size
+        return rank

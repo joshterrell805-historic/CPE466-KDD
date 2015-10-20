@@ -27,7 +27,7 @@ typedef struct Graph {
   int iterationBatchSize;
   double dVal;
   double epsilonConverge;
-  int normalize;
+  int scale;
   int maxNodeCount;
   int threadCount;
 
@@ -36,8 +36,8 @@ typedef struct Graph {
   int iterationCount;
   double initPageRank;
 
+  int size;
   struct Node *nodes;
-  struct Node *nextUnusedNode;
   Node *nextUnusedNodeForIteration;
 
   // cffi can't #include
@@ -57,25 +57,22 @@ typedef struct Graph {
 // epsilonConverged: init converged flag to true on every iteration
 //  if any node has change in pageRank >= epsilonConverged, set converged
 //  flag to false
+// scale: scale pagerank by number of nodes before epsilon-check
 Graph *newGraph(int maxNodes, int iterationBatchSize, double dVal,
-    double epsilonConverge, int threadCount, int normalize);
+    double epsilonConverge, int threadCount, int scale);
 
 // destroy the graph
 void cleanup(Graph*);
 
-// add an edge to the graph from the node with `fromName` to `toName`
+// add an edge to the graph from the node with `fromId` to `toId`
 // creates missing nodes, if any
 // return 0 if successful.
-int addEdge(Graph*, char *fromName, char *toName);
-
-// Same as addEdge, but with ids instead
 int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId);
 
 // called by main (python) thread only
 // compute one iteration
 void computeIteration(Graph*);
 
-Node *findNodeByName(Graph*, char *name);
 Node *findNodeById(Graph*, int id);
 
 /////////////////////// exposed for testing only ///////////////////////////////
@@ -94,8 +91,7 @@ void computePageRank(Graph*);
 void computePageRankN(Graph*, Node* node);
 
 ////////////////////// exposed, but really shouldn't be used ///////////////////
-Node *createNode(Graph*, char *name);
-Node *findOrCreateNode(Graph*, char *name);
+void initializeNode(Graph *graph, Node *node, unsigned int id);
 Node *findOrCreateNodeById(Graph *graph, int id);
 // add Node to end of LLNode linked list
 void createLLNode(LLNode **llNode, Node *self);

@@ -1,15 +1,15 @@
 Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
-    double epsilonConverge, int threadCount, int normalize) {
+    double epsilonConverge, int threadCount, int scale) {
   Graph *graph = calloc(sizeof(Graph), 1);
 
+  graph->size = 0;
   graph->nodes = calloc(sizeof(Node), maxNodeCount);
-  graph->nextUnusedNode = graph->nodes;
   graph->maxNodeCount = maxNodeCount;
   graph->iterationBatchSize = iterationBatchSize;
   graph->dVal = dVal;
   graph->epsilonConverge = epsilonConverge;
   graph->threadCount = threadCount;
-  graph->normalize = normalize;
+  graph->scale = scale;
 
   graph->iterationStartSem = malloc(sizeof(size_t) * 4);
   graph->iterationEndSem = malloc(sizeof(size_t) * 4);
@@ -39,7 +39,7 @@ void cleanup(Graph *graph) {
     exit(-1);
   }
 
-  for (Node *n = graph->nodes; n != graph->nextUnusedNode; ++n) {
+  for (Node *n = graph->nodes; n != graph->nodes + graph->size; ++n) {
     freeNodeData(n);
   }
 
@@ -67,20 +67,6 @@ void cleanup(Graph *graph) {
   free(graph);
 }
 
-int addEdge(Graph* graph, char *fromName, char *toName) {
-  Node* from = findOrCreateNode(graph, fromName);
-  Node* to = findOrCreateNode(graph, toName);
-
-  if (!(from && to)) {
-    return -1;
-  }
-
-  ++from->outDegree;
-  createLLNode(&to->inNodes, from);
-
-  return 0;
-}
-
 int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId) {
   Node* from = findOrCreateNodeById(graph, fromId);
   Node* to = findOrCreateNodeById(graph, toId);
@@ -101,11 +87,7 @@ void computeIteration(Graph *graph) {
   graph->nextUnusedNodeForIteration = graph->nodes;
   ++graph->iterationCount;
   graph->isSourceA = !graph->isSourceA;
-  if (graph->normalize) {
-    graph->initPageRank = 1.0 / (graph->nextUnusedNode - graph->nodes);
-  } else {
-    graph->initPageRank = 1.0;
-  }
+  graph->initPageRank = 1.0 / graph->size;
 
   // unlock all the threads so they can start computing
   for (int i = 0; i < graph->threadCount; ++i) {
@@ -122,7 +104,7 @@ void getNextBatchInIteration(Graph *graph, Node **retStart, int *count) {
   pthread_mutex_lock(graph->getBatchLock); 
 
   int a = graph->iterationBatchSize;
-  int b = graph->nextUnusedNode - graph->nextUnusedNodeForIteration;
+  int b = graph->size - (graph->nextUnusedNodeForIteration - graph->nodes);
 
   *count = a < b ? a : b;
   *retStart = graph->nextUnusedNodeForIteration;
@@ -160,23 +142,14 @@ void computePageRankN(Graph* graph, Node *node) {
       llNode->self->outDegree;
     llNode = llNode->next;
   }
+
   *dstRank = *dstRank * graph->dVal + (1 - graph->dVal) * graph->initPageRank;
 
   // thread-safe! :)
-  if (graph->converged &&
-      fabs(node->pageRank_b - node->pageRank_a) >= graph->epsilonConverge) {
+  double delta = fabs(node->pageRank_b - node->pageRank_a);
+  if (graph->converged && (graph->size * delta) >= graph->epsilonConverge) {
     graph->converged = 0;
   }
-}
-
-Node *findNodeByName(Graph *graph, char *name) {
-  for (Node *n = graph->nodes; n != graph->nextUnusedNode; ++n) {
-    if (strcmp(n->name, name) == 0) {
-      return n;
-    }
-  }
-
-  return 0;
 }
 
 Node *findNodeById(Graph *graph, int id) {
@@ -190,34 +163,10 @@ Node *findNodeById(Graph *graph, int id) {
 
 // ----------- helper functions, not exposed to cffi -----------------
 
-Node *createNode(Graph *graph, char *name) {
-  if (graph->nextUnusedNode - graph->nodes == graph->maxNodeCount) {
-    return 0;
-  }
-
-  graph->nextUnusedNode->name = calloc(sizeof(char), strlen(name) + 1);
-  strcpy(graph->nextUnusedNode->name, name);
-
-  return graph->nextUnusedNode++;
-}
-
 void initializeNode(Graph *graph, Node *node, unsigned int id) {
-  if (node >= graph->nextUnusedNode) {
-    graph->nextUnusedNode = node + 1;
-  }
-
   node->id = id;
   node->active = 1;
-}
-
-Node *findOrCreateNode(Graph *graph, char *name) {
-  Node *n = findNodeByName(graph, name);
-
-  if (!n) {
-    n = createNode(graph, name);
-  }
-
-  return n;
+  ++graph->size;
 }
 
 Node *findOrCreateNodeById(Graph *graph, int id) {
