@@ -1,4 +1,5 @@
 import unittest
+import io
 from scripts import ranker
 
 class TestRanker(unittest.TestCase):
@@ -15,3 +16,7 @@ class TestRanker(unittest.TestCase):
     def test_parse_comment(self):
         parse = ranker.parse_file('snap', ['# Nodes: 8846 Edges: 31839'])
         self.assertEqual(list(parse), [])
+
+    def test_countNodes(self):
+        count = ranker.countNodes(io.StringIO("data\ndata\ndata"))
+        self.assertEqual(count, 3)
