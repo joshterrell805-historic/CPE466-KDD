@@ -19,6 +19,7 @@ typedef struct Node {
 
 // a wrapper around a node so we can create a linked list of nodes
 typedef struct LLNode {
+  int weight;
   struct Node *self;
   struct LLNode *next;
 } LLNode;
@@ -37,6 +38,7 @@ typedef struct Graph {
   double initPageRank;
 
   int size;
+  int weightedSize;
   struct Node *nodes;
   Node *nextUnusedNodeForIteration;
 
@@ -67,7 +69,8 @@ void cleanup(Graph*);
 // add an edge to the graph from the node with `fromId` to `toId`
 // creates missing nodes, if any
 // return 0 if successful.
-int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId);
+int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId,
+    int weight);
 
 // called by main (python) thread only
 // compute one iteration
@@ -94,7 +97,7 @@ void computePageRankN(Graph*, Node* node);
 void initializeNode(Graph *graph, Node *node, unsigned int id);
 Node *findOrCreateNodeById(Graph *graph, int id);
 // add Node to end of LLNode linked list
-void createLLNode(LLNode **llNode, Node *self);
+void createLLNode(LLNode **llNode, Node *self, int weight);
 void freeNodeData(Node *node);
 void freeLLNodes(LLNode *llNode);
 void *threadMain(Graph*);

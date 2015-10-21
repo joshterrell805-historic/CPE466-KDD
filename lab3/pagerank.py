@@ -2,18 +2,20 @@ from _page_rank import ffi, lib
 import sys
 
 class PageRank:
-    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize, scale):
+    def __init__(self, maxNodes, epsilon, dVal, threads, batchsize, scale,
+            weighted):
         self.graph = lib.newGraph(maxNodes, batchsize, dVal, epsilon, threads,
                 1 if scale else 0)
         self.mapping = {}
         self.index = 0
         self.scale = scale
+        self.weighted = weighted
 
     def __del__(self):
         lib.cleanup(self.graph)
 
     def addEdge(self, line):
-        (left, right) = line
+        (left, right, weight) = line
 
         # see http://stackoverflow.com/a/402704/2243495
         if isinstance(left, int):
@@ -26,9 +28,16 @@ class PageRank:
         else:
             rightId = self.getOrSetId(right)
 
-        lib.addEdgeByIds(
-                self.graph, leftId,
-                rightId)
+        if not self.weighted:
+            weight = 1
+
+        if weight > 0:
+            lib.addEdgeByIds(self.graph, rightId, leftId, weight)
+        elif weight < 0:
+            lib.addEdgeByIds(self.graph, leftId, rightId, -weight)
+        else:
+            # lets not figure out how to handle this until it happens
+            raise Exception("zero weight")
 
         return [left, right]
 
@@ -74,5 +83,5 @@ class PageRank:
         struct = self.findNode(node)
         rank = struct.pageRank_b if self.graph.isSourceA == 1 else struct.pageRank_a
         if self.scale:
-            rank = rank * self.graph.size
+            rank = rank * self.graph.weightedSize
         return rank

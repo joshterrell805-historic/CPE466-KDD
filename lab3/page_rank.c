@@ -2,7 +2,6 @@ Graph *newGraph(int maxNodeCount, int iterationBatchSize, double dVal,
     double epsilonConverge, int threadCount, int scale) {
   Graph *graph = calloc(sizeof(Graph), 1);
 
-  graph->size = 0;
   graph->nodes = calloc(sizeof(Node), maxNodeCount);
   graph->maxNodeCount = maxNodeCount;
   graph->iterationBatchSize = iterationBatchSize;
@@ -67,7 +66,8 @@ void cleanup(Graph *graph) {
   free(graph);
 }
 
-int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId) {
+int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId,
+    int weight) {
   Node* from = findOrCreateNodeById(graph, fromId);
   Node* to = findOrCreateNodeById(graph, toId);
 
@@ -75,8 +75,11 @@ int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId) {
     return -1;
   }
 
-  ++from->outDegree;
-  createLLNode(&to->inNodes, from);
+  createLLNode(&to->inNodes, from, weight);
+
+  // we're pretending there are more nodes than there actually are.
+  graph->weightedSize += weight;
+  from->outDegree += weight;
 
   return 0;
 }
@@ -87,7 +90,7 @@ void computeIteration(Graph *graph) {
   graph->nextUnusedNodeForIteration = graph->nodes;
   ++graph->iterationCount;
   graph->isSourceA = !graph->isSourceA;
-  graph->initPageRank = 1.0 / graph->size;
+  graph->initPageRank = 1.0 / graph->weightedSize;
 
   // unlock all the threads so they can start computing
   for (int i = 0; i < graph->threadCount; ++i) {
@@ -124,7 +127,7 @@ void computePageRank(Graph *graph) {
   }
 }
 
-// p(i) = (1-d) * 1 / |V| + d * SUM(1->k, 1/|Ojk| * p(jk)
+// p(i) = (1-d) / |V| + d * SUM(1->k, 1/|Ojk| * p(jk)
 // pageRank_i+1(node) = (1-d) / #nodeCount    +
 //    d * SUM(1/outdegree(incommingNode) * pageRank_i(incommingNode))
 void computePageRankN(Graph* graph, Node *node) {
@@ -137,9 +140,10 @@ void computePageRankN(Graph* graph, Node *node) {
   *dstRank = 0.0;
 
   while (llNode) {
-    *dstRank +=
-      (graph->isSourceA ? llNode->self->pageRank_a : llNode->self->pageRank_b) /
-      llNode->self->outDegree;
+    double rank = (graph->isSourceA ?
+        llNode->self->pageRank_a : llNode->self->pageRank_b);
+
+    *dstRank += llNode->weight * rank / llNode->self->outDegree;
     llNode = llNode->next;
   }
 
@@ -147,7 +151,8 @@ void computePageRankN(Graph* graph, Node *node) {
 
   // thread-safe! :)
   double delta = fabs(node->pageRank_b - node->pageRank_a);
-  if (graph->converged && (graph->size * delta) >= graph->epsilonConverge) {
+  if (graph->converged &&
+      (graph->weightedSize * delta) >= graph->epsilonConverge) {
     graph->converged = 0;
   }
 }
@@ -179,13 +184,14 @@ Node *findOrCreateNodeById(Graph *graph, int id) {
   return n;
 }
 
-void createLLNode(LLNode **llNode, Node *self) {
+void createLLNode(LLNode **llNode, Node *self, int weight) {
   while (*llNode) {
     llNode = &(*llNode)->next;
   }
   *llNode = malloc(sizeof(LLNode));
   (*llNode)->self = self;
   (*llNode)->next = 0;
+  (*llNode)->weight = weight;
 }
 
 void freeNodeData(Node *node) {

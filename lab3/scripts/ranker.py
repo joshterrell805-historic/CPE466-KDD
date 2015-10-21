@@ -16,8 +16,10 @@ from pagerank import PageRank
 @click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
 @click.option('--fmt', type=click.Choice(['csv', 'snap']), default='csv')
 @click.option('--scale/--no-scale', help='Scales epsilon comparision and printed page ranks by size of graph.', default=True)
+@click.option('--weighted', help='Specify flag to indicate graph is weighted.',
+        is_flag=True)
 def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
-         batchsize, fmt, scale):
+         batchsize, fmt, scale, weighted):
     # Create Ranker
 
     # Time loading the data into the graph
@@ -25,7 +27,8 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     maxNodes = countNodes(datafile)
     print("Nodes: {0}".format(maxNodes))
     maxNodes = maxNodes * 2 if undirected else maxNodes
-    ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize, scale)
+    ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize, scale,
+            weighted)
     nodes = set()
     loaded = 0
     for line in parse_file(fmt, datafile):
@@ -71,7 +74,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
         if struct:
             delta = abs(struct.pageRank_a - struct.pageRank_b)
             if scale:
-                delta = delta * len(ordered)
+                delta = delta * ranker.graph.weightedSize
             print(fmt.format(node, ranker.getRank(node), delta))
             thesum += ranker.getRank(node)
 
@@ -90,13 +93,19 @@ def parseCSVLine(line):
 
     left = parts[0].strip().strip('"')
     right = parts[2].strip().strip('"')
-    return (left, right)
+    wA = int(parts[1].strip())
+    wB = int(parts[3].strip())
+    weight = wA - wB
+
+    return (left, right, weight)
 
 def parseSNAPLine(line):
     parts = line.split("\t")
     left = int(parts[0].strip())
     right = int(parts[1].strip())
-    return (left, right)
+    weight = 1
+
+    return (left, right, weight)
 
 def parse_file(fmt, datafile):
     if fmt == 'csv':
