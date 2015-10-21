@@ -3,65 +3,61 @@ import unittest
 
 class TestPageRank(unittest.TestCase):
     def test_graphCreation(self):
-        graph = lib.newGraph(4, -1, -1, -1, 1)
+        graph = lib.newGraph(4, -1, -1, -1, 1, 0)
 
-        ret = lib.addEdge(graph, b"a", b"b")
+        ret = lib.addEdgeByIds(graph, 1, 2, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdge(graph, b"b", b"c")
+        ret = lib.addEdgeByIds(graph, 2, 3, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdge(graph, b"a", b"c")
+        ret = lib.addEdgeByIds(graph, 1, 3, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdge(graph, b"d", b"c")
+        ret = lib.addEdgeByIds(graph, 0, 3, 1)
         self.assertEqual(ret, 0)
 
         # can't create more than 4 nodes
-        ret = lib.addEdge(graph, b"c", b"e")
+        ret = lib.addEdgeByIds(graph, 3, 4, 1)
         self.assertEqual(ret, -1)
-        self.assertEqual(lib.findNodeByName(graph, b"e"), ffi.NULL)
+        self.assertEqual(lib.findNodeById(graph, 4), ffi.NULL)
 
         # nodes have correct data
-        n = lib.findNodeByName(graph, b"a")
-        self.assertNode(n, b"a")
+        n = lib.findNodeById(graph, 1)
         self.assertEqual(n.outDegree, 2)
-        self.assertLLValues(n.inNodes, [])
+        self.assertLLValuesById(n.inNodes, [])
 
-        n = lib.findNodeByName(graph, b"b")
-        self.assertNode(n, b"b")
+        n = lib.findNodeById(graph, 2)
         self.assertEqual(n.outDegree, 1)
-        self.assertLLValues(n.inNodes, [b"a"])
+        self.assertLLValuesById(n.inNodes, [1])
 
-        n = lib.findNodeByName(graph, b"c")
-        self.assertNode(n, b"c")
+        n = lib.findNodeById(graph, 3)
         self.assertEqual(n.outDegree, 0)
-        self.assertLLValues(n.inNodes, [b"b", b"a", b"d"])
+        self.assertLLValuesById(n.inNodes, [2, 1, 0])
 
-        n = lib.findNodeByName(graph, b"d")
-        self.assertNode(n, b"d")
+        n = lib.findNodeById(graph, 0)
         self.assertEqual(n.outDegree, 1)
-        self.assertLLValues(n.inNodes, [])
+        self.assertLLValuesById(n.inNodes, [])
 
         lib.cleanup(graph)
 
     def test_graphCreationById(self):
-        graph = lib.newGraph(4, -1, -1, -1, 1)
+        graph = lib.newGraph(4, -1, -1, -1, 1, 0)
 
-        ret = lib.addEdgeByIds(graph, 0, 1)
+        ret = lib.addEdgeByIds(graph, 0, 1, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdgeByIds(graph, 1, 2)
+        ret = lib.addEdgeByIds(graph, 1, 2, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdgeByIds(graph, 0, 2)
+        ret = lib.addEdgeByIds(graph, 0, 2, 1)
         self.assertEqual(ret, 0)
 
-        ret = lib.addEdgeByIds(graph, 3, 2)
+        ret = lib.addEdgeByIds(graph, 3, 2, 1)
         self.assertEqual(ret, 0)
 
         # can't create more than 4 nodes
-        ret = lib.addEdgeByIds(graph, 2, 4)
+        ret = lib.addEdgeByIds(graph, 2, 4, 1)
         self.assertEqual(ret, -1)
         self.assertEqual(lib.findNodeById(graph, 4), ffi.NULL)
 
@@ -91,17 +87,21 @@ class TestPageRank(unittest.TestCase):
     def test_computePageRank(self):
         epsilon = 0.00001
         nodeCount = 3
-        graph = lib.newGraph(nodeCount+10, 1, 0.5, epsilon, 2)
-        lib.addEdge(graph, b"a", b"b")
-        lib.addEdge(graph, b"a", b"c")
-        lib.addEdge(graph, b"b", b"c")
-        lib.addEdge(graph, b"c", b"a")
+        graph = lib.newGraph(nodeCount+10, 1, 0.5, epsilon, 2, 0)
+        lib.addEdgeByIds(graph, 1, 2, 1)
+        lib.addEdgeByIds(graph, 1, 3, 1)
+        lib.addEdgeByIds(graph, 2, 3, 1)
+        lib.addEdgeByIds(graph, 3, 1, 1)
 
         lib.computeIteration(graph)
 
-        n = lib.findNodeByName(graph, b"c")
         # initial pageRank
-        self.assertTrue(abs(n.pageRank_a - 1.0/nodeCount) < epsilon)
+        n = lib.findNodeById(graph, 1)
+        self.assertTrue(abs(n.pageRank_a - 1.0/graph.weightedSize) < epsilon)
+        n = lib.findNodeById(graph, 2)
+        self.assertTrue(abs(n.pageRank_a - 1.0/graph.weightedSize) < epsilon)
+        n = lib.findNodeById(graph, 3)
+        self.assertTrue(abs(n.pageRank_a - 1.0/graph.weightedSize) < epsilon)
 
         while graph.converged == 0:
             lib.computeIteration(graph)
@@ -109,9 +109,9 @@ class TestPageRank(unittest.TestCase):
         # one more so both a and b have the converged page rank
         lib.computeIteration(graph)
 
-        a = lib.findNodeByName(graph, b"a")
-        b = lib.findNodeByName(graph, b"b")
-        c = lib.findNodeByName(graph, b"c")
+        a = lib.findNodeById(graph, 1)
+        b = lib.findNodeById(graph, 2)
+        c = lib.findNodeById(graph, 3)
 
         # the examples are not normalized so we must divide by nodeCount
         # http://pr.efactory.de/e-pagerank-algorithm.shtml
@@ -127,11 +127,11 @@ class TestPageRank(unittest.TestCase):
     def test_computePageRankById(self):
         epsilon = 0.00001
         nodeCount = 3
-        graph = lib.newGraph(nodeCount+10, 1, 0.5, epsilon, 2)
-        lib.addEdgeByIds(graph, 0, 1)
-        lib.addEdgeByIds(graph, 0, 2)
-        lib.addEdgeByIds(graph, 1, 2)
-        lib.addEdgeByIds(graph, 2, 0)
+        graph = lib.newGraph(nodeCount+10, 1, 0.5, epsilon, 2, 0)
+        lib.addEdgeByIds(graph, 0, 1, 1)
+        lib.addEdgeByIds(graph, 0, 2, 1)
+        lib.addEdgeByIds(graph, 1, 2, 1)
+        lib.addEdgeByIds(graph, 2, 0, 1)
 
         lib.computeIteration(graph)
 
@@ -159,20 +159,6 @@ class TestPageRank(unittest.TestCase):
         self.assertTrue(abs(c.pageRank_b - 1.15384615 / nodeCount) < epsilon*10)
 
         lib.cleanup(graph)
-
-
-    def assertLLValues(self, lln, values):
-        lln = ffi.cast('LLNode*', lln)
-
-        for i in range(len(values)):
-            self.assertNode(lln.self, values[i])
-            lln = ffi.cast('LLNode*', lln.next)
-
-        self.assertEqual(lln, ffi.NULL)
-
-    def assertNode(self, node, name):
-        node = ffi.cast('Node*', node)
-        self.assertEqual(lib.strcmp(node.name, name), 0)
 
 
     def assertLLValuesById(self, lln, values):

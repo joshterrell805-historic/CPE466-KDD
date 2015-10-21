@@ -108,7 +108,7 @@ void getNextBatchInIteration(Graph *graph, Node **retStart, int *count) {
   pthread_mutex_lock(graph->getBatchLock); 
 
   int a = graph->iterationBatchSize;
-  int b = graph->size - (graph->nextUnusedNodeForIteration - graph->nodes);
+  int b = graph->maxNodeCount - (graph->nextUnusedNodeForIteration - graph->nodes);
 
   *count = a < b ? a : b;
   *retStart = graph->nextUnusedNodeForIteration;
@@ -123,7 +123,9 @@ void computePageRank(Graph *graph) {
 
   while (getNextBatchInIteration(graph, &node, &length), length) {
     while (length--) {
-      computePageRankN(graph, node++);
+      if (node->active) {
+        computePageRankN(graph, node++);
+      }
     }
   }
 }
