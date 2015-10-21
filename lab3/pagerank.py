@@ -10,9 +10,19 @@ class PageRank:
         self.index = 0
         self.scale = scale
         self.weighted = weighted
+        self.weight = {}
 
     def __del__(self):
         lib.cleanup(self.graph)
+
+    def addWeight(self, name, weight):
+        if not name in self.weight:
+            self.weight[name] = 0
+
+        self.weight[name] += weight
+
+    def getTotalWeight(self, name):
+        return self.weight[name]
 
     def addEdge(self, line):
         (left, right, weight) = line
@@ -34,8 +44,12 @@ class PageRank:
 
         if weight > 0:
             lib.addEdgeByIds(self.graph, rightId, leftId, weight)
+            self.addWeight(right, weight)
+            self.addWeight(left, -weight)
         elif weight < 0:
             lib.addEdgeByIds(self.graph, leftId, rightId, -weight)
+            self.addWeight(left, -weight)
+            self.addWeight(right, weight)
         else:
             # lets not figure out how to handle this until it happens
             raise Exception("zero weight")
@@ -79,6 +93,9 @@ class PageRank:
     def getOrderedNodes(self, nodes):
         name_ordered = sorted(nodes)
         return sorted(name_ordered, key=self.getRank, reverse=True)
+
+    def getTotalWeightOrderedNodes(self, nodes):
+        return sorted(nodes, key=self.getTotalWeight, reverse=True)
 
     def getRank(self, node):
         struct = self.findNode(node)

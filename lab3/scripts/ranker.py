@@ -80,6 +80,9 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
 
     # print('sum: %s\navg %s' % (thesum, thesum / len(ordered)))
 
+    for node in ranker.getTotalWeightOrderedNodes(nodes):
+        print("{0!s}\tweight: {1}".format(node, ranker.getTotalWeight(node)))
+
 def countNodes(datafile):
     maxNodes = 0
     for line in datafile:
