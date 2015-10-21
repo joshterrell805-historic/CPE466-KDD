@@ -1,7 +1,7 @@
 #!/bin/bash
 runranker() {
     mkdir -p "$(dirname "$2")"
-    ranker --limit --epsilon 0.0000001 "$1" | sed '0,/Outdegree:/d' > "$2"
+    ranker --no-scale --maxiterations 10000 --limit --epsilon 0.0000001 "$1" | sed '0,/Outdegree:/d' > "$2"
     sort "$2" > "$2.sorted"
 }
 
