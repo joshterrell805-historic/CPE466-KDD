@@ -152,8 +152,8 @@ void computePageRankN(Graph* graph, Node *node) {
 
   // thread-safe! :)
   double delta = fabs(node->pageRank_b - node->pageRank_a);
-  if (graph->converged &&
-      (graph->weightedSize * delta) >= graph->epsilonConverge) {
+  double comp = graph->scale ? (graph->weightedSize * delta) : delta;
+  if (graph->converged && comp >= graph->epsilonConverge) {
     graph->converged = 0;
   }
 }
