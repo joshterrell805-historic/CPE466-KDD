@@ -44,12 +44,12 @@ class PageRank:
 
         if weight > 0:
             lib.addEdgeByIds(self.graph, rightId, leftId, weight)
-            self.addWeight(right, weight)
-            self.addWeight(left, -weight)
+            self.addWeight(left, weight)
+            self.addWeight(right, 0)
         elif weight < 0:
             lib.addEdgeByIds(self.graph, leftId, rightId, -weight)
-            self.addWeight(left, -weight)
-            self.addWeight(right, weight)
+            self.addWeight(right, -weight)
+            self.addWeight(left, 0)
         else:
             # lets not figure out how to handle this until it happens
             raise Exception("zero weight")
