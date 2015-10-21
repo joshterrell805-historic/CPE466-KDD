@@ -63,8 +63,8 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     if limit:
         # Skip the last 3 places of the epsilon's precision. They're
         # too variable for diff-based testing
-        precision = str(math.floor(-math.log10(epsilon) - 3))
-        fmt = "{0!s}\t{1:." + precision + "f}\t({2:." + precision + "f})"
+        precision = math.floor(-math.log10(epsilon) - 3)
+        fmt = "{0!s}\t{1:." + str(precision) + "f}\t({2:." + str(precision) + "f})"
     else:
         fmt = "{0!s}\t{1}\t({2})"
 
