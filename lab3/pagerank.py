@@ -29,7 +29,8 @@ class PageRank:
             rightId = self.getOrSetId(right)
 
         if not self.weighted:
-            weight = 1
+            # we want to point from left to right with weight 1
+            weight = -1
 
         if weight > 0:
             lib.addEdgeByIds(self.graph, rightId, leftId, weight)

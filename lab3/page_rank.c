@@ -78,7 +78,8 @@ int addEdgeByIds(Graph* graph, unsigned int fromId, unsigned int toId,
   createLLNode(&to->inNodes, from, weight);
 
   // we're pretending there are more nodes than there actually are.
-  graph->weightedSize += weight;
+  // weighted size gets only the "extra" node count added to it
+  graph->weightedSize += weight - 1;
   from->outDegree += weight;
 
   return 0;
@@ -172,6 +173,7 @@ void initializeNode(Graph *graph, Node *node, unsigned int id) {
   node->id = id;
   node->active = 1;
   ++graph->size;
+  ++graph->weightedSize;
 }
 
 Node *findOrCreateNodeById(Graph *graph, int id) {
