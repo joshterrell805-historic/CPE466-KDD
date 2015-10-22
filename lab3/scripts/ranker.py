@@ -101,10 +101,14 @@ def parseCSVLine(line):
     return (left, right, weight)
 
 def parseSNAPLine(line):
-    parts = line.split("\t")
+    parts = line.split("\s+")
     left = int(parts[0].strip())
     right = int(parts[1].strip())
-    weight = 1
+    if (len(parts) > 2):
+        # Handle Slashdot data
+        weight = -int(parts[2])
+    else:
+        weight = float('NaN')
 
     return (left, right, weight)
 
