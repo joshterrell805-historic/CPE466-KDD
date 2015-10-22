@@ -33,6 +33,7 @@ To run:
 ```
 ranker <filename.csv>            # unweighted
 ranker <filename.csv> --weighted # weighted
+ranker <filename.txt> --fmt=snap # option specifiying input file is snap format
 ```
 
 You can use `ranker --help` for more options such as setting the pagerank `d`
