@@ -11,14 +11,13 @@ from pagerank import PageRank
 @click.option('--limit/--no-limit', help='Limit precision of printed page rank to three less places than the precision specified by epsilon option. Note that this doesn\'t handle the case where epsilon >= 0.001', default=False)
 @click.option('--dval', help='Probability of following a link in pagerank algorithm.', default=0.85)
 @click.option('--threads', help='number of threads computing pagerank.', default=4)
-@click.option('--undirected', help='Specify flag to indicate that this source file contains undirected node data.', is_flag=True)
 @click.argument('datafile', type=click.File('r'))
 @click.option('--batchsize', help='On each iteration, each thread claims `batchsize` nodes to compute pagerank for. A batchsize of too small, and threads may constantly be sychronizing around a mutex. Too large, and a few threads may end up doing most of the work while others sit idly.', default=100)
 @click.option('--fmt', type=click.Choice(['csv', 'snap']), default='csv')
 @click.option('--scale/--no-scale', help='Scales epsilon comparision and printed page ranks by size of graph.', default=True)
 @click.option('--weighted', help='Specify flag to indicate graph is weighted.',
         is_flag=True)
-def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
+def rank(epsilon, maxiterations, dval, threads, datafile, limit,
          batchsize, fmt, scale, weighted):
     # Create Ranker
 
@@ -26,7 +25,6 @@ def rank(epsilon, maxiterations, dval, threads, datafile, undirected, limit,
     start = time.clock()
     maxNodes = countNodes(datafile)
     print("Nodes: {0}".format(maxNodes))
-    maxNodes = maxNodes * 2 if undirected else maxNodes
     ranker = PageRank(maxNodes, epsilon, dval, threads, batchsize, scale,
             weighted)
     nodes = set()
