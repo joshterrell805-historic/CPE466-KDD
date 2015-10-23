@@ -2,7 +2,38 @@ require 'fileutils'
 
 RESULTS_DIR = 'results'
 
-task :default do
+task :default => ['report.pdf']
+
+file 'report.pdf' => ['stateborderstimes.tex'] do
+  sh 'latexmk report.tex'
+end
+
+rule 'times.tex' => proc {|name| File.join(RESULTS_DIR, File.basename(name, 'times.tex'))} do |t|
+
+  data = {}
+  open(t.source) do |io|
+    io.each do |line|
+      case line
+      when /^Nodes: (\d+)$/
+        data[:node_estimate] = $~[1].to_i
+      when /^Load Time: ([\d.]+)$/
+        data[:loadtime] = $~[1].to_f
+      when /^Converged! after (\d+) iter/
+        data[:iter_count] = $~[1].to_i
+      when /^Run Time: ([\d.]+)$/
+        data[:runtime] = $~[1].to_f
+      when /Outdegree:/
+        break
+      end
+    end
+
+    data[:results] = io.readlines.join
+  end
+
+  p data
+end
+
+task :recalculate_data do
   calculate 'data/stateborders.csv'
   calculate 'data/dolphins.csv'
   calculate 'data/karate.csv'
@@ -29,7 +60,7 @@ def calculate file, weighted=false
     raise "Unknown extension " + ext
   end
   
-  result = File.join RESULTS_DIR, File.basename(file)
+  result = File.join RESULTS_DIR, File.basename(file, ext)
   FileUtils.mkdir_p RESULTS_DIR
 
   args = %w[--scale --threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
