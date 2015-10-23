@@ -1,0 +1,8 @@
+task :default do
+  calculate 'data/dolphins.csv', 'csv', 'results/dolphins.csv'
+end
+
+def calculate file, format, result
+  system './virtual/bin/ranker', '--scale', '--fmt', format,
+         file, out: result
+end
