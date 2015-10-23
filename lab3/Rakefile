@@ -1,8 +1,39 @@
+require 'fileutils'
+
 task :default do
-  calculate 'data/dolphins.csv', 'csv', 'results/dolphins.csv'
+  calculate 'data/stateborders.csv'
+  calculate 'data/dolphins.csv'
+  calculate 'data/karate.csv'
+  calculate 'data/lesmis.csv'
+  calculate 'data/NCAA_football.csv', true
+  calculate 'data/polblogs.csv'
+
+  calculate 'snapData/p2p-Gnutella05.txt'
+  calculate 'snapData/wiki-Vote.txt'
+  calculate 'snapData/soc-sign-Slashdot081106.txt'
+  calculate 'snapData/amazon0505.txt'
+  calculate 'snapData/soc-LiveJournal1.txt'
 end
 
-def calculate file, format, result
-  system './virtual/bin/ranker', '--scale', '--fmt', format,
-         file, out: result
+def calculate file, weighted=false
+  puts "Running calculations on #{file}"
+  ext = File.extname file
+  case ext
+  when '.csv'
+    format = 'csv'
+  when '.txt'
+    format = 'snap'
+  else
+    raise "Unknown extension " + ext
+  end
+  
+  result = File.join 'results', File.basename(file)
+  FileUtils.mkdir_p 'results'
+
+  args = %w[--scale --threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
+  if weighted
+    args << '--weighted'
+  end
+
+  system './virtual/bin/ranker', *args, '--fmt', format, file, out: result
 end
