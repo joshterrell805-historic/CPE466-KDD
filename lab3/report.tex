@@ -24,10 +24,6 @@
 % Import an info need results file
 \newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
 
-% Allow customizing algorithm names
-\newcommand{\okapi}{okapi }
-\newcommand{\cosine}{cosine similarity }
-
 \title{CPE466\\Lab2}
 \author{
   Gilbert, Andrew\\
@@ -50,26 +46,36 @@ on several datasets.
 \end{abstract}
 
 \section{Introduction}
-The PageRank algorithm, developed by Larry Page and Sergey Brin, and initially used in what became the Google search engine, is a technique for calculating the importance of nodes in a graph.
+The PageRank algorithm, developed by Larry Page and Sergey Brin, and
+initially used in what became the Google search engine, is a technique
+for calculating the importance of nodes in a graph.
 
 
 
 \section{Implementation Overview}
-We implemented our reading and writing system in Python, but the bulk of the algorithm in C. The C runs a master thread and a (configurable) number of worker threads. Each thread asks the master thread for a block of data to work on. The data is stored in structs with six fields:
+We implemented our reading and writing system in Python, but the bulk
+of the algorithm in C. The C runs a master thread and a (configurable)
+number of worker threads. Each thread asks the master thread for a
+block of data to work on. The data is stored in structs with six
+fields:
 \begin{lstlisting}[lang=ANSI]
 {
-  id: unsigned int,
-  outgoing: unsigned int,
-  incoming: [unsigned int],
-  nIncoming: unsigned int,
-  lRank: double,
-  rRank: double,
+  unsigned int id;
+  char active;
+  double pageRank_a;
+  double pageRank_b;
+  int outDegree;
+  struct LLNode *inNodes;
 }
 \end{lstlisting}
+The \texttt{LLNode} is a linked list implementation used to store a list of nodes which link to this node.
+
 Multiple passes are used to process the data. On each pass, the
-PageRank for each node is read from either the \texttt{lRank} or
-\texttt{rRank} field and the new rank is written to the other. If the
-rank has changed more than a certain delta, a flag is updated to allow
+PageRank for each node is read from either the \texttt{pageRank_a} or
+\texttt{pageRank_b} field and the new rank is written to the other. If the
+rank has changed more than a certain delta, 
+% Is this correct?
+a flag is updated to allow
 the system to know the algorithm has not converged. Once all the
 worker threads have completed their work, if the ``unconverged'' flag
 is set, the master thread starts the workers again, this time telling
@@ -90,6 +96,7 @@ the field they were reading from.
 \subsection{LIVEJOURNAL1}
 
 \section{Overall Summary}
+We observered that the NCAA data set is troublesome, because the nodes are in the opposite order from the other datasets. We decided it made more sense to 
 
 \section{Performance Evaluation}
 \begin{table}
