@@ -17,8 +17,10 @@ from pagerank import PageRank
 @click.option('--scale/--no-scale', help='Scales epsilon comparision and printed page ranks by size of graph.', default=True)
 @click.option('--weighted', help='Specify flag to indicate graph is weighted.',
         is_flag=True)
+@click.option('--showweights/--no-showweights', help='Specify flag to show weights gathered',
+              default=False)
 def rank(epsilon, maxiterations, dval, threads, datafile, limit,
-         batchsize, fmt, scale, weighted):
+         batchsize, fmt, scale, weighted, showweights):
     # Create Ranker
 
     # Time loading the data into the graph
@@ -78,8 +80,9 @@ def rank(epsilon, maxiterations, dval, threads, datafile, limit,
 
     # print('sum: %s\navg %s' % (thesum, thesum / len(ordered)))
 
-    for node in ranker.getTotalWeightOrderedNodes(nodes):
-        print("{0!s}\tweight: {1}".format(node, ranker.getTotalWeight(node)))
+    if (showweights):
+        for node in ranker.getTotalWeightOrderedNodes(nodes):
+            print("{0!s}\tweight: {1}".format(node, ranker.getTotalWeight(node)))
 
 def countNodes(datafile):
     maxNodes = 0
