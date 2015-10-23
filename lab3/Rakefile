@@ -1,5 +1,7 @@
 require 'fileutils'
 
+RESULTS_DIR = 'results'
+
 task :default do
   calculate 'data/stateborders.csv'
   calculate 'data/dolphins.csv'
@@ -27,8 +29,8 @@ def calculate file, weighted=false
     raise "Unknown extension " + ext
   end
   
-  result = File.join 'results', File.basename(file)
-  FileUtils.mkdir_p 'results'
+  result = File.join RESULTS_DIR, File.basename(file)
+  FileUtils.mkdir_p RESULTS_DIR
 
   args = %w[--scale --threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
   if weighted
