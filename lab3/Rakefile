@@ -43,7 +43,7 @@ task :recalculate_data do
 
   calculate 'snapData/p2p-Gnutella05.txt'
   calculate 'snapData/wiki-Vote.txt'
-  calculate 'snapData/soc-sign-Slashdot081106.txt'
+  calculate 'snapData/soc-sign-Slashdot081106.txt', true
   calculate 'snapData/amazon0505.txt'
   calculate 'snapData/soc-LiveJournal1.txt'
 end
@@ -63,7 +63,7 @@ def calculate file, weighted=false
   result = File.join RESULTS_DIR, File.basename(file, ext)
   FileUtils.mkdir_p RESULTS_DIR
 
-  args = %w[--scale --threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
+  args = %w[--threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
   if weighted
     args << '--weighted'
   end
