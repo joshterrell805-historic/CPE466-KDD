@@ -68,19 +68,18 @@ fields:
   struct LLNode *inNodes;
 }
 \end{lstlisting}
-The \texttt{LLNode} is a linked list implementation used to store a list of nodes which link to this node.
+Each node struct also contains a linked list with pointers to the nodes which link to this one.
 
-Multiple passes are used to process the data. On each pass, the
-PageRank for each node is read from either the \texttt{pageRank_a} or
-\texttt{pageRank_b} field and the new rank is written to the other. If the
-rank has changed more than a certain delta, 
-% Is this correct?
-a flag is updated to allow
-the system to know the algorithm has not converged. Once all the
-worker threads have completed their work, if the ``unconverged'' flag
-is set, the master thread starts the workers again, this time telling
-them to read from the field they were just writing to and to write to
-the field they were reading from.
+Once the graph is built, multiple passes are used to process the
+data. On each pass, each worker thread grabs blocks of data and processes them until there is no data left to process.
+For each node in the block, the PageRank is read from either the
+\texttt{pageRank_a} or \texttt{pageRank_b} field and the new rank is
+written to the other. If the rank has changed more than the (configurable) epsilon % Is this correct?
+a flag is updated to allow the system to know the algorithm has not
+converged. Once all the worker threads have completed their work, if
+the ``unconverged'' flag is set, the master thread starts the workers
+again, this time telling them to read from the field they were just
+writing to and to write to the field they were reading from.
 
 \section{Results}
 \subsection{STATES}
