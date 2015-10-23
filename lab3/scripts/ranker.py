@@ -43,6 +43,7 @@ def rank(epsilon, maxiterations, dval, threads, datafile, limit,
     # Run algorithm
     retries = 0
     iterations = maxiterations
+    start = time.clock()
     while True:
         ranker.computeRanking(iterations)
 
@@ -56,7 +57,8 @@ def rank(epsilon, maxiterations, dval, threads, datafile, limit,
             iterations = int(math.pow(2, retries)) * maxiterations
             if not click.confirm("We've run {0} iterations and it's not converged. Keep running for {1} iterations?".format(olditerations, iterations), default=True):
                 break
-
+    runtime = time.clock() - start
+    print("Run Time:", runtime)
     print("Outdegree:")
 
     ordered = ranker.getOrderedNodes(nodes)
