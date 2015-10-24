@@ -1,28 +1,15 @@
-\documentclass{report}
+\documentclass[draft]{report}
 
 \usepackage{siunitx}
 \sisetup{
   round-mode = places,
   round-precision = 3
 }
-% Format a query and the question the results should answer
-\newcommand{\query}[2]{\item\textit{#1}\\#2}
 
-% Format an information need
-\newcommand{\infoneed}[2]{
-\item \begin{list}{}{}
-  \item #1
-
-  \item \itshape#2
-  \end{list}
-}
-
-% Import a query results file
-\newcommand{\results}[2]{\subsection{Query #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
+% format a result
+\newcommand{\result}[3]{\item #1 #2 #3}
 % Format each result record
-\newenvironment{result}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
-% Import an info need results file
-\newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
+\newenvironment{resultashdfksj}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
 
 \title{CPE466\\Lab3}
 \author{
@@ -135,6 +122,7 @@ reading from.
 
 \section{Results}
 \subsection{STATES}
+\input{stateborderstimes.tex}
 \subsection{NCAA-FOOTBALL}
 We observered that the NCAA data set is troublesome to run as unweighted because
 the nodes are in the opposite order from the other datasets. Typically edges in
@@ -146,9 +134,14 @@ represent the winning team gaining prestige from the losing team. Our program
 only provides meaningful results for this dataset if the \texttt{--weighted}
 flag is provided, in which case the edges are flipped to go from right to left
 due to the weighting of edges.
+
+%\input{NCAA_footballtimes.tex}
 \subsection{KARATE}
+%\input{karatetimes.tex}
 \subsection{DOLPHINS}
+%\input{dolphinstimes.tex}
 \subsection{LES-MISERABLES}
+%\input{lesmistimes.tex}
 \subsection{POLITICAL-BLOGS}
 \subsection{WIKI-VOTE}
 \subsection{P2P-GNUTELLA05}
