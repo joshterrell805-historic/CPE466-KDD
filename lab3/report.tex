@@ -14,8 +14,6 @@
 % format a result
 \newcommand{\runsummary}[3]{}
 \newcommand{\result}[3]{#1 & #2 & #3\\}
-% Format each result record
-\newenvironment{resultashdfksj}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
 
 % name
 \newcommand{\pagerank}{PageRank }
@@ -195,17 +193,7 @@ All datasets were successfully executed in roughly 30 minutes (combined) on a 4-
     \toprule
     Dataset & Execution Time (seconds)\\
     \midrule
-    amazon0505 & 38.734575 \\
-    dolphins & 0.005477999999999997 \\
-    karate & 0.004890999999999993 \\
-    lesmis & 0.005057000000000006 \\
-    NCAA\_football & 0.006725000000000009 \\
-    p2p-Gnutella05 & 0.025919000000000025 \\
-    polblogs & 0.06062600000000001 \\
-    soc-LiveJournal1 & 1121.060663 \\
-    soc-sign-Slashdot081106 & 2.5643610000000003 \\
-    stateborders & 0.006414000000000003 \\
-    wiki-Vote & 0.0008580000000000254 \\
+    \input{performance.tex}
     \bottomrule
   \end{tabular}
   \caption{Execution Times on Datasets}
