@@ -11,14 +11,15 @@ ylimits = c(
   ceiling(max(data$execution_seconds) * 1.1)
 );
 
-fn_smooth <- smooth.spline(x=data$edge_count, y=data$execution_seconds);
-data$smooth = data.frame(predict(fn_smooth, data$edge_count))$y;
+# fn_smooth <- smooth.spline(x=data$edge_count, y=data$execution_seconds);
+# data$smooth = data.frame(predict(fn_smooth, data$edge_count))$y;
 
+options(scipen=10000)
 graph <- ggplot() +
     geom_point(data=data , aes(x=edge_count, y=execution_seconds)) +
-    stat_smooth(data=data , aes(x=edge_count, y=smooth)) +
-    scale_y_continuous(trans='log2') +
-    scale_x_continuous(trans='log2') +
+#   stat_smooth(data=data , aes(x=edge_count, y=smooth)) +
+    scale_y_continuous(trans='log10') +
+    scale_x_continuous(trans='log10') +
     xlab('Edge Count') +
     ylab('Execution Seconds');
 
