@@ -1,4 +1,4 @@
-\documentclass[draft]{report}
+\documentclass{report}
 
 \usepackage{graphicx}
 \usepackage{siunitx}
@@ -93,7 +93,7 @@ the nodes. The result is that edges with higher weight indicate stronger
 relationships than edges with lower weights.
 
 The in-memory representation of the graph, \pagerank computation, and parallel
-execution all happen in c. In the parallelized \pagerank computation, each thread
+execution all happen in C. In the parallelized \pagerank computation, each thread
 asks the master thread for a block of nodes to work on. Each node has two page
 ranks---the page rank of the previous iteration and the page rank of this
 iteration.  By having both page ranks, we were able to parallelize computation
