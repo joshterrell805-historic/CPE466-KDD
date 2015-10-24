@@ -8,7 +8,6 @@ task :default => ['report.pdf']
 
 task :clobber do
   sh 'latexmk -C'
-  rm 'stateborderstimes.tex'
 end
 
 file 'report.pdf' => ['report.tex', 'performance.png'] do
@@ -23,13 +22,14 @@ sources = %w[amazon0505 dolphins karate lesmis NCAA_football p2p-Gnutella05 polb
 
 sources.each do |source|
   results_file = "#{source}-results.tex"
+  CLEAN << results_file
   data_file = File.join(RESULTS_DIR, source)
   file 'report.pdf' => results_file
   file results_file => [data_file] do |t|
     data = get_data t.source
     open(t.name, 'w') do |io|
       io.puts "\\runsummary{#{data[:loadtime]}}{#{data[:runtime]}}{#{data[:iter_count]}}"
-      data[:results].take(25).each do |result|
+      data[:results].take(78).each do |result|
         io.puts'\result' + "{#{result[:name]}}{#{result[:rank]}}{#{result[:delt]}}"
       end
     end
@@ -62,8 +62,8 @@ def get_data source
         data[:iter_count] = $~[1]
       when /^Run Time: ([\d.]+)$/
         data[:runtime] = $~[1]
-      when /^(.+)\s+(.+)\s+\((.+)\)\s*/
-        if data[:results].size < 100
+      when /^(.+)\s+(.+?)\s+\((.+?)\)\s*/
+        if data[:results].size < 200
           data[:results] << {name: $~[1],
                              rank: $~[2],
                              delt: $~[3]}

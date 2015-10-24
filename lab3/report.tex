@@ -8,9 +8,9 @@
 }
 
 % Insert a results file
-\newcommand{\results}[1]{\begin{tabular}{lll}
+\newcommand{\results}[1]{\begin{longtabu}{rll}
                            \input{#1}
-                         \end{tabular}}
+                         \end{longtabu}\clearpage}
 % format a result
 \newcommand{\runsummary}[3]{}
 \newcommand{\result}[3]{#1 & #2 & #3\\}
