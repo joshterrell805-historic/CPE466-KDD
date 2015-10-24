@@ -1,0 +1,108 @@
+actual 2007
+http://espn.go.com/college-football/rankings/_/year/2007
+USC
+LSU
+West Virginia
+Texas
+Michigan
+Florida
+Wisconsin
+Oklahoma
+Virginia Tech
+Louisville
+Ohio State
+California
+Georgia
+UCLA
+Tennessee
+Rutgers
+Penn State
+Auburn
+Florida State
+Nebraska
+Arkansas
+TCU
+Hawaii
+Boise State
+Texas A&M
+
+0.5 (8/25)
+*Florida
+*Oklahoma
+Mississippi
+*USC
+Texas Tech
+*Texas
+Oregon State
+Weber State
+*TCU
+Richmond
+Montana
+Utah
+*Penn State
+Tulsa
+Alabama
+Appalachian State
+Houston
+Villanova
+James Madison
+North Carolina
+Missouri
+South Carolina
+*West Virginia
+*Ohio State
+Grambling State
+
+0.9 (10/25)
+Mississippi
+*Florida
+*USC
+Oregon State
+*Oklahoma
+South Carolina
+Texas Tech
+Alabama
+*Penn State
+Vanderbilt
+*Texas
+Utah
+Oregon
+Wake Forest
+North Carolina State
+*Florida State
+North Carolina
+Clemson
+Maryland
+Virginia
+*TCU
+Iowa
+*Georgia
+*West Virginia
+*LSU
+
+0.97 (9/25)
+Mississippi
+*Florida
+Oregon State
+*USC
+South Carolina
+*Penn State
+*Oklahoma
+Vanderbilt
+Oregon
+Alabama
+Texas Tech
+Utah
+*Texas
+Wake Forest
+Maryland
+*Florida State
+North Carolina State
+Clemson
+North Carolina
+Iowa
+*Georgia
+Virginia
+*TCU
+*California
+Boston College
