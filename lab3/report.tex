@@ -8,10 +8,15 @@
 }
 
 % Insert a results file
-\newcommand{\results}[1]{\begin{list}{}{}\input{#1}\end{list}}
+\newcommand{\results}[1]{\begin{tabular}{lll}
+                           \beginrule
+                           \midrule
+                           \input{#1}
+                           \endrule
+                         \end{tabular}}
 % format a result
 \newcommand{\runsummary}[3]{}
-\newcommand{\result}[3]{\item #1 #2 #3}
+\newcommand{\result}[3]{#1 & #2 & #3\\}
 % Format each result record
 \newenvironment{resultashdfksj}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
 
