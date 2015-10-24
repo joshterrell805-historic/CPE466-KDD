@@ -157,6 +157,17 @@ due to the weighting of edges.
 \subsection{LIVEJOURNAL1}
 
 \section{Overall Summary}
+Before implementing edge weights, page rank appeared to do decently on the
+graphs we manually tested. We created our own fakeball dataset, and analyzed
+carefully the results of the NCAA football dataset before and after weighting.
+As noted in the NCAA football section of Results, NCAA football was a bit
+troublesome to run unweighted.
+
+Once we implemented edge weights, we noticed different rankings of the football
+teams, and the change in rankings seemed a bit more inline with the rankings
+from ESPN's 2008 data, though the rankings were far from perfect. We also
+compared the PageRank results with a ranking the teams by total score. Weighted
+PageRank matched much more closely to the teams sorted by total season score.
 
 \section{Performance Evaluation}
 \begin{table}
