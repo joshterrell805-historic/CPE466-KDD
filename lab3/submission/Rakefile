@@ -1,0 +1,124 @@
+require 'fileutils'
+require 'csv'
+require 'rake/clean'
+
+RESULTS_DIR = 'results'
+
+task :default => ['report.pdf']
+
+task :clobber do
+  sh 'latexmk -C'
+end
+
+file 'report.pdf' => ['report.tex', 'performance.png', 'performance.tex'] do
+  sh 'latexmk report.tex'
+end
+
+file 'readme.tex' => 'README.md' do |t|
+  sh "cat #{t.source} | sed '1,1d' | pandoc -o #{t.name} -"
+end
+
+sources = %w[amazon0505 dolphins karate lesmis NCAA_football p2p-Gnutella05 polblogs soc-LiveJournal1 soc-sign-Slashdot081106 stateborders wiki-Vote]
+
+sources.each do |source|
+  results_file = "#{source}-results.tex"
+  CLEAN << results_file
+  data_file = File.join(RESULTS_DIR, source)
+  file 'report.pdf' => results_file
+  file results_file => [data_file] do |t|
+    data = get_data t.source
+    open(t.name, 'w') do |io|
+      io.puts "\\runsummary{#{data[:loadtime]}}{#{data[:runtime]}}{#{data[:iter_count]}}"
+      data[:results].take(78).each do |result|
+        io.puts'\result' + "{#{result[:name]}}{#{result[:rank]}}{#{result[:delt]}}"
+      end
+    end
+  end
+end
+
+CLOBBER << "performance.png"
+file "performance.png" => ["performance.R", "performance.csv"] do
+  sh "R --save < performance.R"
+end
+
+CLEAN << "performance.tex"
+file "performance.tex" => ["performance.csv"] do
+  sh %q[cat performance.csv | sed -r '1d; s/^(.*),.*,(.*)$/\1 \& \2 \\\\\\\\/' > performance.tex]
+end
+
+CLEAN << "performance.csv"
+file "performance.csv" do |t|
+  CSV.open(t.name, 'w') do |csv|
+    csv << ['dataset', 'edge_count', 'execution_seconds']
+    sources.each do |source|
+      data = get_data File.join('results', source)
+      csv << [source, data[:node_estimate], data[:runtime]]
+    end
+  end
+end
+
+def get_data source
+  data = {results: []}
+  open(source) do |io|
+    io.each do |line|
+      case line
+      when /^Nodes: (\d+)$/
+        data[:node_estimate] = $~[1]
+      when /^Load Time: ([\d.]+)$/
+        data[:loadtime] = $~[1]
+      when /^Converged! after (\d+) iter/
+        data[:iter_count] = $~[1]
+      when /^Run Time: ([\d.]+)$/
+        data[:runtime] = $~[1]
+      when /^(.+)\s+(.+?)\s+\((.+?)\)\s*/
+        if data[:results].size < 200
+          data[:results] << {name: $~[1],
+                             rank: $~[2],
+                             delt: $~[3]}
+        end
+      else
+        p line
+      end
+    end
+  end
+
+  data
+end
+
+task :recalculate_data do
+  calculate 'data/stateborders.csv'
+  calculate 'data/dolphins.csv'
+  calculate 'data/karate.csv'
+  calculate 'data/lesmis.csv', true
+  calculate 'data/NCAA_football.csv', true
+  calculate 'data/polblogs.csv'
+
+  calculate 'snapData/p2p-Gnutella05.txt'
+  calculate 'snapData/wiki-Vote.txt'
+  calculate 'snapData/soc-sign-Slashdot081106.txt', true
+  calculate 'snapData/amazon0505.txt'
+  calculate 'snapData/soc-LiveJournal1.txt'
+end
+
+def calculate file, weighted=false
+  puts "Running calculations on #{file}"
+  ext = File.extname file
+  case ext
+  when '.csv'
+    format = 'csv'
+  when '.txt'
+    format = 'snap'
+  else
+    raise "Unknown extension " + ext
+  end
+  
+  result = File.join RESULTS_DIR, File.basename(file, ext)
+  FileUtils.mkdir_p RESULTS_DIR
+
+  args = %w[--threads 8 --maxiterations 1000000 --epsilon 0.00000001 --batchsize 5000]
+  if weighted
+    args << '--weighted'
+  end
+
+  system './virtual/bin/ranker', *args, '--fmt', format, file, out: result
+end
