@@ -37,7 +37,7 @@ task :recalculate_data do
   calculate 'data/stateborders.csv'
   calculate 'data/dolphins.csv'
   calculate 'data/karate.csv'
-  calculate 'data/lesmis.csv'
+  calculate 'data/lesmis.csv', true
   calculate 'data/NCAA_football.csv', true
   calculate 'data/polblogs.csv'
 
