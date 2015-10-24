@@ -136,6 +136,16 @@ reading from.
 \section{Results}
 \subsection{STATES}
 \subsection{NCAA-FOOTBALL}
+We observered that the NCAA data set is troublesome to run as unweighted because
+the nodes are in the opposite order from the other datasets. Typically edges in
+the dataset run from left (source) to right (destination), but for PageRank to
+do anything meaningful with this dataset, the edges must run from right to left.
+This is because the left team is always the winning team, and thus there should
+be an edge connecting from losing team (right) to winning team (left) to
+represent the winning team gaining prestige from the losing team. Our program
+only provides meaningful results for this dataset if the \texttt{--weighted}
+flag is provided, in which case the edges are flipped to go from right to left
+due to the weighting of edges.
 \subsection{KARATE}
 \subsection{DOLPHINS}
 \subsection{LES-MISERABLES}
@@ -147,16 +157,6 @@ reading from.
 \subsection{LIVEJOURNAL1}
 
 \section{Overall Summary}
-We observered that the NCAA data set is troublesome to run as unweighted because
-the nodes are in the opposite order from the other datasets. Typically edges in
-the dataset run from left (source) to right (destination), but for PageRank to
-do anything meaningful with this dataset, the edges must run from right to left.
-This is because the left team is always the winning team, and thus there should
-be an edge connecting from losing team (right) to winning team (left) to
-represent the winning team gaining prestige from the losing team. Our program
-only provides meaningful results for this dataset if the \texttt{--weighted}
-flag is provided, in which case the edges are flipped to go from right to left
-due to the weighting of edges.
 
 \section{Performance Evaluation}
 \begin{table}
