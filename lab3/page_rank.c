@@ -125,6 +125,8 @@ void computePageRank(Graph *graph) {
     while (length--) {
       if (node->active) {
         computePageRankN(graph, node++);
+      } else {
+        node++;
       }
     }
   }
