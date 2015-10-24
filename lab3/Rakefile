@@ -1,36 +1,51 @@
 require 'fileutils'
+require 'csv'
+require 'rake/clean'
 
 RESULTS_DIR = 'results'
 
 task :default => ['report.pdf']
+
+task :clobber do
+  sh 'latexmk -C'
+  rm 'stateborderstimes.tex'
+end
 
 file 'report.pdf' => ['stateborderstimes.tex'] do
   sh 'latexmk report.tex'
 end
 
 rule 'times.tex' => proc {|name| File.join(RESULTS_DIR, File.basename(name, 'times.tex'))} do |t|
-
-  data = {}
+  filename = File.basename t.name
+  data = {results: []}
   open(t.source) do |io|
     io.each do |line|
       case line
       when /^Nodes: (\d+)$/
-        data[:node_estimate] = $~[1].to_i
+        data[:node_estimate] = $~[1]
       when /^Load Time: ([\d.]+)$/
-        data[:loadtime] = $~[1].to_f
+        data[:loadtime] = $~[1]
       when /^Converged! after (\d+) iter/
-        data[:iter_count] = $~[1].to_i
+        data[:iter_count] = $~[1]
       when /^Run Time: ([\d.]+)$/
-        data[:runtime] = $~[1].to_f
-      when /Outdegree:/
-        break
+        data[:runtime] = $~[1]
+      when /^(.+)\s+(.+)\s+\((.+)\)\s*/
+        data[:results] << {name: $~[1],
+                           rank: $~[2],
+                           delt: $~[3]}
+      else
+        p line
       end
     end
-
-    data[:results] = io.readlines.join
   end
 
-  p data
+  p data[:results]
+  open(t.name, 'w') do |io|
+    io.puts "\\runsummary{#{data[:loadtime]}}{#{data[:runtime]}}{#{data[:iter_count]}}"
+    data[:results].take(25).each do |result|
+      io.puts'\result' + "{#{result[:name]}}{#{result[:rank]}}{#{result[:delt]}}"
+    end
+  end
 end
 
 task :recalculate_data do
