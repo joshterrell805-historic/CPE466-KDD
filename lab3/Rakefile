@@ -11,7 +11,7 @@ task :clobber do
   rm 'stateborderstimes.tex'
 end
 
-file 'report.pdf' => ['report.tex'] do
+file 'report.pdf' => ['report.tex', 'performance.png'] do
   sh 'latexmk report.tex'
 end
 
@@ -36,7 +36,11 @@ sources.each do |source|
   end
 end
 
-file "graphdata.csv" do |t|
+file "performance.png" => ["performance.R", "performance.csv"] do
+  sh "R --save < performance.R"
+end
+
+file "performance.csv" do |t|
   CSV.open(t.name, 'w') do |csv|
     sources.each do |source|
       data = get_data File.join('results', source)
