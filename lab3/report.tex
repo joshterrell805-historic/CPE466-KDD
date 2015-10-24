@@ -10,12 +10,14 @@
 % Insert a results file
 \newcommand{\results}[1]{\begin{list}{}{}\input{#1}\end{list}}
 % format a result
+\newcommand{\runsummary}[3]{}
 \newcommand{\result}[3]{\item #1 #2 #3}
 % Format each result record
 \newenvironment{resultashdfksj}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
 
 % name
 \newcommand{\pagerank}{PageRank }
+\newcommand{\pageranks}{PageRanks }
 
 \title{CPE466\\Lab3}
 \author{
@@ -127,7 +129,7 @@ reading from.
 
 \section{Results}
 \subsection{STATES}
-\results{stateborderstimes.tex}
+\results{stateborders-results.tex}
 \subsection{NCAA-FOOTBALL}
 We observered that the NCAA data set is troublesome to run as unweighted because
 the nodes are in the opposite order from the other datasets. Typically edges in
@@ -140,11 +142,11 @@ only provides meaningful results for this dataset if the \texttt{--weighted}
 flag is provided, in which case the edges are flipped to go from right to left
 due to the weighting of edges.
 
-%\input{NCAA_footballtimes.tex}
+\results{NCAA_football-results.tex}
 \subsection{KARATE}
-%\input{karatetimes.tex}
+\results{karate-results.tex}
 \subsection{DOLPHINS}
-%\input{dolphinstimes.tex}
+\results{dolphins-results.tex}
 \subsection{LES-MISERABLES}
 %\input{lesmistimes.tex}
 \subsection{POLITICAL-BLOGS}
@@ -211,7 +213,7 @@ Increasing the edges also involved increasing the node count. We discovered that
 to the graph so that outdegree and other variables of the \pagerank computation
 were accurate.
 
-We used our weighted modification to the \pagerank algorithm to compute \pagerank s
+We used our weighted modification to the \pagerank algorithm to compute \pageranks
 for the NCAA\_football, lesmis, and SlashDot datasets.
 
 
@@ -219,6 +221,8 @@ for the NCAA\_football, lesmis, and SlashDot datasets.
 
 \section{README}
 \lstset{language=bash}
+Team: Andrew Gilbert, Josh Terrell
+
 \textbf{Important: Run everything from the project's root directory}
 
 \subsection{Setup environment}
@@ -229,16 +233,42 @@ pip install --upgrade -e .
 \end{lstlisting}
 
 \subsection{Run all the tests}
-Run \verb+python3 -m unittest discover+ from the directory containing
-this file
-
-\subsection{Calculate and print \pagerank for all the data}
 \begin{lstlisting}
-pagerank data/<dataset>.csv
+python3 -m unittest discover
 \end{lstlisting}
+
+\subsection{Compute Page Rank}
+The ranker scripts assume the graph is directed.
+
+Correctly parsed formats include:
+
+SNAP (edges must be repeated if undirected) (weight is optional):
+\begin{verbatim}
+a b [weight]
+\end{verbatim}
+CSVs, (edges must be repeated if undirected) (w\_a and w\_b are ignored unless
+\verb+--weighted+ flag is specified):
+\begin{verbatim}
+a,w_a,b,w_b
+\end{verbatim}
+
+To run:
+\begin{lstlisting}
+ranker <filename.csv>            # unweighted
+ranker <filename.csv> --weighted # weighted
+ranker <filename.txt> --fmt=snap # option specifiying input file is snap format
+\end{lstlisting}
+
+You can use \verb+ranker --help+ for more options such as setting the pagerank \verb+d+
+parameter or tweaking parallel computation settings.
 
 \subsection{Deactivate environment}
 \begin{lstlisting}
 deactivate
+\end{lstlisting}
+
+\subsection{(Optional) Manual Rebuild of Page Rank C-Implementation}
+\begin{lstlisting}
+python build_page_rank.py
 \end{lstlisting}
 \end{document}

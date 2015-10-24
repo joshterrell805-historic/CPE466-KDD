@@ -11,24 +11,30 @@ task :clobber do
   rm 'stateborderstimes.tex'
 end
 
-file 'report.pdf' => ['report.tex', 'stateborderstimes.tex'] do
+file 'report.pdf' => ['report.tex'] do
   sh 'latexmk report.tex'
 end
 
-rule 'times.tex' => proc {|name| File.join(RESULTS_DIR, File.basename(name, 'times.tex'))} do |t|
-  filename = File.basename t.name
-  data = get_data t.source
-
-  p data[:results]
-  open(t.name, 'w') do |io|
-    io.puts "\\runsummary{#{data[:loadtime]}}{#{data[:runtime]}}{#{data[:iter_count]}}"
-    data[:results].take(25).each do |result|
-      io.puts'\result' + "{#{result[:name]}}{#{result[:rank]}}{#{result[:delt]}}"
-    end
-  end
+file 'readme.tex' => 'README.md' do |t|
+  sh "cat #{t.source} | sed '1,1d' | pandoc -o #{t.name} -"
 end
 
 sources = %w[amazon0505 dolphins karate lesmis NCAA_football p2p-Gnutella05 polblogs soc-LiveJournal1 soc-sign-Slashdot081106 stateborders wiki-Vote]
+
+sources.each do |source|
+  results_file = "#{source}-results.tex"
+  data_file = File.join(RESULTS_DIR, source)
+  file 'report.pdf' => results_file
+  file results_file => [data_file] do |t|
+    data = get_data t.source
+    open(t.name, 'w') do |io|
+      io.puts "\\runsummary{#{data[:loadtime]}}{#{data[:runtime]}}{#{data[:iter_count]}}"
+      data[:results].take(25).each do |result|
+        io.puts'\result' + "{#{result[:name]}}{#{result[:rank]}}{#{result[:delt]}}"
+      end
+    end
+  end
+end
 
 file "graphdata.csv" do |t|
   CSV.open(t.name, 'w') do |csv|
