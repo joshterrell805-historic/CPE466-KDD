@@ -176,7 +176,27 @@ due to the weighting of edges.
   \caption{Graph of Execution Times on Datasets}
   \label{execution-times-graph}
 \end{figure}
+
+\section{Extra Credit}
+We added a weighted flag to our algorithm which takes into account a weight per
+edge when computing PageRank. We experimented with different ideas, but decided
+that simply using the weight as a multiplication factor for the importance of
+the edge would have the desired effect. We treated weights as edge counts.  For
+instance, if the edge a->b had a weight of 7, we would compute page rank as if
+there were 7 edges from a to b. A weight of -7 would mean there were 7 edges in
+the opposite direction.
+
+Increasing the edges also involved increasing the node count. We discovered that
+PageRank would not converge unless we added an appropriate amount of fake nodes
+to the graph so that outdegree and other variables of the PageRank computation
+were accurate.
+
+We used our weighted modification to the PageRank algorithm to compute pageranks
+for the NCAA\_football, lesmis, and SlashDot datasets.
+
+
 \appendix
+
 \section{README}
 \lstset{lang=bash}
 \textbf{Important: Run everything from the project's root directory}
