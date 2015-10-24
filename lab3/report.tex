@@ -24,7 +24,7 @@
 % Import an info need results file
 \newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
 
-\title{CPE466\\Lab2}
+\title{CPE466\\Lab3}
 \author{
   Gilbert, Andrew\\
   \texttt{apgilber@calpoly.edu}
@@ -39,25 +39,71 @@
 \maketitle
 
 \begin{abstract}
-  When looking at a graph of data, it can be helpful to find the most
-influential nodes. The PageRank algorithm provides a straightforward
-way to achieve this. We implemented the PageRank algorithm and ran it
-on several datasets.
+When working with a graph of social data, where nodes represent actors and edges
+represent relationships, it can be useful to determine the most influential
+nodes. The PageRank algorithm provides a straightforward way to rank nodes based
+on their influence. We implemented the PageRank algorithm and observed its
+results on various datasets.
 \end{abstract}
 
 \section{Introduction}
-The PageRank algorithm, developed by Larry Page and Sergey Brin, and
-initially used in what became the Google search engine, is a technique
-for calculating the importance of nodes in a graph.
-
-
+The PageRank algorithm, developed by Larry Page and Sergey Brin, and initially
+used in what became the Google search engine, is a technique for calculating the
+importance of nodes in a graph. We wrote and tested an implementation of this
+algorithm to better understand how it works as well as observe its behavior on
+various datasets.
 
 \section{Implementation Overview}
-We implemented our reading and writing system in Python, but the bulk
-of the algorithm in C. The C runs a master thread and a (configurable)
-number of worker threads. Each thread asks the master thread for a
-block of data to work on. The data is stored in structs with six
-fields:
+We implemented our reading and writing system in Python. We wrote the
+PageRank algorithm in c, and used Python's cffi library to interface between
+the two languages.
+
+The ranking process starts by loading a given file into memory by parsing each
+line as an edge between two nodes. Each edge can have an optional weight. If the
+\texttt{--weighted} flag is specified, the weight is read from file. Otherwise
+each line is expected to be an edge between the left node pointing to the right
+node.
+
+Our implementation computes the standard PageRank with options to customize its
+behavior. 
+
+\item \begin{list}{}{}
+  \item \texttt{--help} display all the below options and descriptions
+  \item \texttt{--dval <int>} - the \texttt{d} parameter of the PageRank
+  algorithm; probability of following a link
+  \item \texttt{--epsilon <float>} - (per iteration) consider the algorithm to
+  have converged if the maximum change in pagerank of each node in the graph is
+  less than epsilon
+  \item \texttt{--maxiterations <int>} - the number of iterations the algorithm
+  will run before before giving up and considering the graph converged
+  \item \texttt{--threads <int>} - the number of computation threads to use
+  \item \texttt{--batchsize <int>} - per iteration, each thread claims
+  \texttt{batchsize} nodes at a time to compute pagerank for. Too small and the
+  threads will spend all their time synchronizing around a mutex. Too large and
+  all the threads may wait on one thread to finish so the algorithm can continue
+  to the next iteration.
+  \item \texttt{--fmt string} - the data format; either csv (default) or snap
+  \item \texttt{--scale} - scale epsilon and the printed results by the size of
+  the graph.
+  \item \textbf{\texttt{--weighted}} - specify if the graph includes weights per
+  edge.
+  \end{list}
+}
+
+When the \texttt{--weighted} flag is enabled, our algorithm runs a modified
+version of PageRank which takes into account the weights of edges. The modified
+version computes PageRank such that the weight is the number of edges between
+the nodes. The result is that edges with higher weight indicate stronger
+relationships than edges with lower weights.
+
+The in-memory representation of the graph, PageRank computation, and parallel
+execution all happen in c. In the parallelized PageRank computation, each thread
+asks the master thread for a block of nodes to work on. Each node has two page
+ranks---the page rank of the previous iteration and the page rank of this
+iteration.  By having both page ranks, we were able to parallelize computation
+without forcing Nodes to be computed in a specific order.
+
+The graph is composed of an array of Nodes, a c structure with six fields:
 \begin{lstlisting}[lang=ANSI]
 {
   unsigned int id;
@@ -68,18 +114,24 @@ fields:
   struct LLNode *inNodes;
 }
 \end{lstlisting}
-Each node struct also contains a linked list with pointers to the nodes which link to this one.
 
-Once the graph is built, multiple passes are used to process the
-data. On each pass, each worker thread grabs blocks of data and processes them until there is no data left to process.
-For each node in the block, the PageRank is read from either the
-\texttt{pageRank_a} or \texttt{pageRank_b} field and the new rank is
-written to the other. If the rank has changed more than the (configurable) epsilon % Is this correct?
-a flag is updated to allow the system to know the algorithm has not
-converged. Once all the worker threads have completed their work, if
-the ``unconverged'' flag is set, the master thread starts the workers
-again, this time telling them to read from the field they were just
-writing to and to write to the field they were reading from.
+The pageRank fields allow us to switch between the page rank of the last
+iteration and this iteration. inNodes is a linked list of incomming edges. Each
+edge has a source node and weight.
+
+Once the graph is built, many iterations of the PageRank are computed until the
+algorithm converges. On every iteration, worker threads calculate PageRank
+on blocks of nodes from the list of nodes that haven't been processed yet until
+there are no nodes left to process in the iteration.
+
+For each node in the block, the current PageRank is read from either the
+\texttt{pageRank\_a} or \texttt{pageRank\_b} field and the new rank is written
+to the other. If the rank has changed more than the (configurable) epsilon, a
+flag is updated to inform the system that the algorithm has not converged. Once
+all the worker threads have completed their work, if the ``unconverged'' flag is
+set, the master thread starts the workers again, this time telling them to read
+from the field they were just writing to and to write to the field they were
+reading from.
 
 \section{Results}
 \subsection{STATES}
@@ -95,7 +147,16 @@ writing to and to write to the field they were reading from.
 \subsection{LIVEJOURNAL1}
 
 \section{Overall Summary}
-We observered that the NCAA data set is troublesome, because the nodes are in the opposite order from the other datasets. We decided it made more sense to 
+We observered that the NCAA data set is troublesome to run as unweighted because
+the nodes are in the opposite order from the other datasets. Typically edges in
+the dataset run from left (source) to right (destination), but for PageRank to
+do anything meaningful with this dataset, the edges must run from right to left.
+This is because the left team is always the winning team, and thus there should
+be an edge connecting from losing team (right) to winning team (left) to
+represent the winning team gaining prestige from the losing team. Our program
+only provides meaningful results for this dataset if the \texttt{--weighted}
+flag is provided, in which case the edges are flipped to go from right to left
+due to the weighting of edges.
 
 \section{Performance Evaluation}
 \begin{table}
