@@ -6,42 +6,52 @@ reason sick danger disease
 
 6
 
+relevant
 9.12646560141058
 Allen, Benjamin (Legislator) Senate
 I think this is about being able to tell, look parents in the eye and tell them that their government has taken the reasonable steps necessary for protecting their children from dangerous communicable disease. So that's why we're here today. We're happy to have a discussion about all the legal and rights issues involved.
 
+relevant
 8.329522635997002
 Allen, Travis (Legislator) Senate
 Ultimately, our goal is trying to protect public health, increase vaccination rates, prevent the likelihood of an outbreak, protect kids, make sure the parents know that the government is taking reasonable steps to ensure that when they send their kids to school, they will not be exposed to dangerous communicable diseases that we have the tools to stop. That's what this is about.
 
+relevant
 8.24813049999738
 Loe Fisher, Barbara (GeneralPublic) Assembly
 We nurture them throughout childhood, so they can grow up to be productive members of society. We are personally responsible for their health and we are the ones who care for them when they become sick and unable to care for themselves for any reason.
 
+not relevant
 7.732741683780548
 Russin, Leah (GeneralPublic) Senate
 A dad shared his concern about whether to take his child into the pediatrician. He worried his son had an ear infection, but he was more worried about what dangerous disease his son might catch.
 
+relevant
 7.507806725182068
 Pan, Richard (Legislator) Assembly
 Keep them free from disease. That's freedom. Not to be sick. And we need to be sure that that is what we strive for. I respectfully ask for an aye vote. And thanks again. I want to thank the committee and members for your thoughtful discussion.
 
+relevant
 7.478195606316017
 Allen, Benjamin (Legislator) Assembly
 I used to work for the United Nations in East Africa, and I was so grateful of the fact that I was able to go to the doctor, get vaccinated, and get the shots to protect me from the dangerous diseases that existed there. I continue to be grateful that I grew up fully vaccinated, that I grew up in a society that actually took the steps necessary to protect our young people, our children, from dangerous communicable diseases that continue to impact people all over the world today.
 
+not relevant
 7.460884752487668
 Russin, Leah (GeneralPublic) Senate
 Pertussis, Whooping Cough, and other deadly childhood diseases at epidemic levels again. And a study in Pediatrics points again, to low vaccination rates. No vaccine is 100% effective. So even though we followed our pediatrician's advice and vaccinated our kids, if exposed to an highly infectious disease, they may still get sick.
 
+not relevant
 7.2673007812919455
 Reiss, Dorit (GeneralPublic) Senate
 The last statement on this was in the 1944 case of Prince versus Massachusetts which was about a different issue but where the courts said the parent's rights and the parent's religious rights don't trump the freedom of the child from a dangerous disease or the freedom of the community from diseases as well.
 
+not relevant
 6.680218306456022
 Pan, Richard (Legislator) Senate
 Varicella is a very dangerous infection, particularly with people who have been treated with chemotherapy. So the FDA does not, the recommendation I would perhaps defer to our infectious disease expert, since you have two general pediatricians who disagree, perhaps with the Chair's permission, we can let our infectious disease expert tell us what the recommendation is.
 
+relevant
 6.553086576413747
 Hall, Isadore (Legislator) Senate
 So if someone is in my district and they're sick, they have some type of condition where they cannot be, autoimmune disease of some sort. And they're exposed to someone who perhaps is ill, who chooses not to be vaccinated, if you will, would that person put in harm's way, would that person put my constituent in harm's way?
