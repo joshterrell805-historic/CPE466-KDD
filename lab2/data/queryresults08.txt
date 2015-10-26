@@ -1,39 +1,49 @@
+not relevant
 4.921907668723156
 McDaid Ting, Farrah (GeneralPublic) Senate
 Farrah McDaid Ting representing the California State Association of Counties as well as the County Health Executives Association of California in support.
 
+not relevant
 4.921907668723156
 McDaid Ting, Farrah (Lobbyist) Senate
 Farrah McDaid Ting representing the California State Association of Counties as well as the County Health Executives Association of California in support.
 
+not relevant
 4.902710968633834
 Bautista, Phillip (Lobbyist) Senate
 Phillip Bautista, elected director to the American Nurses Association California, and as a board of directors on behalf of the association we strongly support this bill.
 
+not relevant
 4.902710968633834
 Bautista, Phillip (GeneralPublic) Senate
 Phillip Bautista, elected director to the American Nurses Association California, and as a board of directors on behalf of the association we strongly support this bill.
 
+relevant
 4.812498461251444
 Pearce, Julianna (GeneralPublic) Assembly
 Julianna Pearce, President of National Autism Association. We strongly oppose.
 
+not relevant
 4.792419477674715
 Reid, Lee Angela (Lobbyist) Senate
 Lee Angela Reid on behalf of the San Fransisco Unified School District, the Small School Districts Association and the School Employers Association of California in support.
 
+relevant
 4.718879670218847
 Stenzler, Brian (GeneralPublic) Senate
 Dr. Brian Stenzler, President of the California Chiropractic Association. We oppose this bill.
 
+not relevant
 4.663139449522017
 Imitel, Michael (Lobbyist) Assembly
 Michael Imitel with the California Transit Association in support.
 
+not relevant
 4.638143430588506
 Warren, Brian (GeneralPublic) Assembly
 Brian Warren with the California Pharmacists Association in support.
 
+not relevant
 4.638143430588506
 Warren, Brian (Lobbyist) Assembly
 Brian Warren with the California Pharmacists Association in support.

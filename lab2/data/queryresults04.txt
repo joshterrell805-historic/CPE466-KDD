@@ -1,39 +1,49 @@
+relevant
 124.54140352341525
 Allen, Benjamin (Legislator) Senate
 Nearly everyone, from my father's generation and generations older than him, when I'd go and speak to groups, talk about the stories that they have both from their own childhood, from friends, personal stories of near-death experiences, friends they had who were maimed by communicable diseases.
 
+not relevant
 34.29720621046978
 Allen, Benjamin (Legislator) Senate
 He got polio when he was a little kid. He got it right before the vaccine became widely available. He doesn't even have the arm strength in his arms to be able to break his fall. When I go down to my district, and I talk to folks from his generation and older, I hear a story every single time about the horror stories of communicable diseases from measles to polio,
 
+not relevant
 26.05429533906798
 Pan, Richard (Legislator) Senate
 We need to restore that balance so that people, we've had witnesses here who talked about how they are afraid of now bringing their infant into public places. To pick up their older sibling in school, or go to other public places.
 
+not relevant
 25.088158617771164
 Loop, Ariel (GeneralPublic) Senate
 It was stressful, terrifying, and we had to go through it by ourselves at home. The days prior to the rash appearing while Mobius was contagious, we were all over town. The Public Health Department had to follow up individually for nearly a month with the 12 friends and family members who had direct contact with him during his contagious period.
 
+not relevant
 24.77568407629558
 Allen, Benjamin (Legislator) Senate
 I also come to this story as the son of a Polio survivor who got Polio as a child and was nursed to health by his very determined mother but who is from a generation that I think is amazed that we have allowed these communicable diseases back into American society when we have the tools to prevent that sort of human suffering and that sort of, of human suffering I suppose.
 
+not relevant
 22.986796991743105
 Allen, Benjamin (Legislator) Assembly
 If you did, you know that what brought me to this story was the fact that my father had polio as a kid, and got it before the vaccine became widely available. Folks from his generation can't believe that we've allowed these communicable diseases back into American society.
 
+not relevant
 21.418011287112655
 Allen, Ben (StateAgencyRep) Senate
 I think that's something that we're going to have to work on with the Education Committee to try to craft a good solution with our friends from the school boards that will both addresses our financial concerns for parents that you're talking about.
 
+not relevant
 21.35821467691213
 Pan, Richard (Legislator) Assembly
 I think that your question strikes to the heart of the issue. In fact, I have right next to me, expert infectious disease as well as pediatric infectious disease, as well as my own expertise as a pediatrician with a background in public health diseases like chicken pox. And I relayed the story of the child who had the heart transplant. They are deadly to children who are immunosuppressed. They are not worried about catching the cold, right?
 
+not relevant
 20.625675994000698
 Pan, Richard (Legislator) Assembly
 They want to be in fear that their child or their loved one is gonna be exposed to a deadly disease when they walk into a store, when they drop their kids off at school, when they go ride on public transit, go to other public places, go visit Disneyland. That is not what we want to have happen.
 
+not relevant
 20.50686581315504
 Pan, Richard (Legislator) Assembly
 There is no limitation on a physician from doing that, other than their own professional judgment, their own knowledge and expertise about what they believe is safe for the patient. I think that when we craft our laws, it's best that we try not to direct, unless we have strong scientific evidence. And the direct position that they now must do something that they have the ability to already do.
