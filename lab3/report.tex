@@ -1,30 +1,25 @@
 \documentclass{report}
 
+\usepackage{graphicx}
 \usepackage{siunitx}
 \sisetup{
   round-mode = places,
   round-precision = 3
 }
-% Format a query and the question the results should answer
-\newcommand{\query}[2]{\item\textit{#1}\\#2}
 
-% Format an information need
-\newcommand{\infoneed}[2]{
-\item \begin{list}{}{}
-  \item #1
+% Insert a results file
+\newcommand{\results}[1]{{\ttfamily \begin{longtabu}{rll}
+                           \input{#1}
+                         \end{longtabu}\clearpage}}
+% format a result
+\newcommand{\runsummary}[3]{}
+\newcommand{\result}[3]{#1 & #2 & #3\\}
 
-  \item \itshape#2
-  \end{list}
-}
+% name
+\newcommand{\pagerank}{PageRank }
+\newcommand{\pageranks}{PageRanks }
 
-% Import a query results file
-\newcommand{\results}[2]{\subsection{Query #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
-% Format each result record
-\newenvironment{result}[2]{\item #2 \hfill{\small (\num{#1})}\begin{quote}}{\end{quote}}
-% Import an info need results file
-\newcommand{\needresults}[2]{\subsection{Info Need #1 Results}\begin{list}{}{}\input{data/#2}\end{list}}
-
-\title{CPE466\\Lab2}
+\title{CPE466\\Lab3}
 \author{
   Gilbert, Andrew\\
   \texttt{apgilber@calpoly.edu}
@@ -39,26 +34,71 @@
 \maketitle
 
 \begin{abstract}
-  When looking at a graph of data, it can be helpful to find the most
-influential nodes. The PageRank algorithm provides a straightforward
-way to achieve this. We implemented the PageRank algorithm and ran it
-on several datasets.
+When working with a graph of social data, where nodes represent actors and edges
+represent relationships, it can be useful to determine the most influential
+nodes. The \pagerank algorithm provides a straightforward way to rank nodes based
+on their influence. We implemented the \pagerank algorithm and observed its
+results on various datasets.
 \end{abstract}
 
 \section{Introduction}
-The PageRank algorithm, developed by Larry Page and Sergey Brin, and
-initially used in what became the Google search engine, is a technique
-for calculating the importance of nodes in a graph.
-
-
+The \pagerank algorithm, developed by Larry Page and Sergey Brin, and initially
+used in what became the Google search engine, is a technique for calculating the
+importance of nodes in a graph. We wrote and tested an implementation of this
+algorithm to better understand how it works as well as observe its behavior on
+various datasets.
 
 \section{Implementation Overview}
-We implemented our reading and writing system in Python, but the bulk
-of the algorithm in C. The C runs a master thread and a (configurable)
-number of worker threads. Each thread asks the master thread for a
-block of data to work on. The data is stored in structs with six
-fields:
-\begin{lstlisting}[lang=ANSI]
+We implemented our reading and writing system in Python. We wrote the
+\pagerank algorithm in c, and used Python's cffi library to interface between
+the two languages.
+
+The ranking process starts by loading a given file into memory by parsing each
+line as an edge between two nodes. Each edge can have an optional weight. If the
+\texttt{--weighted} flag is specified, the weight is read from file. Otherwise
+each line is expected to be an edge between the left node pointing to the right
+node.
+
+Our implementation computes the standard \pagerank with options to customize its
+behavior: 
+
+\begin{list}{}{}
+  \item \texttt{--help} --- display all the below options and descriptions
+  \item \texttt{--dval <int>} --- the \texttt{d} parameter of the \pagerank
+  algorithm; probability of following a link
+  \item \texttt{--epsilon <float>} --- (per iteration) consider the algorithm to
+  have converged if the maximum change in \pagerank of each node in the graph is
+  less than epsilon
+  \item \texttt{--maxiterations <int>} --- the number of iterations the algorithm
+  will run before before giving up and considering the graph converged
+  \item \texttt{--threads <int>} --- the number of computation threads to use
+  \item \texttt{--batchsize <int>} --- per iteration, each thread claims
+  \texttt{batchsize} nodes at a time to compute \pagerank for. Too small and the
+  threads will spend all their time synchronizing around a mutex. Too large and
+  all the threads may wait on one thread to finish so the algorithm can continue
+  to the next iteration.
+  \item \texttt{--fmt string} --- the data format; either csv (default) or snap
+  \item \texttt{--scale} --- scale epsilon and the printed results by the size of
+  the graph.
+  \item \textbf{\texttt{--weighted}} --- specify if the graph includes weights per
+  edge.
+\end{list}
+
+When the \texttt{--weighted} flag is enabled, our algorithm runs a modified
+version of \pagerank which takes into account the weights of edges. The modified
+version computes \pagerank such that the weight is the number of edges between
+the nodes. The result is that edges with higher weight indicate stronger
+relationships than edges with lower weights.
+
+The in-memory representation of the graph, \pagerank computation, and parallel
+execution all happen in C. In the parallelized \pagerank computation, each thread
+asks the master thread for a block of nodes to work on. Each node has two page
+ranks---the page rank of the previous iteration and the page rank of this
+iteration.  By having both page ranks, we were able to parallelize computation
+without forcing Nodes to be computed in a specific order.
+
+The graph is composed of an array of Nodes, a c structure with six fields:
+\begin{lstlisting}[language=C]
 {
   unsigned int id;
   char active;
@@ -68,42 +108,103 @@ fields:
   struct LLNode *inNodes;
 }
 \end{lstlisting}
-Each node struct also contains a linked list with pointers to the nodes which link to this one.
 
-Once the graph is built, multiple passes are used to process the
-data. On each pass, each worker thread grabs blocks of data and processes them until there is no data left to process.
-For each node in the block, the PageRank is read from either the
-\texttt{pageRank_a} or \texttt{pageRank_b} field and the new rank is
-written to the other. If the rank has changed more than the (configurable) epsilon % Is this correct?
-a flag is updated to allow the system to know the algorithm has not
-converged. Once all the worker threads have completed their work, if
-the ``unconverged'' flag is set, the master thread starts the workers
-again, this time telling them to read from the field they were just
-writing to and to write to the field they were reading from.
+The \pagerank fields allow us to switch between the page rank of the last
+iteration and this iteration. inNodes is a linked list of incomming edges. Each
+edge has a source node and weight.
+
+Once the graph is built, many iterations of the \pagerank are computed until the
+algorithm converges. On every iteration, worker threads calculate \pagerank
+on blocks of nodes from the list of nodes that haven't been processed yet until
+there are no nodes left to process in the iteration.
+
+For each node in the block, the current \pagerank is read from either the
+\texttt{pageRank\_a} or \texttt{pageRank\_b} field and the new rank is written
+to the other. If the rank has changed more than the (configurable) epsilon, a
+flag is updated to inform the system that the algorithm has not converged. Once
+all the worker threads have completed their work, if the ``unconverged'' flag is
+set, the master thread starts the workers again, this time telling them to read
+from the field they were just writing to and to write to the field they were
+reading from.
 
 \section{Results}
+In general, we ran all the computations with \verb+--threads 8+
+\verb+--maxiterations 1000000+ \verb+--epsilon 0.00000001+
+\verb+--batchsize 5000+. For the \verb+LES-MISERABLES+, \verb+NCAA-FOOTBALL+, and
+\verb+SLASHDOT-ZOO-NOV6-2008+ datasets, we also added the \verb+--weighted+
+flag.
+
+The results below include 3 columns each. The first column is the node name, the second the page rank, and the third the change in pagerank on the final iteration before convergence.
+
 \subsection{STATES}
+\results{stateborders-results.tex}
 \subsection{NCAA-FOOTBALL}
+We observered that the NCAA data set is troublesome to run as unweighted because
+the nodes are in the opposite order from the other datasets. Typically edges in
+the dataset run from left (source) to right (destination), but for \pagerank to
+do anything meaningful with this dataset, the edges must run from right to left.
+This is because the left team is always the winning team, and thus there should
+be an edge connecting from losing team (right) to winning team (left) to
+represent the winning team gaining prestige from the losing team. Our program
+only provides meaningful results for this dataset if the \texttt{--weighted}
+flag is provided, in which case the edges are flipped to go from right to left
+due to the weighting of edges.
+
+\results{NCAA_football-results.tex}
 \subsection{KARATE}
+\results{karate-results.tex}
 \subsection{DOLPHINS}
+\results{dolphins-results.tex}
 \subsection{LES-MISERABLES}
+\results{lesmis-results.tex}
+%\input{lesmistimes.tex}
 \subsection{POLITICAL-BLOGS}
+\results{polblogs-results.tex}
 \subsection{WIKI-VOTE}
+\results{wiki-Vote-results.tex}
 \subsection{P2P-GNUTELLA05}
+\results{p2p-Gnutella05-results.tex}
 \subsection{SLASHDOT-ZOO-NOV6-2008}
+\results{soc-sign-Slashdot081106-results.tex}
 \subsection{AMAZON-MAY03}
+\results{amazon0505-results.tex}
 \subsection{LIVEJOURNAL1}
+\results{soc-LiveJournal1-results.tex}
 
 \section{Overall Summary}
-We observered that the NCAA data set is troublesome, because the nodes are in the opposite order from the other datasets. We decided it made more sense to 
+Before implementing edge weights, page rank appeared to do decently on the
+graphs we manually tested. We created our own fakeball dataset, and analyzed
+carefully the results of the NCAA football dataset before and after weighting.
+As noted in the NCAA football section of Results, NCAA football was a bit
+troublesome to run unweighted.
+
+Once we implemented edge weights, we noticed different rankings of the football
+teams, and the change in rankings seemed a bit more inline with the rankings
+from ESPN's 2008 data, though the rankings were far from perfect. We also
+compared the \pagerank results with a ranking the teams by total score. Weighted
+\pagerank matched much more closely to the teams sorted by total season score.
 
 \section{Performance Evaluation}
+All datasets were successfully executed in roughly 30 minutes (combined) on a 4-core hyperthreaded processor using 8 threads. The execution time for each dataset is provided in \cref{execution-times-table}. A visual representation is also included in \cref{execution-times-graph}. Note that that on the graph, both the x and y axis are drawn in log10 so the outliers do not crowd out the trends. The visible trend on the graph suggests that the execution times increase roughly linearly as edge count increases to the max of our dataset.  
+
 \begin{table}
   \centering
-  \begin{tabular}{}
+  \begin{tabular}{ll}
     \toprule
-    Dataset & Execution Time\\
+    Dataset & Execution Time (seconds)\\
     \midrule
+    \input{performance.tex}
+%     amazon0505 & 40.117672 \\
+% dolphins & 0.005594000000000002 \\
+% karate & 0.004950999999999997 \\
+% lesmis & 0.005074999999999996 \\
+% NCAA\_football & 0.0063620000000000065 \\
+% p2p-Gnutella05 & 0.017859999999999987 \\
+% polblogs & 0.04911300000000002 \\
+% soc-LiveJournal1 & 1193.963033 \\
+% soc-sign-Slashdot081106 & 2.74611 \\
+% stateborders & 0.004391999999999993 \\
+% wiki-Vote & 0.0008930000000000327 \\
     \bottomrule
   \end{tabular}
   \caption{Execution Times on Datasets}
@@ -111,13 +212,44 @@ We observered that the NCAA data set is troublesome, because the nodes are in th
 \end{table}
 \begin{figure}
   \centering
-  
+  \includegraphics[scale=0.5]{performance.png}
   \caption{Graph of Execution Times on Datasets}
   \label{execution-times-graph}
 \end{figure}
+
+\section{Extra Credit}
+We added a weighted flag to our algorithm which takes into account a weight per
+edge when computing \pagerank. We experimented with different ideas, but decided
+that simply using the weight as a multiplication factor for the importance of
+the edge would have the desired effect. We treated weights as edge counts.  For
+instance, if the edge a->b had a weight of 7, we would compute page rank as if
+there were 7 edges from a to b. A weight of -7 would mean there were 7 edges in
+the opposite direction.
+
+Increasing the edges also involved increasing the node count. We discovered that
+\pagerank would not converge unless we added an appropriate amount of fake nodes
+to the graph so that outdegree and other variables of the \pagerank computation
+were accurate.
+
+We used our weighted modification to the \pagerank algorithm to compute \pageranks
+for the NCAA\_football, lesmis, and SlashDot datasets.
+
+The file \texttt{extra-credit.txt} contains the results of running our weighted
+\pagerank using different \texttt{d} values. The top set of 25 teams is the
+actual rankings of teams from 2007 NCAA rankings, ESPN. The url to the actual
+rankings is included in the file. We found that changing the dval between 0.5,
+0.9, and 0.97 had seemingly no significant impact on the amount of correct
+results found in the 25 nodes with the highest pagerank. Regardless of dval,
+\pagerank resulted in typically 9 nodes correctly included in the top 25
+results.
+
+
 \appendix
+
 \section{README}
-\lstset{lang=bash}
+\lstset{language=bash}
+Team: Andrew Gilbert, Josh Terrell
+
 \textbf{Important: Run everything from the project's root directory}
 
 \subsection{Setup environment}
@@ -128,16 +260,42 @@ pip install --upgrade -e .
 \end{lstlisting}
 
 \subsection{Run all the tests}
-Run \verb+python3 -m unittest discover+ from the directory containing
-this file
-
-\subsection{Calculate and print PageRank for all the data}
 \begin{lstlisting}
-pagerank data/<dataset>.csv
+python3 -m unittest discover
 \end{lstlisting}
+
+\subsection{Compute Page Rank}
+The ranker scripts assume the graph is directed.
+
+Correctly parsed formats include:
+
+SNAP (edges must be repeated if undirected) (weight is optional):
+\begin{verbatim}
+a b [weight]
+\end{verbatim}
+CSVs, (edges must be repeated if undirected) (w\_a and w\_b are ignored unless
+\verb+--weighted+ flag is specified):
+\begin{verbatim}
+a,w_a,b,w_b
+\end{verbatim}
+
+To run:
+\begin{lstlisting}
+ranker <filename.csv>            # unweighted
+ranker <filename.csv> --weighted # weighted
+ranker <filename.txt> --fmt=snap # option specifiying input file is snap format
+\end{lstlisting}
+
+You can use \verb+ranker --help+ for more options such as setting the pagerank \verb+d+
+parameter or tweaking parallel computation settings.
 
 \subsection{Deactivate environment}
 \begin{lstlisting}
 deactivate
+\end{lstlisting}
+
+\subsection{(Optional) Manual Rebuild of Page Rank C-Implementation}
+\begin{lstlisting}
+python build_page_rank.py
 \end{lstlisting}
 \end{document}

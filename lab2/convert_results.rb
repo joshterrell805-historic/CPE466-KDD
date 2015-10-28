@@ -5,7 +5,7 @@ class ResultReader
     @results = []
   end
   def main
-    @state = :score
+    @state = :relevant
     # States:
     # score
     # meta
@@ -13,6 +13,8 @@ class ResultReader
     $<.each_line do |line|
       line.gsub!(/%/, '\%')
       case @state
+      when :relevant
+        readRelevant line
       when :score
         readScore line
       when :meta
@@ -26,6 +28,20 @@ class ResultReader
 
     @results << @current
     @results.each {|r| r.render}
+  end
+
+  def readRelevant line
+    line = line.strip
+
+    if line == 'relevant'
+      @current.relevant = true 
+    elsif line == 'not relevant'
+      @current.relevant = false
+    else
+      raise 'relevance line should be "relevant" or "not relevant"'
+    end
+      
+    @state = :score
   end
 
   def readScore line
@@ -49,19 +65,20 @@ class ResultReader
   def restart
     @results << @current
     @current = Result.new
-    @state = :score
+    @state = :relevant
   end
 end
 
 
 class Result
-  attr_accessor :score, :meta, :text
+  attr_accessor :relevant, :score, :meta, :text
 
   def initialize
     @text = ""
   end
 
   def render
+    @text = if @relevant then "\\textbf{#{text}}" else @text end
     puts <<END
 \\begin{result}{#{score}}{#{meta}}
 #{text}\\end{result}

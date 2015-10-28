@@ -43,7 +43,7 @@ end
 
 CLEAN << "performance.tex"
 file "performance.tex" => ["performance.csv"] do
-  sh %q[cat performance.csv | sed -r '1d; s/_/\\\\_/g; s/^(.*),.*,(.*)$/\1 \& \2 \\\\\\\\/' > performance.tex]
+  sh %q[cat performance.csv | sed -r '1d; s/^(.*),.*,(.*)$/\1 \& \2 \\\\\\\\/' > performance.tex]
 end
 
 CLEAN << "performance.csv"
