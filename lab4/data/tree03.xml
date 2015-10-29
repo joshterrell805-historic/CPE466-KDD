@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  
+
+  <head>
+    <title>
+      Attachment – Datasets
+    </title>
+        <link rel="search" href="/datasets/search" />
+        <link rel="help" href="/datasets/wiki/TracGuide" />
+        <link rel="alternate" href="/datasets/raw-attachment/wiki/FullSet/tree03.xml" type="text/xml; charset=iso-8859-15" title="Original Format" />
+        <link rel="up" href="/datasets/wiki/FullSet" title="FullSet" />
+        <link rel="start" href="/datasets/wiki" />
+        <link rel="stylesheet" href="/datasets/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/datasets/pygments/trac.css" type="text/css" /><link rel="stylesheet" href="/datasets/chrome/common/css/code.css" type="text/css" /><link rel="stylesheet" href="/datasets/chrome/tracwysiwyg/wysiwyg.css" type="text/css" />
+        <link rel="shortcut icon" href="/datasets/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/datasets/chrome/common/trac.ico" type="image/x-icon" />
+      <link type="application/opensearchdescription+xml" rel="search" href="/datasets/search/opensearch" title="Search Datasets" />
+    <script type="text/javascript" src="/datasets/chrome/common/js/jquery.js"></script><script type="text/javascript" src="/datasets/chrome/common/js/trac.js"></script><script type="text/javascript" src="/datasets/chrome/common/js/search.js"></script><script type="text/javascript" src="/datasets/chrome/tracwysiwyg/wysiwyg.js"></script><script type="text/javascript" src="/datasets/chrome/tracwysiwyg/wysiwyg-load.js"></script>
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="/datasets/chrome/common/js/ie_pre7_hacks.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://example.org/"><img src="/datasets/chrome/common/trac_banner.png" alt="(configure using the CSL-&gt;Header Logo admin settings)" /></a>
+      </div>
+      <form id="search" action="/datasets/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/datasets/login">Login</a></li><li><a href="/datasets/wiki/TracGuide">Help/Guide</a></li><li><a href="/datasets/about">About Trac</a></li><li class="last"><a href="/datasets/prefs">Preferences</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/datasets/wiki">Wiki</a></li><li><a href="/datasets/timeline">Timeline</a></li><li><a href="/datasets/roadmap">Roadmap</a></li><li><a href="/datasets/browser">Browse Source</a></li><li><a href="/datasets/report">View Tickets</a></li><li class="last"><a href="/datasets/search">Search</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+          <ul>
+              <li class="last first"><a href="/datasets/wiki/FullSet">Back to FullSet</a></li>
+          </ul>
+        <hr />
+      </div>
+    <div id="content" class="attachment">
+        <h1><a href="/datasets/wiki/FullSet">FullSet</a>: tree03.xml</h1>
+        <table id="info" summary="Description">
+          <tbody>
+            <tr>
+              <th scope="col">
+                File tree03.xml, <span title="1487 bytes">1.5 KB</span>
+                (added by jverburg,  <a class="timeline" href="/datasets/timeline?from=2009-04-20T13%3A22%3A06-0700&amp;precision=second" title="2009-04-20T13:22:06-0700 in Timeline">7 years</a> ago)
+              </th>
+            </tr>
+            <tr>
+              <td class="message searchable">
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="preview" class="searchable">
+    <table class="code"><thead><tr><th class="lineno" title="Line numbers">Line</th><th class="content"> </th></tr></thead><tbody><tr><th id="L1"><a href="#L1">1</a></th><td><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></td></tr><tr><th id="L2"><a href="#L2">2</a></th><td><span class="nt">&lt;Tree</span> <span class="na">name =</span> <span class="s">"known"</span><span class="nt">&gt;</span></td></tr><tr><th id="L3"><a href="#L3">3</a></th><td>        <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Political Party"</span><span class="nt">&gt;</span></td></tr><tr><th id="L4"><a href="#L4">4</a></th><td>                <span class="nt">&lt;edge</span> <span class="na">var =</span><span class="s">"Democratic"</span><span class="nt">&gt;</span></td></tr><tr><th id="L5"><a href="#L5">5</a></th><td>                        <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Bush Approval"</span><span class="nt">&gt;</span></td></tr><tr><th id="L6"><a href="#L6">6</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Approve"</span><span class="nt">&gt;</span></td></tr><tr><th id="L7"><a href="#L7">7</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"2"</span> <span class="na">p=</span><span class="s">".9"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L8"><a href="#L8">8</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L9"><a href="#L9">9</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Disapprove"</span><span class="nt">&gt;</span></td></tr><tr><th id="L10"><a href="#L10">10</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"1"</span> <span class="na">p=</span><span class="s">".95"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L11"><a href="#L11">11</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L12"><a href="#L12">12</a></th><td>                        <span class="nt">&lt;/node&gt;</span></td></tr><tr><th id="L13"><a href="#L13">13</a></th><td>                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L14"><a href="#L14">14</a></th><td>                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Republican"</span><span class="nt">&gt;</span></td></tr><tr><th id="L15"><a href="#L15">15</a></th><td>                          <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Bush Approval"</span><span class="nt">&gt;</span></td></tr><tr><th id="L16"><a href="#L16">16</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Approve"</span><span class="nt">&gt;</span></td></tr><tr><th id="L17"><a href="#L17">17</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"2"</span> <span class="na">p=</span><span class="s">".99"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L18"><a href="#L18">18</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L19"><a href="#L19">19</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Disapprove"</span><span class="nt">&gt;</span></td></tr><tr><th id="L20"><a href="#L20">20</a></th><td>                                    <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Gender"</span><span class="nt">&gt;</span></td></tr><tr><th id="L21"><a href="#L21">21</a></th><td>                                        <span class="nt">&lt;edge</span> <span class="na">var=</span><span class="s">"Male"</span><span class="nt">&gt;</span></td></tr><tr><th id="L22"><a href="#L22">22</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"2"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L23"><a href="#L23">23</a></th><td>                                        <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L24"><a href="#L24">24</a></th><td>                                        <span class="nt">&lt;edge</span> <span class="na">var =</span><span class="s">"Female"</span><span class="nt">&gt;</span> </td></tr><tr><th id="L25"><a href="#L25">25</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"1"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L26"><a href="#L26">26</a></th><td>                                        <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L27"><a href="#L27">27</a></th><td>                                    <span class="nt">&lt;/node&gt;</span>                                     </td></tr><tr><th id="L28"><a href="#L28">28</a></th><td></td></tr><tr><th id="L29"><a href="#L29">29</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L30"><a href="#L30">30</a></th><td>                        <span class="nt">&lt;/node&gt;</span></td></tr><tr><th id="L31"><a href="#L31">31</a></th><td>                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L32"><a href="#L32">32</a></th><td>                <span class="nt">&lt;edge</span> <span class="na">var=</span><span class="s">"Independent"</span><span class="nt">&gt;</span></td></tr><tr><th id="L33"><a href="#L33">33</a></th><td>                        <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Ideology"</span><span class="nt">&gt;</span></td></tr><tr><th id="L34"><a href="#L34">34</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Liberal"</span><span class="nt">&gt;</span></td></tr><tr><th id="L35"><a href="#L35">35</a></th><td>                                        <span class="nt">&lt;decision</span> <span class="na">end =</span><span class="s">"1"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L36"><a href="#L36">36</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L37"><a href="#L37">37</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Moderate"</span><span class="nt">&gt;</span></td></tr><tr><th id="L38"><a href="#L38">38</a></th><td>                                    <span class="nt">&lt;node</span> <span class="na">var =</span><span class="s">"Bush Approval"</span><span class="nt">&gt;</span></td></tr><tr><th id="L39"><a href="#L39">39</a></th><td>                                       <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Approve"</span><span class="nt">&gt;</span></td></tr><tr><th id="L40"><a href="#L40">40</a></th><td>                                           <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"2"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L41"><a href="#L41">41</a></th><td>                                       <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L42"><a href="#L42">42</a></th><td>                                       <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Disapprove"</span><span class="nt">&gt;</span></td></tr><tr><th id="L43"><a href="#L43">43</a></th><td>                                           <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"1"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L44"><a href="#L44">44</a></th><td>                                       <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L45"><a href="#L45">45</a></th><td>                                    <span class="nt">&lt;/node&gt;</span></td></tr><tr><th id="L46"><a href="#L46">46</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L47"><a href="#L47">47</a></th><td>                                <span class="nt">&lt;edge</span> <span class="na">var =</span> <span class="s">"Conservative"</span><span class="nt">&gt;</span></td></tr><tr><th id="L48"><a href="#L48">48</a></th><td>                                         <span class="nt">&lt;decision</span> <span class="na">end=</span><span class="s">"2"</span> <span class="na">p=</span><span class="s">".8"</span> <span class="nt">/&gt;</span></td></tr><tr><th id="L49"><a href="#L49">49</a></th><td>                                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L50"><a href="#L50">50</a></th><td>                        <span class="nt">&lt;/node&gt;</span></td></tr><tr><th id="L51"><a href="#L51">51</a></th><td>                <span class="nt">&lt;/edge&gt;</span></td></tr><tr><th id="L52"><a href="#L52">52</a></th><td>        <span class="nt">&lt;/node&gt;</span></td></tr><tr><th id="L53"><a href="#L53">53</a></th><td><span class="nt">&lt;/Tree&gt;</span></td></tr></tbody></table>
+        </div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="last first">
+          <a rel="nofollow" href="/datasets/raw-attachment/wiki/FullSet/tree03.xml">Original Format</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="/datasets/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">
+        Powered by <a href="/datasets/about"><strong>Trac 0.11.5</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.
+      </p>
+      <p class="right">Visit the Trac open source project at<br /><a href="http://trac.edgewall.org/">http://trac.edgewall.org/</a></p>
+    </div>
+  </body>
+</html>
