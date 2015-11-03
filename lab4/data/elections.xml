@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain>
+  <variable name = "Party">
+    <group name = "Democratic" />
+    <group name = "Republican" />
+    <group name = "Independent" />
+  </variable>
+  <Category name = "Vote">
+    <choice name = "Obama" type ="1" />
+    <choice name = "McCain" type ="2" />
+  </Category>
+</domain>
