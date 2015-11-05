@@ -55,3 +55,24 @@ def build_tree_recursive(xml_root):
         return Label(xml_root.get('choice'))
     else:
         raise Exception('tree elements must be "node" or "edge"')
+
+def stringify_tree(tree):
+    node = build_xml_tree_recursive(tree)
+    root = ET.Element('Tree', {'name': '?'})
+    root.append(node)
+    return ET.tostring(root)
+
+def build_xml_tree_recursive(tree):
+    if type(tree) == Node:
+        e = ET.Element('node', {'var': tree.name, 'num': '?'})
+        e.extend([build_xml_tree_recursive((k, v)) \
+                for k,v in tree.edges.items()])
+        return e
+    elif type(tree) == Label:
+        return ET.Element('decision', {'end': '?', 'choice': tree.category})
+    elif type(tree) == tuple:
+        e = ET.Element('edge', {'var': tree[0], 'num': '?'})
+        e.append(build_xml_tree_recursive(tree[1]))
+        return e
+    else:
+        raise Exception('unknown tree element: ' + type(tree))
