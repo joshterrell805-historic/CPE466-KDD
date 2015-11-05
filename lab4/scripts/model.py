@@ -9,6 +9,9 @@ class Node:
             label = 1
             self.edges[edge[name]] = edge[label]
 
+    def __eq__(self, other):
+        return self.name == other.name and self.edges == other.edges
+
 class Label:
     def __init__(self, category):
         self.category = category

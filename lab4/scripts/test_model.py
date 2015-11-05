@@ -26,6 +26,30 @@ class TestModel(unittest.TestCase):
         self.assertEqual(node.edges['true'], Label("5 stars"))
         self.assertEqual(node.edges['false'], Label("3 stars"))
 
+    def test_tree_equality(self):
+        root = Node("Has chicken breast on menu",
+                     ("true", Label("5 stars")),
+                     ("false", Node("Has burritos on menu",
+                                     ("true", Node("Has chicken in burritos",
+                                                    ("true", Label("5 stars")),
+                                                    ("false", Label("3 stars")))),
+                                     ("false", Label("0 stars")))))
+        self.assertEqual(root, root)
+        self.assertEqual(root.edges['true'], Label('5 stars'))
+        self.assertEqual(root.edges['false'],
+                Node("Has burritos on menu",
+                      ("true", Node("Has chicken in burritos",
+                                     ("true", Label("5 stars")),
+                                     ("false", Label("3 stars")))),
+                      ("false", Label("0 stars"))))
+
+        self.assertEqual(root.edges['false'].edges['true'],
+                Node("Has chicken in burritos",
+                      ("true", Label("5 stars")),
+                      ("false", Label("3 stars"))))
+
+        self.assertEqual(root.edges['false'].edges['false'], Label('0 stars'))
+
     def test_build_tree(self):
         tree_str = """
         <Tree name = "test">
