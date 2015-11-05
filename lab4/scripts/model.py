@@ -10,3 +10,6 @@ class Node:
 class Label:
     def __init__(self, category):
         self.category = category
+
+    def __eq__(self, other):
+        return self.category == other.category
