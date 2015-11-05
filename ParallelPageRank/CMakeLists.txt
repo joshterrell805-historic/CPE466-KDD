@@ -24,6 +24,8 @@ macro (build_test test)
     )
 endmacro (build_test)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 enable_testing()
 add_subdirectory(src)
 add_subdirectory(tests)
