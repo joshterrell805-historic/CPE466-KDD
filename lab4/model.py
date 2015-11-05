@@ -5,19 +5,22 @@ class Node:
         self.name = name
         self.edges = {}
         for edge in edge_tuples:
-            name = 0
+            name  = 0
             label = 1
             self.edges[edge[name]] = edge[label]
 
     def __eq__(self, other):
-        return self.name == other.name and self.edges == other.edges
+        return (isinstance(other, __class__) and
+                self.name == other.name and
+                self.edges == other.edges)
 
 class Label:
     def __init__(self, category):
         self.category = category
 
     def __eq__(self, other):
-        return self.category == other.category
+        return (isinstance(other, __class__) and
+                self.category == other.category)
 
 def build_tree(xml_str):
     xml_tree = ET.fromstring(xml_str)
