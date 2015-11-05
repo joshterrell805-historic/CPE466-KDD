@@ -8,3 +8,4 @@ macro (do_test test lib)
   add_test(NAME ${test} COMMAND ${test})
 endmacro (do_test)
 
+do_test(hashtable_test hashtable)
