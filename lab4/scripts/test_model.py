@@ -99,3 +99,13 @@ class TestModel(unittest.TestCase):
         self.assertEqual(node.edges['Liberal'], Label("Obama"))
         self.assertEqual(node.edges['Moderate'], Label("Obama"))
         self.assertEqual(node.edges['Conservative'], Label("McCain"))
+
+        tree = Node("Gender",
+                ("Female", Node("Bush Approval",
+                        ("Approve", Label("McCain")),
+                        ("Disapprove", Label("Obama")))),
+                ("Male", Node("Ideology",
+                        ("Liberal", Label("Obama")),
+                        ("Moderate", Label("Obama")),
+                        ("Conservative", Label("McCain")))))
+        self.assertEqual(root, tree)
