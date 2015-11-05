@@ -1,4 +1,6 @@
 import unittest
+import c45
+from model import Node, Label
 
 class TestC45(unittest.TestCase):
     def test_basic(self):
@@ -23,12 +25,12 @@ class TestC45(unittest.TestCase):
         threshold = 0.8
         result = c45.run(d, attributes, threshold)
         expected = Node("Location",
-                        ("North", Label("Not Visited"))
-                        ("South", Node("Bedrooms"
-                                       (3, Node("Basement"
-                                                (true, Node("Floorplan"
-                                                            ("traditional", Label("Visited"))
-                                                            ("open", Label("Not Visited"))))
-                                                (false, Label("Not Visited"))))
+                        ("North", Label("Not Visited")),
+                        ("South", Node("Bedrooms",
+                                       (3, Node("Basement",
+                                                ("true", Node("Floorplan",
+                                                              ("traditional", Label("Visited")),
+                                                              ("open", Label("Not Visited")))),
+                                                ("false", Label("Not Visited")))),
                                        (4, Label("Visited")))))
         self.assertEqual(result, expected)
