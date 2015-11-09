@@ -1,6 +1,6 @@
 clear all
 dP = .95; %Random jump probability
-n = 100; %number of nodes
+n = 250; %number of nodes
 tol = 1e-4; %error tol and dP for testing (Lupo said use these)
 probDistA = zeros(n, 100);
 probDistB = zeros(n, 100);
@@ -39,10 +39,12 @@ P2 = sparse(P- ones(n, n)*(1-dP)/n); % we wont actually do this this way
 toAdd = ones(1, n)*(1-dP)/n*sum(probDistA(:, 1));
 probDistA(:, 2) = probDistA(:, 1)'*P2+toAdd;
 i = 2;
+error = 10;
 %maybe we find a better way to quantify the difference (error)
-while(abs(norm(probDistA(:, i-1)-probDistA(:, i))) >tol) 
+while(n*error/dP >tol) 
    toAdd = ones(1,n)*((1-dP)/n)*sum(probDistA(:,i));
    probDistA(:, i+1) = probDistA(:, i)'*P2 + toAdd;
+   error = abs(probDistA(1, i+1)-probDistA(1, i));
    i = i +1;
 end
 
