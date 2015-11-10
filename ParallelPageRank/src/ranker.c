@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
   int fd = open(filename, O_RDONLY);
   char *data = (char *) mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
   data[finfo.st_size] = '\0';
+  printf("Data loaded.\n");
 
   char *curr = data;
   for (int i = 0; i < 2; i++) {
@@ -117,6 +118,7 @@ int main(int argc, char **argv) {
 
   int nodes = atoi(nodesStr);
   int edges = atoi(edgesStr);
+  printf("edges: %d, nodes %d\n", edges, nodes);
 
   float *values = calloc(edges, sizeof(float));
   MKL_INT *rowind = calloc(edges, sizeof(MKL_INT));
@@ -126,10 +128,10 @@ int main(int argc, char **argv) {
   int numNodes = nodes * nodes;
 
   map *undense = createMap(3 * nodes);
-  int unmap[nodes];
+  int *unmap = calloc(nodes, sizeof(int));
   unsigned int denseId = 0;
 
-  unsigned int number = 0;
+  unsigned int sparseEdgeIndex = 0;
   // Is this faster with ints?
 
   char *end = data + finfo.st_size;
@@ -170,14 +172,18 @@ int main(int argc, char **argv) {
     }
 
     printf("From %i to %i first time\n", from, to);
-    values[number] = 1;
-    rowind[number] = denseFrom;
-    colind[number] = denseTo;
-    number++;
+    values[sparseEdgeIndex] = 1;
+    rowind[sparseEdgeIndex] = denseFrom;
+    colind[sparseEdgeIndex] = denseTo;
+    sparseEdgeIndex++;
   }
+
+  printf("Done creating sparse matrix.\n");
 
   for (int i = 0; i < edges; i++) {
       printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   }
+//void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, int n, float dP);
+  //makeP(values, rowind, &numRows, colind, &nnz, numNodes, float dP);
   return 0;
 }

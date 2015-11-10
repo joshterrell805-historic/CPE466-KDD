@@ -7,7 +7,13 @@ from model import Label, Node, stringify_tree
 @click.argument('TrainingSetCSV', type=click.File('r'))
 @click.argument('RestrictionsTXT', required=False, type=click.File('r'))
 def main(domainxml, trainingsetcsv, restrictionstxt):
-    col_sets, data = dataset.read(trainingsetcsv.read())
+    if restrictionstxt == None:
+        restrictions = None
+    else:
+        restrictions = [False if x == '0' else True \
+                for x in restrictionstxt.read().split(',')]
+
+    col_sets, data = dataset.read(trainingsetcsv.read(), restrictions)
     # call train function with:
     #   `col_sets` - list of sets per column, including class label
     #   `data` (list of ([train data], class))
