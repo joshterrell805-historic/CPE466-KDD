@@ -183,5 +183,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < edges; i++) {
       printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   }
+//void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, int n, float dP);
+  //makeP(values, rowind, &numRows, colind, &nnz, numNodes, float dP);
   return 0;
 }
