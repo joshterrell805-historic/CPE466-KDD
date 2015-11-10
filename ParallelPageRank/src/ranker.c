@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
   int numNodes = nodes * nodes;
 
   map *undense = createMap(3 * nodes);
-  int unmap[nodes];
+  int *unmap = calloc(nodes, sizeof(int));
   unsigned int denseId = 0;
 
   unsigned int sparseEdgeIndex = 0;
