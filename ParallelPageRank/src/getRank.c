@@ -1,5 +1,6 @@
 #include "mkl.h"
 #include <stdio.h>
+#include <math.h>
 void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  float dP);
 void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP);
 float sum(float *x, int N);
@@ -24,6 +25,8 @@ int main(int argc, char *argv[]){
    for(i = 0; i<numRow; i++){
       printf("x[%d] = %lf\n", i+1, x[i]);
    }
+   free(x);
+   
    return 0;
 }
 
@@ -42,8 +45,13 @@ void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_
          if (d[rowind[i]] && Avals[i]) {
             Avals[i] = dP/d[rowind[i]];
          }
-         //printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
+         else if(!d[rowind[i]]){
+             Avals[i] = -dP/(float)(*numRow);
+         }
+         printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
    }
+   free(d);
+   free(one);
 } 
 
 void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP){
@@ -51,20 +59,22 @@ void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *
    float *y = (float*)malloc(sizeof(float)*(*numRows));
    int i, j;
    ones(y, *numRows);
-   char transa = 'N';
+   char transa = 'T';
    float alpha = 1, beta;
    char matdescra[6] = {'G', 'U', 'U','C'};
-//   float error = 10;
+ //  float error = 10;
    i = 0;
-   while(i++ <86){
-//    error = x[1];
+// while((float)*numRows*abs(error)/dP >tol){
+   while (i++<500) {
+  //  error = x[1];
       beta = (float)((1-dP)/(*numRows))*sum(x, *numRows);
       mkl_scoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
       memcpy(x, y, *numRows*sizeof(float));
       ones(y, *numRows);
-//    error -=x[1];
-      //printf("error: %lf\n", (float)(*numRows)*error);
+ //   error -=x[1];
+    //  printf("error: %lf\n", ((float)*numRows)*abs(error)/dP);
    }
+   free(y);
 }
 
 float sum(float *x, int N){
