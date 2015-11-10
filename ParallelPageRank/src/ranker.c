@@ -6,7 +6,12 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <fcntl.h>
+#include <ctype.h>
+#include <string.h>
+#include "hashtable.h"
+typedef int MKL_INT;
 
 void skip_line(FILE *f, char terminator) {
   char c;
@@ -14,6 +19,27 @@ void skip_line(FILE *f, char terminator) {
   do {
     c = fgetc(f);
   } while (c != terminator);
+}
+
+int read_int(FILE *f) {
+  char buf[150];
+  int i;
+  char c = '9';
+  // Read non-space characters
+  for (i = 0; i < 150 && isdigit(c); i++) {
+    buf[i] = c = fgetc(f);
+  }
+  // Set the last (non-digit) character we wrote to buf to a null,
+  // making buf a string.
+  buf[i] = '\0';
+
+  // Drop all following space
+  while (isspace(c)) {
+    c = fgetc(f);
+  }
+  // The last character we read won't be a space
+  ungetc(c, f);
+  return atoi(buf);
 }
 
 int main(int argc, char **argv) {
@@ -58,32 +84,100 @@ int main(int argc, char **argv) {
 
   printf("Filename: %s\n", filename);
 
-  FILE *file = fopen(filename, "r");
+  struct stat finfo;
   int from;
   int to;
-  int nodes;
+  stat(filename, &finfo);
+  int fd = open(filename, O_RDONLY);
+  char *data = (char *) mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+  data[finfo.st_size] = '\0';
 
-  skip_line(file, '\n');
-  skip_line(file, '\n');
-  fscanf(file, "# Nodes: %i Edges: %*i ", &nodes);
-  printf("Total nodes: %i\n", nodes);
-  skip_line(file, '\n');
+  char *curr = data;
+  for (int i = 0; i < 2; i++) {
+    curr = strchr(curr, '\n');
+    curr++;
+  }
+  // Skip "# Nodes: "
+  curr += 9;
 
-  char *adjacency_matrix;
+  char *nodesStr = curr;
+
+  curr = strchr(curr, ' ');
+  *curr = '\0';
+
+  // Skip "\0Edges: "
+  curr += 8;
+  char *edgesStr = curr;
+  curr = strchr(curr, '\r');
+  *curr = '\0';
+  curr += 2;
+
+  curr = strchr(curr, '\n');
+  curr++;
+
+  int nodes = atoi(nodesStr);
+  int edges = atoi(edgesStr);
+
+  float *values = calloc(edges, sizeof(float));
+  MKL_INT *rowind = calloc(edges, sizeof(MKL_INT));
+  MKL_INT *colind = calloc(edges, sizeof(MKL_INT));
+  MKL_INT nnz = edges;
+  MKL_INT numRows = nodes;
+  int numNodes = nodes * nodes;
+
+  map *undense = createMap(3 * nodes);
+  int unmap[nodes];
+  unsigned int denseId = 0;
+
+  unsigned int number = 0;
   // Is this faster with ints?
-  adjacency_matrix = (char *) calloc(nodes * nodes, sizeof(char));
 
-  while (EOF != fscanf(file, "%i %i ", &from, &to)) {
+  char *end = data + finfo.st_size;
+  while(curr < end) {
     /* printf("From %i to %i\n", from, to); */
-    adjacency_matrix[from * nodes + to] = 1;
+    char *fromStr = curr;
+    curr = strchr(curr, '\t');
+    *curr = '\0';
+    from = atoi(fromStr);
+
+    curr++;
+
+    char *toStr = curr;
+    curr = strchr(curr, '\r');
+    *curr = '\0';
+    to = atoi(toStr);
+
+    curr += 2;
+
+    int denseFrom;
+    if (hasItem(undense, from)) {
+      denseFrom = getItem(undense, from);
+    } else {
+      addItem(undense, from, denseId);
+      denseFrom = denseId;
+      unmap[denseId] = from;
+      denseId++;
+    }
+      
+    int denseTo;
+    if (hasItem(undense, to)) {
+      denseTo = getItem(undense, to);
+    } else {
+      addItem(undense, to, denseId);
+      denseTo = denseId;
+      unmap[denseId] = to;
+      denseId++;
+    }
+
+    printf("From %i to %i first time\n", from, to);
+    values[number] = 1;
+    rowind[number] = denseFrom;
+    colind[number] = denseTo;
+    number++;
   }
 
-  for (int i = 0; i < nodes; i++) {
-    for (int j = 0; j < nodes; j++) {
-      if (adjacency_matrix[i * nodes + j]) {
-        printf("From %i to %i\n", i, j);
-      }
-    }
+  for (int i = 0; i < edges; i++) {
+      printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   }
   return 0;
 }

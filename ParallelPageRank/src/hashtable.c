@@ -15,6 +15,16 @@ void destroyMap(map *garbage) {
   free(garbage);
 }
 
+int hasItem(map *hashtable, unsigned int key) {
+  // Ensure value is non-zero
+  key++;
+  int index = key % hashtable->size;
+  while (hashtable->keys[index] != key && hashtable->keys[index]) {
+    index++;
+  }
+  return hashtable->keys[index] > 0;
+}
+
 int getItem(map *hashtable, unsigned int key) {
   // Ensure value is non-zero
   key++;
