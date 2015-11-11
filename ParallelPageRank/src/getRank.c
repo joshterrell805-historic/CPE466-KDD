@@ -1,13 +1,5 @@
-#include "mkl.h"
-#include <stdio.h>
-#include <math.h>
-void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  float dP);
-void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP);
-//void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow);
-float sum(float *x, int N);
-void ones(float *a, int N);
-float getError(float *v1, float *v2, MKL_INT size);
-
+#include "getRank.h"
+/*
 int main(int argc, char *argv[]){
    MKL_INT nnz = 14;
    float tol = .0001;
@@ -37,7 +29,7 @@ int main(int argc, char *argv[]){
    free(x);
    return 0;
 }
-
+*/
 void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, float dP){
 
    float *one = (float*)malloc(sizeof(float)*(*numRow));

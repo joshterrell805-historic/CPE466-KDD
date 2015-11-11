@@ -11,7 +11,8 @@
 #include <ctype.h>
 #include <string.h>
 #include "hashtable.h"
-typedef int MKL_INT;
+#include "mkl.h"
+#include "getRank.h"
 
 void skip_line(FILE *f, char terminator) {
   char c;
@@ -41,7 +42,6 @@ int read_int(FILE *f) {
   ungetc(c, f);
   return atoi(buf);
 }
-
 int main(int argc, char **argv) {
   bool grumpy = false;
   /* Derived from getopt docs: */
@@ -85,8 +85,7 @@ int main(int argc, char **argv) {
   printf("Filename: %s\n", filename);
 
   struct stat finfo;
-  int from;
-  int to;
+  int from, to , i;
   stat(filename, &finfo);
   int fd = open(filename, O_RDONLY);
   char *data = (char *) mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
@@ -94,7 +93,7 @@ int main(int argc, char **argv) {
   printf("Data loaded.\n");
 
   char *curr = data;
-  for (int i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++) {
     curr = strchr(curr, '\n');
     curr++;
   }
@@ -179,10 +178,20 @@ int main(int argc, char **argv) {
   }
 
   printf("Done creating sparse matrix.\n");
-
-  for (int i = 0; i < edges; i++) {
+   float tol = .0001;
+  for ( i = 0; i < edges; i++) {
       printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   }
+   makeP(values, rowind, &numRows, colind, &nnz, .95);
+   float *x = (float*)malloc(sizeof(float)*numRows);
+   for(i = 0; i<numRows; i++){
+      x[i] = (float)1/numRows;
+   }
+   getRank(values, x, rowind, colind, &numRows, &nnz, tol, .95);
+   printf("result: \n");
+   for(i = 0; i<numRows; i++){
+      printf("x[%d] = %lf\n", i+1, x[i]);
+   }
 //void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, int n, float dP);
   //makeP(values, rowind, &numRows, colind, &nnz, numNodes, float dP);
   return 0;
