@@ -3,8 +3,10 @@
 #include <math.h>
 void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  float dP);
 void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP);
+//void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow);
 float sum(float *x, int N);
 void ones(float *a, int N);
+float getError(float *v1, float *v2, MKL_INT size);
 
 int main(int argc, char *argv[]){
    MKL_INT nnz = 14;
@@ -15,6 +17,12 @@ int main(int argc, char *argv[]){
    MKL_INT colind[14] = {1, 2, 3, 4, 1, 3, 4, 1, 2, 4, 1, 2, 3, 5};
    MKL_INT numRow = 6;
    makeP(Avals, rowind, &numRow, colind, &nnz, .95);
+   //float *sinkNodes = (float*)malloc(sizeof(float)*numRow*numSinks);
+   //ones(sinkNodes, numRow*numSinks);
+   //MKL_INT *sinkRow = (MKL_INT*)malloc(sizeof(MKL_INT)*numRow*numSinks);
+   //MKL_INT *sinkCol = (MKL_INT*)malloc(sizeof(MKL_INT)*numRow*numSinks);
+   //makeSinks(sinkRow, sinkCol, d, numRow);
+
    float *x = (float*)malloc(sizeof(float)*numRow);
    int i;
    for(i = 0; i<numRow; i++){
@@ -25,35 +33,48 @@ int main(int argc, char *argv[]){
    for(i = 0; i<numRow; i++){
       printf("x[%d] = %lf\n", i+1, x[i]);
    }
+
    free(x);
-   
    return 0;
 }
 
 void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, float dP){
 
-   float *d = (float*)malloc(sizeof(float)*(*numRow));
    float *one = (float*)malloc(sizeof(float)*(*numRow));
-   int i;
+   float *d = (float*)malloc(sizeof(float)*(*numRow));
+   ones(d, *numRow);
+   int i, sinkNodes = 0;
    ones(one, *numRow);
    char transa = 'N';
    mkl_cspblas_scoogemv (&transa, numRow, Avals ,rowind , colind , nnz , one, d );
-  // for(i = 0; i<*numRow; i++){
- //   printf("d[%d] = %lf\n", i, d[i]);
-//  }
+   /*
+   for(i = 0; i<*numRow; i++){
+    printf("d[%d] = %lf\n", i, d[i]);
+   }
+   */
    for (i = 0; i<*nnz; i++){
          if (d[rowind[i]] && Avals[i]) {
             Avals[i] = dP/d[rowind[i]];
          }
-         else if(!d[rowind[i]]){
-             Avals[i] = -dP/(float)(*numRow);
-         }
-         printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
+         //printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
    }
-   free(d);
    free(one);
-} 
-
+}
+/*
+ makeP will need to spit out d for for this to work
+void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow){
+   int i, j, count= 0;
+   for (i = 0; i<numRow; i++) {
+      if (!d[i]) {
+         for (j = 0; j<numRow; j++) {
+            rowind[count] = i;
+            colind[count] = j;
+            count++;
+         }
+      }
+   }
+}
+*/
 void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP){
 
    float *y = (float*)malloc(sizeof(float)*(*numRows));
@@ -62,17 +83,15 @@ void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *
    char transa = 'T';
    float alpha = 1, beta;
    char matdescra[6] = {'G', 'U', 'U','C'};
- //  float error = 10;
+   float error = 10;
    i = 0;
-// while((float)*numRows*abs(error)/dP >tol){
-   while (i++<500) {
-  //  error = x[1];
-      beta = (float)((1-dP)/(*numRows))*sum(x, *numRows);
+   while (error>tol) {
+      beta = (float)((1-dP)/(*numRows));
       mkl_scoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
+      error = getError(x, y, *numRows);
       memcpy(x, y, *numRows*sizeof(float));
       ones(y, *numRows);
- //   error -=x[1];
-    //  printf("error: %lf\n", ((float)*numRows)*abs(error)/dP);
+      //printf("error: %lf\n", error);
    }
    free(y);
 }
@@ -91,4 +110,12 @@ void ones(float *a, int N){
    for (i =0; i< N; i++) {
       a[i] = 1;
    }
+}
+
+float getError(float *v1, float *v2, MKL_INT size){
+   int i;
+   for (i = 0; i<size; i++) {
+      v1[i] = v1[i]-v2[i];
+   }
+   return cblas_snrm2 (size, v1, 1);
 }
