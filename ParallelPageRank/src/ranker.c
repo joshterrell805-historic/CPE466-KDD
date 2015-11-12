@@ -20,8 +20,8 @@ typedef struct {
   int node;
   float score;
 } pair;
-int compar(const pair *left, const pair *right) {
-  float diff = left->score - right->score;
+int compar(const void *l, const void *r) {
+  float diff = ((pair *) left)->score - ((pair *) right)->score;
   if (diff < 0) {
     return -1;
   } else {
@@ -186,7 +186,8 @@ int main(int argc, char **argv) {
      nodeStructs[i].node = unmap[i];
      nodeStructs[i].score = x[i];
    }
-     
-  mergesort(nodeStruct, numRows, sizeof(pair), (& compar));
+   int (*compare) (const void *, const void*);
+   compare = compar;
+  qsort(nodeStruct, numRows, sizeof(pair), compare);
   return 0;
 }
