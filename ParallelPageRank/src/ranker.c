@@ -14,8 +14,8 @@
 #include "hashtable.h"
 #include "mkl.h"
 #include "getRank.h"
+#include <sys/time.h>
 
-typedef int MKL_INT;
 typedef struct {
   int node;
   float score;
@@ -28,6 +28,21 @@ int compar(const void *l, const void *r) {
     return 1;
   }
 }
+
+typedef struct timeval Benchmark;
+
+Benchmark startBenchmark() {
+  struct timeval time_start;
+  gettimeofday(&time_start,NULL);
+  return time_start;
+}
+
+float msSinceBenchmark(Benchmark *from) {
+  struct timeval to;
+  gettimeofday(&to,NULL);
+  return 1000 * (to.tv_sec - from->tv_sec) + (to.tv_usec - from->tv_usec) / 1000.0;
+}
+
 int main(int argc, char **argv) {
   bool grumpy = false;
   /* Derived from getopt docs: */
@@ -74,9 +89,10 @@ int main(int argc, char **argv) {
   int from, to , i;
   stat(filename, &finfo);
   int fd = open(filename, O_RDONLY);
+  Benchmark benchMmap = startBenchmark(); 
   char *data = (char *) mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
   data[finfo.st_size] = '\0';
-  printf("Data loaded.\n");
+  printf("Data loaded (%.2fms)\n", msSinceBenchmark(&benchMmap));
 
   char *curr = data;
   for (i = 0; i < 2; i++) {
@@ -120,6 +136,7 @@ int main(int argc, char **argv) {
   // Is this faster with ints?
 
   char *end = data + finfo.st_size;
+  Benchmark benchSparse = startBenchmark(); 
   while(curr < end) {
     /* printf("From %i to %i\n", from, to); */
     char *fromStr = curr;
@@ -163,7 +180,9 @@ int main(int argc, char **argv) {
     sparseEdgeIndex++;
   }
 
-  printf("Done creating sparse matrix.\n");
+  printf("Done creating sparse matrix (%.2fms)\n", 
+      msSinceBenchmark(&benchSparse));
+
    float tol = .0001;
  // for ( i = 0; i < edges; i++) {
  //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
