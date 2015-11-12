@@ -10,37 +10,23 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <string.h>
+#include <bsd/stdlib.h>
 #include "hashtable.h"
 #include "mkl.h"
 #include "getRank.h"
 
-void skip_line(FILE *f, char terminator) {
-  char c;
-  char test;
-  do {
-    c = fgetc(f);
-  } while (c != terminator);
-}
-
-int read_int(FILE *f) {
-  char buf[150];
-  int i;
-  char c = '9';
-  // Read non-space characters
-  for (i = 0; i < 150 && isdigit(c); i++) {
-    buf[i] = c = fgetc(f);
+typedef int MKL_INT;
+typedef struct {
+  int node;
+  float score;
+} pair;
+int compar(const pair *left, const pair *right) {
+  float diff = left->score - right->score;
+  if (diff < 0) {
+    return -1;
+  } else {
+    return 1;
   }
-  // Set the last (non-digit) character we wrote to buf to a null,
-  // making buf a string.
-  buf[i] = '\0';
-
-  // Drop all following space
-  while (isspace(c)) {
-    c = fgetc(f);
-  }
-  // The last character we read won't be a space
-  ungetc(c, f);
-  return atoi(buf);
 }
 int main(int argc, char **argv) {
   bool grumpy = false;
@@ -194,5 +180,13 @@ int main(int argc, char **argv) {
  //     printf("x[%d] = %lf\n", i+1, x[i]);
  //  }
 
+   pair *nodeStructs = (pair *) malloc(sizeof(pair) * numRows);
+#pragma omp parallel for simd
+   for (i = 0; i < numRows; i++) {
+     nodeStructs[i].node = unmap[i];
+     nodeStructs[i].score = x[i];
+   }
+     
+  mergesort(nodeStruct, numRows, sizeof(pair), (& compar));
   return 0;
 }
