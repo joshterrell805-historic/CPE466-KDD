@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
   }
 
   if ((argc - optind) != 1) {
-    printf("Missing required filename: ranker <filename>\n");
+    printf("Missing required filename: pageRank <filename>\n");
     exit(2);
   }
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
       denseId++;
     }
 
-    printf("From %i to %i first time\n", from, to);
+   // printf("From %i to %i first time\n", from, to);
     values[sparseEdgeIndex] = 1;
     rowind[sparseEdgeIndex] = denseFrom;
     colind[sparseEdgeIndex] = denseTo;
@@ -179,20 +179,19 @@ int main(int argc, char **argv) {
 
   printf("Done creating sparse matrix.\n");
    float tol = .0001;
-  for ( i = 0; i < edges; i++) {
-      printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
-  }
+ // for ( i = 0; i < edges; i++) {
+ //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
+  //}
    makeP(values, rowind, &numRows, colind, &nnz, .95);
    float *x = (float*)malloc(sizeof(float)*numRows);
    for(i = 0; i<numRows; i++){
       x[i] = (float)1/numRows;
    }
    getRank(values, x, rowind, colind, &numRows, &nnz, tol, .95);
-   printf("result: \n");
-   for(i = 0; i<numRows; i++){
-      printf("x[%d] = %lf\n", i+1, x[i]);
-   }
-//void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, int n, float dP);
-  //makeP(values, rowind, &numRows, colind, &nnz, numNodes, float dP);
+   printf("result: it did things...\n");
+ //  for(i = 0; i<numRows; i++){
+ //     printf("x[%d] = %lf\n", i+1, x[i]);
+ //  }
+
   return 0;
 }
