@@ -208,5 +208,8 @@ int main(int argc, char **argv) {
    int (*compare) (const void *, const void*);
    compare = compar;
   qsort(nodeStruct, numRows, sizeof(pair), compare);
+  for (i = 0; i < numRows; i++) {
+    printf("Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
+  }
   return 0;
 }
