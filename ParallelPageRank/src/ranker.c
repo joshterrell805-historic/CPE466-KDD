@@ -184,6 +184,7 @@ int main(int argc, char **argv) {
   //}
    makeP(values, rowind, &numRows, colind, &nnz, .95);
    float *x = (float*)malloc(sizeof(float)*numRows);
+#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
       x[i] = (float)1/numRows;
    }

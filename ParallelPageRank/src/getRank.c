@@ -91,6 +91,7 @@ void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *
 float sum(float *x, int N){
    int i;
    float result = 0;
+//#pragma omp parallel for simd reduction(+:result)
    for (i = 0; i<N; i++){
       result+= x[i];
    }
@@ -99,6 +100,7 @@ float sum(float *x, int N){
 
 void ones(float *a, int N){
    int i;
+//#pragma omp parallel for simd
    for (i =0; i< N; i++) {
       a[i] = 1;
    }
@@ -106,6 +108,7 @@ void ones(float *a, int N){
 
 float getError(float *v1, float *v2, MKL_INT size){
    int i;
+ //  #pragma omp parallel for simd
    for (i = 0; i<size; i++) {
       v1[i] = v1[i]-v2[i];
    }
