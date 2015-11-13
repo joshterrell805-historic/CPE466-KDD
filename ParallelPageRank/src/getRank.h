@@ -10,11 +10,11 @@
 #define getRank_h
 
 #include "mkl.h"
-void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  float dP);
-void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP);
+void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  double dP);
+void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, float dP);
 //void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow);
-float sum(float *x, int N);
-void ones(float *a, int N);
-float getError(float *v1, float *v2, MKL_INT size);
+float sum(double *x, int N);
+void ones(double *a, int N);
+float getError(double *v1, double *v2, MKL_INT size);
 
 #endif /* getRank_h */

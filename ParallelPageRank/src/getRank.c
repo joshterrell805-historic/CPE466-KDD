@@ -2,8 +2,8 @@
 /*
 int main(int argc, char *argv[]){
    MKL_INT nnz = 14;
-   float tol = .0001;
-   float Avals[14];
+   double tol = .0001;
+   double Avals[14];
    ones(Avals, nnz);
    MKL_INT rowind[14] = {0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4};
    MKL_INT colind[14] = {1, 2, 3, 4, 1, 3, 4, 1, 2, 4, 1, 2, 3, 5};
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
    //MKL_INT *sinkCol = (MKL_INT*)malloc(sizeof(MKL_INT)*numRow*numSinks);
    //makeSinks(sinkRow, sinkCol, d, numRow);
 
-   float *x = (float*)malloc(sizeof(float)*numRow);
+   double *x = (float*)malloc(sizeof(float)*numRow);
    int i;
    for(i = 0; i<numRow; i++){
       x[i] = (float)1/numRow;
@@ -30,15 +30,15 @@ int main(int argc, char *argv[]){
    return 0;
 }
 */
-void makeP(float *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, float dP){
+void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz, double dP){
 
-   float *one = (float*)malloc(sizeof(float)*(*numRow));
-   float *d = (float*)malloc(sizeof(float)*(*numRow));
+   double *one = (double*)malloc(sizeof(double)*(*numRow));
+   double *d = (double*)malloc(sizeof(double)*(*numRow));
    ones(d, *numRow);
    int i, sinkNodes = 0;
    ones(one, *numRow);
    char transa = 'N';
-   mkl_cspblas_scoogemv (&transa, numRow, Avals ,rowind , colind , nnz , one, d );
+   mkl_cspblas_dcoogemv (&transa, numRow, Avals ,rowind , colind , nnz , one, d );
    /*
    for(i = 0; i<*numRow; i++){
     printf("d[%d] = %lf\n", i, d[i]);
@@ -67,30 +67,30 @@ void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow){
    }
 }
 */
-void getRank(float *Pvals, float *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, float tol, float dP){
+void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, double dP){
 
-   float *y = (float*)malloc(sizeof(float)*(*numRows));
+   double *y = (double*)malloc(sizeof(double)*(*numRows));
    int i, j;
    ones(y, *numRows);
    char transa = 'T';
-   float alpha = 1, beta;
+   double alpha = 1, beta;
    char matdescra[6] = {'G', 'U', 'U','C'};
-   float error = 10;
+   double error = 10.0;
    i = 0;
    while (error>tol) {
-      beta = (float)((1-dP)/(*numRows));
-      mkl_scoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
+      beta = (double)((1-dP)/(*numRows));
+      mkl_dcoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
       error = getError(x, y, *numRows);
-      memcpy(x, y, *numRows*sizeof(float));
+      memcpy(x, y, *numRows*sizeof(double));
       ones(y, *numRows);
       //printf("error: %lf\n", error);
    }
    free(y);
 }
 
-float sum(float *x, int N){
+double sum(double *x, int N){
    int i;
-   float result = 0;
+   double result = 0;
 //#pragma omp parallel for simd reduction(+:result)
    for (i = 0; i<N; i++){
       result+= x[i];
@@ -98,7 +98,7 @@ float sum(float *x, int N){
    return result;
 }
 
-void ones(float *a, int N){
+void ones(double *a, int N){
    int i;
 //#pragma omp parallel for simd
    for (i =0; i< N; i++) {
@@ -106,11 +106,11 @@ void ones(float *a, int N){
    }
 }
 
-float getError(float *v1, float *v2, MKL_INT size){
+double getError(double *v1, double *v2, MKL_INT size){
    int i;
  //  #pragma omp parallel for simd
    for (i = 0; i<size; i++) {
       v1[i] = v1[i]-v2[i];
    }
-   return cblas_snrm2 (size, v1, 1);
+   return cblas_dnrm2(size, v1, 1);
 }
