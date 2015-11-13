@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <string.h>
-#include <bsd/stdlib.h>
+//#include <bsd/stdlib.h>
 #include "hashtable.h"
 #include "mkl.h"
 #include "getRank.h"
@@ -20,7 +20,7 @@ typedef struct {
   int node;
   float score;
 } pair;
-int compar(const void *l, const void *r) {
+int compar(const void *left, const void *right) {
   float diff = ((pair *) right)->score - ((pair *) left)->score;
   if (diff < 0) {
     return -1;
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
   //}
    makeP(values, rowind, &numRows, colind, &nnz, .95);
    float *x = (float*)malloc(sizeof(float)*numRows);
-#pragma omp parallel for simd
+   //#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
       x[i] = (float)1/numRows;
    }
@@ -200,14 +200,14 @@ int main(int argc, char **argv) {
  //  }
 
    pair *nodeStructs = (pair *) malloc(sizeof(pair) * numRows);
-#pragma omp parallel for simd
+   //#pragma omp parallel for simd
    for (i = 0; i < numRows; i++) {
      nodeStructs[i].node = unmap[i];
      nodeStructs[i].score = x[i];
    }
    int (*compare) (const void *, const void*);
    compare = compar;
-  qsort(nodeStruct, numRows, sizeof(pair), compare);
+  qsort(nodeStructs, numRows, sizeof(pair), compare);
   for (i = 0; i < numRows; i++) {
     printf("Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
   }
