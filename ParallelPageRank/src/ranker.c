@@ -21,7 +21,7 @@ typedef struct {
   float score;
 } pair;
 int compar(const void *l, const void *r) {
-  float diff = ((pair *) left)->score - ((pair *) right)->score;
+  float diff = ((pair *) right)->score - ((pair *) left)->score;
   if (diff < 0) {
     return -1;
   } else {
