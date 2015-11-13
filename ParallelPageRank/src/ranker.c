@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
   int edges = atoi(edgesStr);
   printf("edges: %d, nodes %d\n", edges, nodes);
 
-  float *values = calloc(edges, sizeof(float));
+  double *values = calloc(edges, sizeof(double));
   MKL_INT *rowind = calloc(edges, sizeof(MKL_INT));
   MKL_INT *colind = calloc(edges, sizeof(MKL_INT));
   MKL_INT nnz = edges;
@@ -183,15 +183,15 @@ int main(int argc, char **argv) {
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
-   float tol = .0001;
+   double tol = .0001;
  // for ( i = 0; i < edges; i++) {
  //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   //}
    makeP(values, rowind, &numRows, colind, &nnz, .95);
-   float *x = (float*)malloc(sizeof(float)*numRows);
+   double *x = (double *) malloc(sizeof(double) * numRows);
    //#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
-      x[i] = (float)1/numRows;
+      x[i] = (double) 1/numRows;
    }
    getRank(values, x, rowind, colind, &numRows, &nnz, tol, .95);
    printf("result: it did things...\n");
