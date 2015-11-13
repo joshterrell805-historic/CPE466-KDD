@@ -179,20 +179,30 @@ int main(int argc, char **argv) {
     colind[sparseEdgeIndex] = denseTo;
     sparseEdgeIndex++;
   }
-
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
    double tol = .0001;
- // for ( i = 0; i < edges; i++) {
- //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
-  //}
+  for ( i = 0; i < edges; i++) {
+      printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
+  }
+#pragma offload target(mic)\
+   in(numRows, nnz)\
+   inout(values: length(nnz))\
+   in(rowind: length(nnz))\
+   in(colind: length(nnz))
    makeP(values, rowind, &numRows, colind, &nnz, .95);
    double *x = (double *) malloc(sizeof(double) * numRows);
    //#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
       x[i] = (double) 1/numRows;
    }
+#pragma offload target(mic)\
+   in(numRows, nnz, tol)\
+   inout(values: length(nnz))\
+   in(x: length(numRows))\
+   in(rowind: length(nnz))\
+   in(colind: length(nnz))
    getRank(values, x, rowind, colind, &numRows, &nnz, tol, .95);
    printf("result: it did things...\n");
  //  for(i = 0; i<numRows; i++){
