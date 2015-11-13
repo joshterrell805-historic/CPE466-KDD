@@ -8,6 +8,9 @@ default:
 
 mic:
 	$(CCINTEL) $(FLAGS) -mmic -o pageRank $(SRCFILES)
+
+offload:
+	$(CCINTEL) $(FLAGS) -o pageRank offload-ranker.c getRank-offload.c hashtable.c
 	
 clean:
 	-rm -f pageRank

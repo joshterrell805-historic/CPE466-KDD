@@ -13,7 +13,7 @@
 //#include <bsd/stdlib.h>
 #include "hashtable.h"
 #include "mkl.h"
-#include "getRank.h"
+#include "offload.h"
 #include <sys/time.h>
 
 typedef struct {
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
   /* Derived from getopt docs: */
   int c;
   int digit_optind = 0;
-
+   double dP = .95, tol = .0001;
   while (1) {
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
@@ -182,16 +182,15 @@ int main(int argc, char **argv) {
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
-   double tol = .0001;
-  for ( i = 0; i < edges; i++) {
-      printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
-  }
+//  for ( i = 0; i < edges; i++) {
+ //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
+ // }
 #pragma offload target(mic)\
    in(numRows, nnz)\
-   inout(values: length(nnz))\
-   in(rowind: length(nnz))\
-   in(colind: length(nnz))
-   makeP(values, rowind, &numRows, colind, &nnz, .95);
+   inout(values [0:nnz])\
+   in(rowind [0:nnz])\
+   in(colind [0:nnz])
+   makeP(values, rowind, &numRows, colind, &nnz, dP);
    double *x = (double *) malloc(sizeof(double) * numRows);
    //#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
@@ -199,11 +198,12 @@ int main(int argc, char **argv) {
    }
 #pragma offload target(mic)\
    in(numRows, nnz, tol)\
-   inout(values: length(nnz))\
-   in(x: length(numRows))\
-   in(rowind: length(nnz))\
-   in(colind: length(nnz))
-   getRank(values, x, rowind, colind, &numRows, &nnz, tol, .95);
+   in(values [0:nnz])\
+   in(x [0:numRows])\
+   out(x [0:numRows])\
+   in(rowind [0:nnz])\
+   in(colind [0:nnz])
+   getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
    printf("result: it did things...\n");
  //  for(i = 0; i<numRows; i++){
  //     printf("x[%d] = %lf\n", i+1, x[i]);
@@ -218,8 +218,10 @@ int main(int argc, char **argv) {
    int (*compare) (const void *, const void*);
    compare = compar;
   qsort(nodeStructs, numRows, sizeof(pair), compare);
+   FILE *fid = fopen("output.out", "w");
   for (i = 0; i < numRows; i++) {
-    printf("Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
+    fprintf(fid, "Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
   }
+   fclose(fid);
   return 0;
 }
