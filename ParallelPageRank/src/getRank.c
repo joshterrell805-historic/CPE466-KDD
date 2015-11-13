@@ -77,7 +77,8 @@ void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT
    char matdescra[6] = {'G', 'U', 'U','C'};
    double error = 10.0;
    i = 0;
-   while (error>tol) {
+   //while (error>tol) {
+   while(i++<500){
       beta = (double)((1-dP)/(*numRows));
       mkl_dcoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
       error = getError(x, y, *numRows);
