@@ -18,10 +18,10 @@
 
 typedef struct {
   int node;
-  float score;
+  double score;
 } pair;
 int compar(const void *left, const void *right) {
-  float diff = ((pair *) right)->score - ((pair *) left)->score;
+  double diff = ((pair *) right)->score - ((pair *) left)->score;
   if (diff < 0) {
     return -1;
   } else {
