@@ -1,0 +1,102 @@
+\documentclass{report}
+
+\usepackage{graphicx}
+\usepackage{siunitx}
+\sisetup{
+  round-mode = places,
+  round-precision = 3
+}
+
+% Insert a results file
+\newcommand{\results}[1]{{\ttfamily \begin{longtabu}{rll}
+                           \input{#1}
+                         \end{longtabu}\clearpage}}
+% format a result
+\newcommand{\runsummary}[3]{}
+\newcommand{\result}[3]{#1 & #2 & #3\\}
+
+% name
+\newcommand{\pagerank}{PageRank }
+\newcommand{\pageranks}{PageRanks }
+
+\title{CPE419 and CPE466 Joint Project\\Parallel Page Rank}
+\author{
+  Gilbert, Andrew\\
+  \texttt{apgilber@calpoly.edu}
+  \and
+  Miller, Drew\\
+  \texttt{dmille26@calpoly.edu}
+  \and
+  Terrell, Josh\\
+  \texttt{jmterrel@calpoly.edu}
+  \and
+  Yost, Morgan\\
+  \texttt{yost@calpoly.edu}
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}
+
+
+\appendix
+
+\section{README}
+\lstset{language=bash}
+Team: Andrew Gilbert, Josh Terrell
+
+\textbf{Important: Run everything from the project's root directory}
+
+\subsection{Setup environment}
+\begin{lstlisting}
+pyvenv virtual
+source virtual/bin/activate
+pip install --upgrade -e .
+\end{lstlisting}
+
+\subsection{Run all the tests}
+\begin{lstlisting}
+python3 -m unittest discover
+\end{lstlisting}
+
+\subsection{Compute Page Rank}
+The ranker scripts assume the graph is directed.
+
+Correctly parsed formats include:
+
+SNAP (edges must be repeated if undirected) (weight is optional):
+\begin{verbatim}
+a b [weight]
+\end{verbatim}
+CSVs, (edges must be repeated if undirected) (w\_a and w\_b are ignored unless
+\verb+--weighted+ flag is specified):
+\begin{verbatim}
+a,w_a,b,w_b
+\end{verbatim}
+
+To run:
+\begin{lstlisting}
+ranker <filename.csv>            # unweighted
+ranker <filename.csv> --weighted # weighted
+ranker <filename.txt> --fmt=snap # option specifiying input file is snap format
+\end{lstlisting}
+
+You can use \verb+ranker --help+ for more options such as setting the pagerank \verb+d+
+parameter or tweaking parallel computation settings.
+
+\subsection{Deactivate environment}
+\begin{lstlisting}
+deactivate
+\end{lstlisting}
+
+\subsection{(Optional) Manual Rebuild of Page Rank C-Implementation}
+\begin{lstlisting}
+python build_page_rank.py
+\end{lstlisting}
+\end{document}
