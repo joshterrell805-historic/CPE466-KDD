@@ -151,7 +151,9 @@ int main(int argc, char **argv) {
     *curr = '\0';
     to = atoi(toStr);
 
-    curr += 2;
+    curr += 1;
+    curr = strchr(curr, '\n');
+    curr += 1;
 
     int denseFrom;
     if (hasItem(undense, from)) {
