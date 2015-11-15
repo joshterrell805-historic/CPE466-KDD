@@ -1,4 +1,13 @@
-\documentclass{report}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% REMOVE DRAFT MODE ([draft]) TO RENDER FULL DOCUMENT %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[draft]{report}
+
+
+
+
 
 \usepackage{graphicx}
 \usepackage{siunitx}
@@ -58,19 +67,19 @@ A problem with vectorizing the pagerank algorithm is that without any memory opt
 The equation for the original transition probability matrix is defined below, where P\textsubscript{ij} is the value of the row i and column j representing the probability of transitioning from node i to node j.
 
 \begin{lstlisting}
-P(*\textsubscript{ij}*) = (1-d)/N + d * /out_degree(i)   if i->j is an edge
-P(*\textsubscript{ij}*) = (1-d)/N                        if i->j is not an edge
-P(*\textsubscript{ij}*) = 1/N                            if i is a sink node
+P(*\textsubscript{ij}*) = (1-d)/N + d / out_degree(i)   if i->j is an edge
+P(*\textsubscript{ij}*) = (1-d)/N                       if i->j is not an edge
+P(*\textsubscript{ij}*) = 1/N                           if i is a sink node
 \end{lstlisting}
 
 In order to represent the matrix as a sparse matrix, we subtracted (1-d)/N from every cell in the matrix to set one of the above cases to zero. We also set each row to zero if it was a sink node so that the definition of \textbf{P} changed to as is described below:
 
 \begin{lstlisting}
-P(*\textsubscript{ij}*) = (1-d)/N + d * /out_degree(i)   if i->j is an edge
-P(*\textsubscript{ij}*) = 0                              otherwise
+P(*\textsubscript{ij}*) = d / out_degree(i)   if i->j is an edge
+P(*\textsubscript{ij}*) = 0                   otherwise
 \end{lstlisting}
 
-The problem with doing this, of course, is that \textbf{P} has a completely different value than it should. Multiplying \textbf{\Pi\textsuperscript{T}P} no longer yields the next \Pi  for the iteration. When making these modifications, we had to adjust the equation for the iteration from
+The problem with modifying \textbf{P} like this is that \textbf{P} has a completely different value than it should. Multiplying \textbf{\Pi\textsuperscript{T}P} no longer yields the next \Pi{} for the iteration. When making these modifications, we had to adjust the equation for the iteration from
 
 \begin{lstlisting}
 (*\Pi*) = (*P\textsuperscript{T}\Pi*)
@@ -79,7 +88,7 @@ The problem with doing this, of course, is that \textbf{P} has a completely diff
 to
 
 \begin{lstlisting}
-(*\Pi*) = (*P\textsuperscript{T}\Pi  + (1-d)/N\cdot\Sigma(\Pi) + \Pi\textsuperscript{T}S*)
+(*\Pi*) = (*P\textsuperscript{T}\Pi{} + (1-d)/N\cdot\Sigma(\Pi) + d/N\cdot\Pi\textsuperscript{T}S*)
 \end{lstlisting}
 
 where S is a vector such that
