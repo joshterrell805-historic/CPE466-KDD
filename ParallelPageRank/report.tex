@@ -61,7 +61,7 @@
 \section{Implementation Overview}
 The previous implementation of pagerank represented the graph in structs and used threads to parallelize computation. To further increase performance, we vectorized the pagerank computation and used matrix math libraries for the Xenon Phi and GPU implementations.
 
-\section{The non-zero transition probability problem}
+\subsection{The non-zero transition probability problem}
 A problem with vectorizing the pagerank algorithm is that without any memory optimizations, a NxN (N=node count) matrix must be created to represent the \textit{transition probability matrix, \textbf{P}}. There is a non-zero probability of transitioning from any node to any other node, so \textbf{P} is throughly dense. For the \textit{live journal} dataset, we simply could not represent a 4Mx4M matrix in memory, so we got creative.
 
 The equation for the original transition probability matrix is defined below, where P\textsubscript{ij} is the value of the row i and column j representing the probability of transitioning from node i to node j.
@@ -104,6 +104,27 @@ Not only did this solve the problem of representing a NxN matrix, but by reducin
 In our previous implementation, we parsed the datasets in python and used cffi to pass data to c to construct the graph. We optimized the load significantly by performing all the dataset reading in c. Our program performs a mmap of the file into memory then, rather than splitting the file into many substrings, we use c string traversal to construct the graph. This results in much less writing to memory and no allocation after the parsing has begun.
 
 TODO memory to and from GPU
+
+\section{Results}
+\subsection{NCAA Football}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{State Borders}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Karate}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Dolphins}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Les Miserables}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Political Blogs}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Wiki Vote}
+\subsection{p2p-Gnutella05}
+\subsection{SlashdotZoo}
+\subsection{Amazon}
+\subsection{LiveJournal}
+
+\section{Performance Summary}
 
 \appendix
 
