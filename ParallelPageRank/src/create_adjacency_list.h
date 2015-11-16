@@ -4,18 +4,19 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "hashtable.h"
+#include <stdlib.h>
 
 typedef struct AdjacencyList {
   MKL_INT *rowind;
   MKL_INT *colind;
+  double  *values;
   MKL_INT nnz;
   MKL_INT numRows;
-  double* values;
-  int* unmap;
+  // for unmapping AdjacencyList to original node numbers
+  int *unmap;
 } AdjacencyList;
 
 typedef struct Graph {
-  AdjacencyList *adj_list;
   int nodes;
   int edges;
 } Graph;
@@ -37,6 +38,9 @@ typedef struct BuildState {
 
 void free_adjacency_list(AdjacencyList *list) {
   free(list->unmap); list->unmap = 0;
+  free(list->values); list->values = 0;
+  free(list->rowind); list->rowind = 0;
+  free(list->colind); list->colind = 0;
   free(list);
 }
 
@@ -45,41 +49,46 @@ void read_metadata(BuildState* buildState, Graph* graph);
 void read_edge(BuildState*, AdjacencyList*);
 
 AdjacencyList* create_adjacency_list(char* filename) {
-  Graph graph;
-  graph.adj_list = malloc(sizeof(AdjacencyList));
-
-  RawDataset ds = read_dataset(filename);
+  RawDataset dataset = read_dataset(filename);
 
   BuildState buildState;
-  buildState.curr = ds.data;
+  buildState.curr = dataset.data;
 
+  Graph graph;
   read_metadata(&buildState, &graph);
   printf("Edges: %d, Nodes %d\n", graph.edges, graph.nodes);
 
-  graph.adj_list->values = calloc(graph.edges, sizeof(double));
-  graph.adj_list->rowind = calloc(graph.edges, sizeof(MKL_INT));
-  graph.adj_list->colind = calloc(graph.edges, sizeof(MKL_INT));
-  graph.adj_list->nnz = graph.edges;
-  graph.adj_list->numRows = graph.nodes;
+  AdjacencyList *list = malloc(sizeof(AdjacencyList));
+  list->values  = calloc(graph.edges, sizeof(double));
+  list->rowind  = calloc(graph.edges, sizeof(MKL_INT));
+  list->colind  = calloc(graph.edges, sizeof(MKL_INT));
+  list->nnz     = graph.edges;
+  list->numRows = graph.nodes;
 
   buildState.undense = createMap(3 * graph.nodes);
   buildState.unmap = calloc(graph.nodes, sizeof(int));
   buildState.denseId = 0;
   buildState.sparseEdgeIndex = 0;
-  buildState.end = ds.data + ds.length;
+  buildState.end = dataset.data + dataset.length;
 
   Benchmark benchSparse = startBenchmark(); 
   while(buildState.curr < buildState.end) {
-    read_edge(&buildState, graph.adj_list);
+    read_edge(&buildState, list);
   }
-
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
-  free(buildState.undense);
-  graph.adj_list->unmap = buildState.unmap;
+  destroyMap(buildState.undense);
+  buildState.undense = 0;
 
-  return graph.adj_list;
+  if (munmap(dataset.data, dataset.length)) {
+    printf("failed to free mmaped data.\n");
+    exit(-1);
+  }
+
+  list->unmap = buildState.unmap;
+
+  return list;
 }
 
 RawDataset read_dataset(char* filename) {
@@ -101,77 +110,77 @@ RawDataset read_dataset(char* filename) {
   return ds;
 }
 
-void read_metadata(BuildState* buildState, Graph* graph) {
+void read_metadata(BuildState* bs, Graph* graph) {
   int i;
   for (i = 0; i < 2; i++) {
-    buildState->curr = strchr(buildState->curr, '\n');
-    buildState->curr++;
+    bs->curr = strchr(bs->curr, '\n');
+    bs->curr++;
   }
   // Skip "# Nodes: "
-  buildState->curr += 9;
+  bs->curr += 9;
 
-  char *nodesStr = buildState->curr;
+  char *nodesStr = bs->curr;
 
-  buildState->curr = strchr(buildState->curr, ' ');
-  *buildState->curr = '\0';
+  bs->curr = strchr(bs->curr, ' ');
+  *bs->curr = '\0';
 
   // Skip "\0Edges: "
-  buildState->curr += 8;
-  char *edgesStr = buildState->curr;
-  buildState->curr = strchr(buildState->curr, '\r');
-  *buildState->curr = '\0';
-  buildState->curr += 2;
+  bs->curr += 8;
+  char *edgesStr = bs->curr;
+  bs->curr = strchr(bs->curr, '\r');
+  *bs->curr = '\0';
+  bs->curr += 2;
 
-  buildState->curr = strchr(buildState->curr, '\n');
-  buildState->curr++;
+  bs->curr = strchr(bs->curr, '\n');
+  bs->curr++;
 
   graph->nodes = atoi(nodesStr);
   graph->edges = atoi(edgesStr);
 }
 
-void read_edge(BuildState* buildState, AdjacencyList* list) {
+void read_edge(BuildState* bs, AdjacencyList* list) {
   int from, to;
 
-  char *fromStr = buildState->curr;
-  buildState->curr = strchr(buildState->curr, '\t');
-  *buildState->curr = '\0';
+  char *fromStr = bs->curr;
+  bs->curr = strchr(bs->curr, '\t');
+  *bs->curr = '\0';
   from = atoi(fromStr);
 
-  buildState->curr++;
+  bs->curr++;
 
-  char *toStr = buildState->curr;
-  buildState->curr = strchr(buildState->curr, '\r');
-  *buildState->curr = '\0';
+  char *toStr = bs->curr;
+  bs->curr = strchr(bs->curr, '\r');
+  *bs->curr = '\0';
   to = atoi(toStr);
 
-  buildState->curr += 1;
-  buildState->curr = strchr(buildState->curr, '\n');
-  buildState->curr += 1;
+  bs->curr += 1;
+  bs->curr = strchr(bs->curr, '\n');
+  bs->curr += 1;
 
   int denseFrom;
-  if (hasItem(buildState->undense, from)) {
-    denseFrom = getItem(buildState->undense, from);
+  if (hasItem(bs->undense, from)) {
+    denseFrom = getItem(bs->undense, from);
   } else {
-    addItem(buildState->undense, from, buildState->denseId);
-    denseFrom = buildState->denseId;
-    buildState->unmap[buildState->denseId] = from;
-    buildState->denseId++;
+    addItem(bs->undense, from, bs->denseId);
+    denseFrom = bs->denseId;
+    bs->unmap[bs->denseId] = from;
+    bs->denseId++;
   }
     
   int denseTo;
-  if (hasItem(buildState->undense, to)) {
-    denseTo = getItem(buildState->undense, to);
+  if (hasItem(bs->undense, to)) {
+    denseTo = getItem(bs->undense, to);
   } else {
-    addItem(buildState->undense, to, buildState->denseId);
-    denseTo = buildState->denseId;
-    buildState->unmap[buildState->denseId] = to;
-    buildState->denseId++;
+    addItem(bs->undense, to, bs->denseId);
+    denseTo = bs->denseId;
+    bs->unmap[bs->denseId] = to;
+    bs->denseId++;
   }
 
-  list->values[buildState->sparseEdgeIndex] = 1;
-  list->rowind[buildState->sparseEdgeIndex] = denseFrom;
-  list->colind[buildState->sparseEdgeIndex] = denseTo;
-  buildState->sparseEdgeIndex++;
+  list->values[bs->sparseEdgeIndex] = 1;
+  list->rowind[bs->sparseEdgeIndex] = denseFrom;
+  list->colind[bs->sparseEdgeIndex] = denseTo;
+  bs->sparseEdgeIndex++;
 }
 
 #endif
