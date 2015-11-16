@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <getopt.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -14,7 +13,8 @@
 #include "hashtable.h"
 #include "mkl.h"
 #include "getRank.h"
-#include <sys/time.h>
+#include "benchmark.h"
+#include "read_options.h"
 
 typedef struct {
   int node;
@@ -29,71 +29,23 @@ int compar(const void *left, const void *right) {
   }
 }
 
-typedef struct timeval Benchmark;
-
-Benchmark startBenchmark() {
-  struct timeval time_start;
-  gettimeofday(&time_start,NULL);
-  return time_start;
-}
-
-float msSinceBenchmark(Benchmark *from) {
-  struct timeval to;
-  gettimeofday(&to,NULL);
-  return 1000 * (to.tv_sec - from->tv_sec) + (to.tv_usec - from->tv_usec) / 1000.0;
-}
-
 int main(int argc, char **argv) {
-
-  /*********** parse options ***********/
-
-  bool grumpy = false;
-  /* Derived from getopt docs: */
-  int c;
-  int digit_optind = 0;
-  double dP = .95, tol = .0001;
-  while (1) {
-    int this_option_optind = optind ? optind : 1;
-    int option_index = 0;
-    static struct option long_options[] = {
-      {"grumpy", no_argument, 0, 'g'},
-      {0,        0,           0, 0}
-    };
-
-    c = getopt_long(argc, argv, "g",
-                    long_options, &option_index);
-    if (c == -1) {
-      break;
-    }
-
-    switch (c) {
-    case 'g':
-      grumpy = true;
-      break;
-    }
-  }
-
-  if ((argc - optind) != 1) {
-    printf("Missing required filename: pageRank <filename>\n");
-    exit(2);
-  }
-
-  char *filename = argv[optind];
-
-  if (grumpy) {
+  // read_options.h
+  Options* options = create_options(argc, argv);
+  if (options->grumpy) {
     printf("Get off my lawn!\n");
   } else {
     printf("Hello World!\n");
   }
 
-  printf("Filename: %s\n", filename);
+  printf("Filename: %s\n", options->filename);
 
   /*********** create adjacency list ***********/
 
   struct stat finfo;
   int from, to , i;
-  stat(filename, &finfo);
-  int fd = open(filename, O_RDONLY);
+  stat(options->filename, &finfo);
+  int fd = open(options->filename, O_RDONLY);
   Benchmark benchMmap = startBenchmark(); 
   char *data = (char *) mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
   data[finfo.st_size] = '\0';
@@ -197,13 +149,13 @@ int main(int argc, char **argv) {
 
   /*********** compute page rank ***********/
 
-  makeP(values, rowind, &numRows, colind, &nnz, dP);
+  makeP(values, rowind, &numRows, colind, &nnz, options->dP);
   double *x = (double *) malloc(sizeof(double) * numRows);
   //#pragma omp parallel for simd
   for(i = 0; i<numRows; i++){
     x[i] = (double) 1/numRows;
   }
-  getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
+  getRank(values, x, rowind, colind, &numRows, &nnz, options->tol, options->dP);
   printf("result: it did things...\n");
   
   //for(i = 0; i<numRows; i++){
@@ -228,5 +180,6 @@ int main(int argc, char **argv) {
   }
   fclose(fid);
 
+  free_options(options);
   return 0;
 }
