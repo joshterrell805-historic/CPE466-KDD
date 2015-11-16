@@ -109,3 +109,15 @@ class TestModel(unittest.TestCase):
                         ("Moderate", Label("Obama")),
                         ("Conservative", Label("McCain")))))
         self.assertEqual(root, tree)
+
+    def test_stringify_tree(self):
+        tree = Node("Gender",
+                ("Female", Node("Bush Approval",
+                        ("Approve", Label("McCain")),
+                        ("Disapprove", Label("Obama")))),
+                ("Male", Node("Ideology",
+                        ("Liberal", Label("Obama")),
+                        ("Moderate", Label("Obama")),
+                        ("Conservative", Label("McCain")))))
+        xml_tree = model.stringify_tree(tree)
+        self.assertEqual(tree, model.build_tree(xml_tree))

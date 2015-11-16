@@ -5,19 +5,22 @@ class Node:
         self.name = name
         self.edges = {}
         for edge in edge_tuples:
-            name = 0
+            name  = 0
             label = 1
             self.edges[edge[name]] = edge[label]
 
     def __eq__(self, other):
-        return self.name == other.name and self.edges == other.edges
+        return (isinstance(other, __class__) and
+                self.name == other.name and
+                self.edges == other.edges)
 
 class Label:
     def __init__(self, category):
         self.category = category
 
     def __eq__(self, other):
-        return self.category == other.category
+        return (isinstance(other, __class__) and
+                self.category == other.category)
 
 def build_tree(xml_str):
     xml_tree = ET.fromstring(xml_str)
@@ -29,6 +32,14 @@ def build_tree(xml_str):
         raise Exception('Invalid Tree root node')
 
     return build_tree_recursive(children[0])
+
+def stringify_tree(tree):
+    node = build_xml_tree_recursive(tree)
+    root = ET.Element('Tree', {'name': '?'})
+    root.append(node)
+    return ET.tostring(root)
+
+###### helper functions #######
 
 def build_tree_recursive(xml_root):
     if xml_root.tag == 'node':
@@ -55,3 +66,18 @@ def build_tree_recursive(xml_root):
         return Label(xml_root.get('choice'))
     else:
         raise Exception('tree elements must be "node" or "edge"')
+
+def build_xml_tree_recursive(tree):
+    if type(tree) == Node:
+        e = ET.Element('node', {'var': tree.name, 'num': '?'})
+        e.extend([build_xml_tree_recursive((k, v)) \
+                for k,v in tree.edges.items()])
+        return e
+    elif type(tree) == Label:
+        return ET.Element('decision', {'end': '?', 'choice': tree.category})
+    elif type(tree) == tuple:
+        e = ET.Element('edge', {'var': tree[0], 'num': '?'})
+        e.append(build_xml_tree_recursive(tree[1]))
+        return e
+    else:
+        raise Exception('unknown tree element: ' + type(tree))

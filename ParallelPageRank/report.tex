@@ -1,0 +1,163 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% REMOVE DRAFT MODE ([draft]) TO RENDER FULL DOCUMENT %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[draft]{report}
+
+
+
+
+
+\usepackage{graphicx}
+\usepackage{siunitx}
+\sisetup{
+  round-mode = places,
+  round-precision = 3
+}
+
+% Insert a results file
+\newcommand{\results}[1]{{\ttfamily \begin{longtabu}{rll}
+                           \input{#1}
+                         \end{longtabu}\clearpage}}
+% format a result
+\newcommand{\runsummary}[3]{}
+\newcommand{\result}[3]{#1 & #2 & #3\\}
+
+% name
+\newcommand{\pagerank}{PageRank }
+\newcommand{\pageranks}{PageRanks }
+\lstset{}
+\lstset{%
+  escapeinside={(*}{*)},%
+  language=bash
+}
+
+\title{CPE419 and CPE466 Joint Project\\Parallel Page Rank}
+\author{
+  Gilbert, Andrew\\
+  \texttt{apgilber@calpoly.edu}
+  \and
+  Miller, Drew\\
+  \texttt{dmille26@calpoly.edu}
+  \and
+  Terrell, Josh\\
+  \texttt{jmterrel@calpoly.edu}
+  \and
+  Yost, Morgan\\
+  \texttt{yost@calpoly.edu}
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}
+
+\section{Implementation Overview}
+The previous implementation of pagerank represented the graph in structs and used threads to parallelize computation. To further increase performance, we vectorized the pagerank computation and used matrix math libraries for the Xenon Phi and GPU implementations.
+
+\subsection{The non-zero transition probability problem}
+A problem with vectorizing the pagerank algorithm is that without any memory optimizations, a NxN (N=node count) matrix must be created to represent the \textit{transition probability matrix, \textbf{P}}. There is a non-zero probability of transitioning from any node to any other node, so \textbf{P} is throughly dense. For the \textit{live journal} dataset, we simply could not represent a 4Mx4M matrix in memory, so we got creative.
+
+The equation for the original transition probability matrix is defined below, where P\textsubscript{ij} is the value of the row i and column j representing the probability of transitioning from node i to node j.
+
+\begin{lstlisting}
+P(*\textsubscript{ij}*) = (1-d)/N + d / out_degree(i)   if i->j is an edge
+P(*\textsubscript{ij}*) = (1-d)/N                       if i->j is not an edge
+P(*\textsubscript{ij}*) = 1/N                           if i is a sink node
+\end{lstlisting}
+
+In order to represent the matrix as a sparse matrix, we subtracted (1-d)/N from every cell in the matrix to set one of the above cases to zero. We also set each row to zero if it was a sink node so that the definition of \textbf{P} changed to as is described below:
+
+\begin{lstlisting}
+P(*\textsubscript{ij}*) = d / out_degree(i)   if i->j is an edge
+P(*\textsubscript{ij}*) = 0                   otherwise
+\end{lstlisting}
+
+The problem with modifying \textbf{P} like this is that \textbf{P} has a completely different value than it should. Multiplying \textbf{\Pi\textsuperscript{T}P} no longer yields the next \Pi{} for the iteration. When making these modifications, we had to adjust the equation for the iteration from
+
+\begin{lstlisting}
+(*\Pi*) = (*P\textsuperscript{T}\Pi*)
+\end{lstlisting}
+
+to
+
+\begin{lstlisting}
+(*\Pi*) = (*P\textsuperscript{T}\Pi{} + (1-d)/N\cdot\Sigma(\Pi) + d/N\cdot\Pi\textsuperscript{T}S*)
+\end{lstlisting}
+
+where S is a vector such that
+
+\begin{lstlisting}
+Si = 1   if row i of P is a sink node
+Si = 0   otherwise
+\end{lstlisting}
+
+Not only did this solve the problem of representing a NxN matrix, but by reducing the matrix to (E=edge count) cells of a sparse matrix, we accidently, conviniently, and significantly reduced the number of operations to be computed on every iteration, assuming nodes have far less out edges than nodes on the graph.
+
+\subsection{Memory movement}
+In our previous implementation, we parsed the datasets in python and used cffi to pass data to c to construct the graph. We optimized the load significantly by performing all the dataset reading in c. Our program performs a mmap of the file into memory then, rather than splitting the file into many substrings, we use c string traversal to construct the graph. This results in much less writing to memory and no allocation after the parsing has begun.
+
+TODO memory to and from GPU
+
+\section{Results}
+\subsection{NCAA Football}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{State Borders}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Karate}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Dolphins}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Les Miserables}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Political Blogs}
+This dataset must be converted to the snap format using \texttt{reformat.py} as described in the README (Appendix A).
+\subsection{Wiki Vote}
+\subsection{p2p-Gnutella05}
+\subsection{SlashdotZoo}
+\subsection{Amazon}
+\subsection{LiveJournal}
+
+\section{Performance Summary}
+
+\appendix
+
+\section{README}
+
+\subsection{Dataset Format}
+The ranker scripts assume the graph is directed in the following form.
+
+\begin{lstlisting}
+# a comment
+# a comment
+# Nodes: <node count> Edges: <edge count>
+# a comment
+node_from<tab>node_to
+node_from<tab>node_to
+node_from<tab>node_to
+\end{lstlisting}
+
+All datasets not in the above format must be converted to this format using the conversion script \texttt{reformat.py}.
+
+\begin{lstlisting}
+TODO conversion script instructions.
+\end{lstlisting}
+
+\subsection{Compile}
+\begin{lstlisting}
+cd src
+make
+\end{lstlisting}
+
+\subsection{Compute Page Rank}
+\begin{lstlisting}
+cd src
+./pageRank <path/to/snap-formatted-dataset.csv>
+\end{lstlisting}
+\end{document}

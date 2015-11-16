@@ -13,7 +13,7 @@
 //#include <bsd/stdlib.h>
 #include "hashtable.h"
 #include "mkl.h"
-#include "getRank.h"
+#include "offload.h"
 #include <sys/time.h>
 
 typedef struct {
@@ -151,9 +151,7 @@ int main(int argc, char **argv) {
     *curr = '\0';
     to = atoi(toStr);
 
-    curr += 1;
-    curr = strchr(curr, '\n');
-    curr += 1;
+    curr += 2;
 
     int denseFrom;
     if (hasItem(undense, from)) {
@@ -181,19 +179,30 @@ int main(int argc, char **argv) {
     colind[sparseEdgeIndex] = denseTo;
     sparseEdgeIndex++;
   }
-
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
- // for ( i = 0; i < edges; i++) {
+//  for ( i = 0; i < edges; i++) {
  //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
-  //}
+ // }
+#pragma offload target(mic)\
+   in(numRows, nnz)\
+   inout(values [0:nnz])\
+   in(rowind [0:nnz])\
+   in(colind [0:nnz])
    makeP(values, rowind, &numRows, colind, &nnz, dP);
    double *x = (double *) malloc(sizeof(double) * numRows);
    //#pragma omp parallel for simd
    for(i = 0; i<numRows; i++){
       x[i] = (double) 1/numRows;
    }
+#pragma offload target(mic)\
+   in(numRows, nnz, tol)\
+   in(values [0:nnz])\
+   in(x [0:numRows])\
+   out(x [0:numRows])\
+   in(rowind [0:nnz])\
+   in(colind [0:nnz])
    getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
    printf("result: it did things...\n");
  //  for(i = 0; i<numRows; i++){
