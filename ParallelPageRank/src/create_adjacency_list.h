@@ -21,6 +21,12 @@ typedef struct Graph {
   int edges;
 } Graph;
 
+typedef struct AdjacencyCell {
+  int row;
+  int col;
+  // all values have 1.0 to start with
+  // double value;
+} AdjacencyCell;
 
 typedef struct RawDataset {
   char* data;
@@ -28,6 +34,7 @@ typedef struct RawDataset {
 } RawDataset;
 
 typedef struct BuildState {
+  AdjacencyCell *unsortedAdjList;
   char* curr;
   char* end;
   map* undense;
@@ -46,7 +53,9 @@ void free_adjacency_list(AdjacencyList *list) {
 
 RawDataset read_dataset(char* filename);
 void read_metadata(BuildState* buildState, Graph* graph);
-void read_edge(BuildState*, AdjacencyList*);
+void read_edge(BuildState*);
+AdjacencyList* actually_create_adj_list(BuildState*, Graph*);
+void sort_adjacency_list(AdjacencyCell* list, int edges);
 
 AdjacencyList* create_adjacency_list(char* filename) {
   RawDataset dataset = read_dataset(filename);
@@ -58,35 +67,55 @@ AdjacencyList* create_adjacency_list(char* filename) {
   read_metadata(&buildState, &graph);
   printf("Edges: %d, Nodes %d\n", graph.edges, graph.nodes);
 
-  AdjacencyList *list = malloc(sizeof(AdjacencyList));
-  list->values  = calloc(graph.edges, sizeof(double));
-  list->rowind  = calloc(graph.edges, sizeof(MKL_INT));
-  list->colind  = calloc(graph.edges, sizeof(MKL_INT));
-  list->nnz     = graph.edges;
-  list->numRows = graph.nodes;
-
   buildState.undense = createMap(3 * graph.nodes);
   buildState.unmap = calloc(graph.nodes, sizeof(int));
   buildState.denseId = 0;
   buildState.sparseEdgeIndex = 0;
   buildState.end = dataset.data + dataset.length;
+  buildState.unsortedAdjList = malloc(graph.edges * sizeof(AdjacencyCell));
 
   Benchmark benchSparse = startBenchmark(); 
   while(buildState.curr < buildState.end) {
-    read_edge(&buildState, list);
+    read_edge(&buildState);
   }
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
-  destroyMap(buildState.undense);
-  buildState.undense = 0;
+  AdjacencyList *list = actually_create_adj_list(&buildState, &graph);
+
+  destroyMap(buildState.undense); buildState.undense = 0;
+  free(buildState.unsortedAdjList); buildState.unsortedAdjList = 0;
+  // don't free buildState.unmap, adj list owns it now.
 
   if (munmap(dataset.data, dataset.length)) {
-    printf("failed to free mmaped data.\n");
+    printf("Failed to free mmaped data.\n");
     exit(-1);
   }
 
-  list->unmap = buildState.unmap;
+  return list;
+}
+
+AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
+  sort_adjacency_list(bs->unsortedAdjList, g->edges);
+
+  AdjacencyList *list = malloc(sizeof(AdjacencyList));
+  list->values  = calloc(g->edges, sizeof(double));
+  list->rowind  = calloc(g->edges, sizeof(MKL_INT));
+  list->colind  = calloc(g->edges, sizeof(MKL_INT));
+  list->nnz     = g->edges;
+  list->numRows = g->nodes;
+
+  if (bs->sparseEdgeIndex != g->edges) {
+    printf("sparseEdgeCount(%d) != graph.edges(%d)\n", bs->sparseEdgeIndex + 1,
+        g->edges);
+    exit(-1);
+  }
+   int i;
+  for (i = 0; i < g->edges; ++i) {
+    list->values[i] = 1.0;
+    list->rowind[i] = bs->unsortedAdjList[i].row;
+    list->colind[i] = bs->unsortedAdjList[i].col;
+  }
 
   return list;
 }
@@ -138,7 +167,7 @@ void read_metadata(BuildState* bs, Graph* graph) {
   graph->edges = atoi(edgesStr);
 }
 
-void read_edge(BuildState* bs, AdjacencyList* list) {
+void read_edge(BuildState* bs) {
   int from, to;
 
   char *fromStr = bs->curr;
@@ -177,10 +206,31 @@ void read_edge(BuildState* bs, AdjacencyList* list) {
     bs->denseId++;
   }
 
-  list->values[bs->sparseEdgeIndex] = 1;
-  list->rowind[bs->sparseEdgeIndex] = denseFrom;
-  list->colind[bs->sparseEdgeIndex] = denseTo;
-  bs->sparseEdgeIndex++;
+  bs->unsortedAdjList[bs->sparseEdgeIndex].row = denseFrom;
+  bs->unsortedAdjList[bs->sparseEdgeIndex].col = denseTo;
+  //printf("%d,", bs->unsortedAdjList[bs->sparseEdgeIndex].col);
+  ++bs->sparseEdgeIndex;
+}
+
+int compare_AdjacencyCell(AdjacencyCell *left, AdjacencyCell *right) {
+  if (right->row < left->row) {
+    return 1;
+  } else if (right->row > left->row) {
+    return -1;
+  } else {
+    if (right->col < left->col) {
+      return 1;
+    } else if (right->col > left->col) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+}
+
+void sort_adjacency_list(AdjacencyCell* list, int edges) {
+  qsort(list, edges, sizeof(AdjacencyCell),
+      (int (*) (const void*, const void*))compare_AdjacencyCell);
 }
 
 #endif
