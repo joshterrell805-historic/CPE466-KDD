@@ -54,7 +54,8 @@ void free_adjacency_list(AdjacencyList *list) {
 RawDataset read_dataset(char* filename);
 void read_metadata(BuildState* buildState, Graph* graph);
 void read_edge(BuildState*);
-AdjacencyList* actually_create_adj_list(BuildState*, Graph* graph);
+AdjacencyList* actually_create_adj_list(BuildState*, Graph*);
+void sort_adjacency_list(AdjacencyCell* list, int edges);
 
 AdjacencyList* create_adjacency_list(char* filename) {
   RawDataset dataset = read_dataset(filename);
@@ -95,6 +96,8 @@ AdjacencyList* create_adjacency_list(char* filename) {
 }
 
 AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
+  sort_adjacency_list(bs->unsortedAdjList, g->edges);
+
   AdjacencyList *list = malloc(sizeof(AdjacencyList));
   list->values  = calloc(g->edges, sizeof(double));
   list->rowind  = calloc(g->edges, sizeof(MKL_INT));
@@ -207,6 +210,27 @@ void read_edge(BuildState* bs) {
   bs->unsortedAdjList[bs->sparseEdgeIndex].col = denseTo;
   //printf("%d,", bs->unsortedAdjList[bs->sparseEdgeIndex].col);
   ++bs->sparseEdgeIndex;
+}
+
+int compare_AdjacencyCell(AdjacencyCell *left, AdjacencyCell *right) {
+  if (right->row < left->row) {
+    return 1;
+  } else if (right->row > left->row) {
+    return -1;
+  } else {
+    if (right->col < left->col) {
+      return 1;
+    } else if (right->col > left->col) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+}
+
+void sort_adjacency_list(AdjacencyCell* list, int edges) {
+  qsort(list, edges, sizeof(AdjacencyCell),
+      (int (*) (const void*, const void*))compare_AdjacencyCell);
 }
 
 #endif
