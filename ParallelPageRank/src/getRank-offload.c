@@ -50,6 +50,7 @@ void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL
          }
          //printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
    }
+   free(d);
    free(one);
 }
 /*

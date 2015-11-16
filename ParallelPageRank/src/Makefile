@@ -2,6 +2,7 @@ CCINTEL=icc
 
 SRCFILES=ranker.c getRank.c hashtable.c
 FLAGS= -mkl -O3 -openmp
+#FLAGS= -mkl -openmp -g -O3 -debug inline-debug-info 
 
 default:
 	$(CCINTEL) $(FLAGS) -o pageRank $(SRCFILES)

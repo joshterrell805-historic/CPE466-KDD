@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
   getRank(list->values, x, list->rowind, list->colind, &list->numRows,
       &list->nnz, options->tol, options->dP);
   printf("result: it did things...\n");
-  
+  free_options(options);
   //for(i = 0; i < list->numRows; i++){
   //   printf("x[%d] = %lf\n", i+1, x[i]);
   //}
@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
         nodeStructs[i].score);
   }
   fclose(fid);
-
+   free(nodeStructs);
   free_adjacency_list(list);
-  free_options(options);
+  free(x);
   return 0;
 }

@@ -222,6 +222,8 @@ int main(int argc, char **argv) {
   for (i = 0; i < numRows; i++) {
     fprintf(fid, "Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
   }
+   free(x);
+   free(nodeStructs);
    fclose(fid);
   return 0;
 }

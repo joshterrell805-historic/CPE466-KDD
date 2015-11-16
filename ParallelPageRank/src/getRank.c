@@ -39,6 +39,7 @@ void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL
    ones(one, *numRow);
    char transa = 'N';
    mkl_cspblas_dcoogemv (&transa, numRow, Avals ,rowind , colind , nnz , one, d );
+ 
    /*
    for(i = 0; i<*numRow; i++){
     printf("d[%d] = %lf\n", i, d[i]);
@@ -51,6 +52,7 @@ void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL
          //printf("P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
    }
    free(one);
+   free(d);
 }
 /*
  makeP will need to spit out d for for this to work
