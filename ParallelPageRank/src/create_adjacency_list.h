@@ -107,8 +107,8 @@ AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
         g->edges);
     exit(-1);
   }
-
-  for (int i = 0; i < g->edges; ++i) {
+   int i;
+  for (i = 0; i < g->edges; ++i) {
     list->values[i] = 1.0;
     list->rowind[i] = bs->unsortedAdjList[i].row;
     list->colind[i] = bs->unsortedAdjList[i].col;
