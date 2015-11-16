@@ -15,6 +15,7 @@
 #include "getRank.h"
 #include "benchmark.h"
 #include "read_options.h"
+#include "dump_adjacency_list.h"
 
 typedef struct {
   int node;
@@ -142,6 +143,8 @@ int main(int argc, char **argv) {
 
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
+
+  //dump_adjacency_list(rowind, colind, values, nnz, "adjacency.csv");
 
   // for ( i = 0; i < edges; i++) {
   //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
