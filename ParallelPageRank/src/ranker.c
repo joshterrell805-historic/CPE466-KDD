@@ -44,11 +44,14 @@ float msSinceBenchmark(Benchmark *from) {
 }
 
 int main(int argc, char **argv) {
+
+  /*********** parse options ***********/
+
   bool grumpy = false;
   /* Derived from getopt docs: */
   int c;
   int digit_optind = 0;
-   double dP = .95, tol = .0001;
+  double dP = .95, tol = .0001;
   while (1) {
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
@@ -84,6 +87,8 @@ int main(int argc, char **argv) {
   }
 
   printf("Filename: %s\n", filename);
+
+  /*********** create adjacency list ***********/
 
   struct stat finfo;
   int from, to , i;
@@ -175,7 +180,8 @@ int main(int argc, char **argv) {
       denseId++;
     }
 
-   // printf("From %i to %i first time\n", from, to);
+    // printf("From %i to %i first time\n", from, to);
+
     values[sparseEdgeIndex] = 1;
     rowind[sparseEdgeIndex] = denseFrom;
     colind[sparseEdgeIndex] = denseTo;
@@ -185,34 +191,42 @@ int main(int argc, char **argv) {
   printf("Done creating sparse matrix (%.2fms)\n", 
       msSinceBenchmark(&benchSparse));
 
- // for ( i = 0; i < edges; i++) {
- //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
+  // for ( i = 0; i < edges; i++) {
+  //     printf("From %i to %i\n", unmap[rowind[i]], unmap[colind[i]]);
   //}
-   makeP(values, rowind, &numRows, colind, &nnz, dP);
-   double *x = (double *) malloc(sizeof(double) * numRows);
-   //#pragma omp parallel for simd
-   for(i = 0; i<numRows; i++){
-      x[i] = (double) 1/numRows;
-   }
-   getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
-   printf("result: it did things...\n");
- //  for(i = 0; i<numRows; i++){
- //     printf("x[%d] = %lf\n", i+1, x[i]);
- //  }
 
-   pair *nodeStructs = (pair *) malloc(sizeof(pair) * numRows);
-   //#pragma omp parallel for simd
-   for (i = 0; i < numRows; i++) {
-     nodeStructs[i].node = unmap[i];
-     nodeStructs[i].score = x[i];
-   }
-   int (*compare) (const void *, const void*);
-   compare = compar;
+  /*********** compute page rank ***********/
+
+  makeP(values, rowind, &numRows, colind, &nnz, dP);
+  double *x = (double *) malloc(sizeof(double) * numRows);
+  //#pragma omp parallel for simd
+  for(i = 0; i<numRows; i++){
+    x[i] = (double) 1/numRows;
+  }
+  getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
+  printf("result: it did things...\n");
+  
+  //for(i = 0; i<numRows; i++){
+  //   printf("x[%d] = %lf\n", i+1, x[i]);
+  //}
+
+  /*********** sort page rank and print results ***********/
+
+  pair *nodeStructs = (pair *) malloc(sizeof(pair) * numRows);
+  //#pragma omp parallel for simd
+  for (i = 0; i < numRows; i++) {
+    nodeStructs[i].node = unmap[i];
+    nodeStructs[i].score = x[i];
+  }
+  int (*compare) (const void *, const void*);
+  compare = compar;
   qsort(nodeStructs, numRows, sizeof(pair), compare);
-   FILE *fid = fopen("output.out", "w");
+
+  FILE *fid = fopen("output.out", "w");
   for (i = 0; i < numRows; i++) {
     fprintf(fid, "Node %i ranked %f\n", nodeStructs[i].node, nodeStructs[i].score);
   }
-   fclose(fid);
+  fclose(fid);
+
   return 0;
 }
