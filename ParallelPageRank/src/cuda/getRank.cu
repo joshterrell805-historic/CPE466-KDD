@@ -1,53 +1,25 @@
 #include <stdio.h>
 #include "getRank.h"
-#include "cublas.h"
-#include "cublas_api.h"
-#include "cusparse.h"
-#include "cuda.h"
+#include "/usr/include/cuda/cuda_runtime.h"
+#include <cublas.h>
+#include <cublas_api.h>
+#include <cusparse.h>
 
-/*
-int main(int argc, char *argv[]){
-   MKL_INT nnz = 14;
-   double tol = .0001;
-   double Avals[14];
-   ones(Avals, nnz);
-   MKL_INT rowind[14] = {0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4};
-   MKL_INT colind[14] = {1, 2, 3, 4, 1, 3, 4, 1, 2, 4, 1, 2, 3, 5};
-   MKL_INT numRow = 6;
-   makeP(Avals, rowind, &numRow, colind, &nnz, .95);
-   //float *sinkNodes = (float*)malloc(sizeof(float)*numRow*numSinks);
-   //ones(sinkNodes, numRow*numSinks);
-   //MKL_INT *sinkRow = (MKL_INT*)malloc(sizeof(MKL_INT)*numRow*numSinks);
-   //MKL_INT *sinkCol = (MKL_INT*)malloc(sizeof(MKL_INT)*numRow*numSinks);
-   //makeSinks(sinkRow, sinkCol, d, numRow);
-
-   double *x = (float*)malloc(sizeof(float)*numRow);
-   int i;
-   for(i = 0; i<numRow; i++){
-      x[i] = (float)1/numRow;
-   }
-   getRank(Avals, x, rowind, colind, &numRow, &nnz, tol, .95);
-   printf("result: \n");
-   for(i = 0; i<numRow; i++){
-      printf("x[%d] = %lf\n", i+1, x[i]);
-   }
-
-   free(x);
-   return 0;
-}
-*/
 void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double dP){
    FILE *f0 = fopen("csrAvals.txt", "w");
    FILE *f2 = fopen("csrCols.txt", "w");
    FILE *f3 = fopen("csrRow.txt", "w");
    FILE *f4 = fopen("newCsrRow.txt", "w");
-   int *testRowind = (int*)calloc(sizeof(int), nnz);
-   int s;
-   for (s = 0; s < nnz; s++) {
-      fprintf(f0,"%lf\n", Avals[s]);
-      fprintf(f3, "%d\n", colind[s]);
-   }
+   FILE *f5 = fopen("newCsrRow2.txt", "w");
+   printf("dp = %lf\n", dP);
    printf("Entering MAKEP.\n");
+   int i;
+   for (i = 0; i < nnz; i++) {
+      fprintf(f3, "i = %d, %d\n",i, rowind[i]);
+      fprintf(f2, "i = %d, %d\n",i, colind[i]);
+      fprintf(f0, "i = %d, %lf\n",i, Avals[i]);
+   }
+
    cusparseStatus_t status;
    cusparseHandle_t handle=0;
    cusparseMatDescr_t descr=0;
@@ -68,74 +40,76 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
       perror("cusparseSetMatType failed");
       exit(2);
    }
-   status = cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ONE);
+   status = cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
    if (status != CUSPARSE_STATUS_SUCCESS) {
       perror("cusparseSetMatIndexBase failed");
       exit(2);
    }
-   cusparseIndexBase_t idxBase = CUSPARSE_INDEX_BASE_ONE;
+   cusparseIndexBase_t idxBase = CUSPARSE_INDEX_BASE_ZERO;
    double *one = (double*)malloc(sizeof(double)*(numRow));
-   double *d = (double*)calloc(numRow, sizeof(double));
+   double *d = (double*)malloc(numRow*sizeof(double));
    double *dev_one, *dev_d, *dev_Avals;
-   int *dev_csrRowInd, *dev_colind, *dev_rowind;
-   int i; 
-   //int sinkNodes = 0;
+   int *dev_csrRowInd, *dev_colind, *dev_rowind, *csrRowInd;
+   csrRowInd = (int*)malloc(sizeof(int)*(numRow+1));
 
-   ones(one, numRow);
    //Convert rowInd vector to CSR format
-   cudaMalloc(&dev_rowind, sizeof(int)*(numRow));
-   cudaMalloc(&dev_csrRowInd, sizeof(int)*numRow+1);
-   cudaMemcpy(dev_rowind, rowind, sizeof(int) * (numRow), cudaMemcpyHostToDevice);
+   cudaMalloc(&dev_rowind, sizeof(int)*(nnz));
+   cudaMalloc(&dev_csrRowInd, sizeof(int)*(numRow+1));
+   cudaMemcpy(dev_rowind, rowind, sizeof(int) * (nnz), cudaMemcpyHostToDevice);
    printf("Before coo2csr.\n");
    status = cusparseXcoo2csr(handle, dev_rowind, nnz, numRow, dev_csrRowInd, idxBase);
+   printf("status of cusparseXcoo2csr is: %d.\n",status);
    if (status != CUSPARSE_STATUS_SUCCESS) {
       perror("FAILURE to set csr row indices.");
       exit(2);
    }
    printf("after coo2csr.\n");
-   cudaMemcpy(testRowind, dev_rowind, sizeof(int)*(numRow), cudaMemcpyDeviceToHost);
-   for(i = 0; i < numRow; i++) {
-      fprintf(f2,"%d\n", testRowind[s]);
-   }
-
-   cudaMemcpy(rowind, dev_csrRowInd, sizeof(int)*(numRow), cudaMemcpyDeviceToHost);
-   for(i = 0; i < numRow; i++) {
-      fprintf(f4,"%d\n", rowind[s]);
+   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int)*(numRow+1), cudaMemcpyDeviceToHost);
+   for(i = 0; i < numRow + 1; i++) {
+      fprintf(f4,"%d\n", csrRowInd[i]);
    }
 
 
+   ones(one, numRow);
+   ones(d, numRow);
    // csr format only way suportted in CUDA
    cudaMalloc(&dev_one, sizeof(double)*(numRow));
    cudaMalloc(&dev_d, sizeof(double)*(numRow));
-   cudaMalloc(&dev_Avals, sizeof(double)*(numRow));
-   cudaMalloc(&dev_colind, sizeof(int)*(numRow));
+   cudaMalloc(&dev_Avals, sizeof(double)*(nnz));
+   cudaMalloc(&dev_colind, sizeof(int)*(nnz));
 
-   
-   cudaMemcpy(dev_one, one, sizeof(double) * (numRow), cudaMemcpyHostToDevice);
    cudaMemcpy(dev_d, d, sizeof(double) * (numRow), cudaMemcpyHostToDevice);
-   cudaMemcpy(dev_Avals, Avals, sizeof(double) * (numRow), cudaMemcpyHostToDevice);
-   cudaMemcpy(dev_colind, colind, sizeof(int) * (numRow),  cudaMemcpyHostToDevice);
+   cudaMemcpy(dev_one, one, sizeof(double) * (numRow), cudaMemcpyHostToDevice);
+   cudaMemcpy(dev_Avals, Avals, sizeof(double) * (nnz), cudaMemcpyHostToDevice);
+   cudaMemcpy(dev_colind, colind, sizeof(int) * (nnz),  cudaMemcpyHostToDevice);
    //csr multiplication call
    double alpha = 1, beta = 0;
 
    printf("Before csrmv.\n");
    cusparseDcsrmv(handle, transa, numRow, numRow, nnz, &alpha, descr, 
                   dev_Avals, dev_csrRowInd, dev_colind, one, &beta, dev_d);
-   printf("After csrmv.\n");
-   printf("Before uncompressing row indices.\n");
-   cusparseXcsr2coo(handle, dev_csrRowInd, nnz, numRow, dev_rowind, idxBase);
-   printf("After uncompressing row indices.\n");
-
-   cudaMemcpy(rowind, dev_rowind, sizeof(int) * (numRow), cudaMemcpyDeviceToHost);
-   cudaMemcpy(colind, dev_colind, sizeof(int) * (numRow), cudaMemcpyDeviceToHost);
-   cudaMemcpy(d, dev_d, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
-
-//   mkl_cspblas_dcoogemv (&transa, numRow, Avals ,rowind , colind , nnz , one, d );
-   /*
-   for(i = 0; i<*numRow; i++){
-    printf("d[%d] = %lf\n", i, d[i]);
+   printf("status of cusparseDcsrmv is: %d.\n",status);
+   if (status != CUSPARSE_STATUS_SUCCESS) {
+      perror("FAILURE to makeP.");
+      exit(2);
    }
-   */
+   printf("After csrmv.\n");
+   cudaMemcpy(Avals, dev_Avals, sizeof(int) * (nnz), cudaMemcpyDeviceToHost);
+   cudaMemcpy(one, dev_one, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
+   cudaMemcpy(d, dev_d, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
+   //for (i = 0; i < nnz; i++) {
+   //   printf("Avals[%d, %d] = %lf\n", rowind[i], colind[i], Avals[i]);
+   //}
+   for (i = 0; i < numRow; i++) {
+      printf("d[%d] = %lf\n",i, d[i]);
+      printf("one[%d] = %lf\n",i, one[i]);
+      printf("Avals[%d] = %lf",i, Avals[i]);
+   }
+   //printf("Before uncompressing row indices.\n");
+   //cusparseXcsr2coo(handle, dev_csrRowInd, nnz, numRow, dev_rowind, idxBase);
+   //printf("After uncompressing row indices.\n");
+
+
    FILE *f1 = fopen("csrAvalsAfter.txt", "w");
 
    for (i = 0; i< nnz; i++){
