@@ -37,7 +37,6 @@ int main(int argc, char **argv) {
   if (options->grumpy) {
     printf("Get off my lawn!\n");
   } else {
-    printf("Hello World!\n");
   }
 
   printf("Filename: %s\n", options->filename);
