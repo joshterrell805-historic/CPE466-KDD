@@ -69,7 +69,7 @@ void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow){
    }
 }
 */
-void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, double dP){
+int getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, double dP){
 
    double *y = (double*)malloc(sizeof(double)*(*numRows));
    int i, j;
@@ -79,16 +79,18 @@ void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT
    char matdescra[6] = {'G', 'U', 'U','C'};
    double error = 10.0;
    i = 0;
-   //while (error>tol) {
-   while(i++<500){
+   while (error>tol/1000) {
+   //while(i++<500){
       beta = (double)((1-dP)/(*numRows));
       mkl_dcoomv(&transa, numRows, numRows, &alpha ,matdescra , Pvals ,rowind , colind , nnz , x , &beta , y );
       error = getError(x, y, *numRows);
       memcpy(x, y, *numRows*sizeof(double));
       ones(y, *numRows);
       //printf("error: %lf\n", error);
+      ++i;
    }
    free(y);
+   return i;
 }
 
 double sum(double *x, int N){

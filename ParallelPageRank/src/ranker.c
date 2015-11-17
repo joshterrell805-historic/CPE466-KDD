@@ -56,10 +56,10 @@ int main(int argc, char **argv) {
     x[i] = (double) 1 / list->numRows;
   }
   Benchmark benchRank = startBenchmark();
-  getRank(list->values, x, list->rowind, list->colind, &list->numRows,
-      &list->nnz, options->tol, options->dP);
-  printf("Done computing page rank (%.2fms)\n",
-      msSinceBenchmark(&benchRank));
+  int iterations = getRank(list->values, x, list->rowind, list->colind, \
+      &list->numRows, &list->nnz, options->tol, options->dP);
+  printf("Done computing page rank in %i iterations (%.2fms)\n",
+      iterations, msSinceBenchmark(&benchRank));
   free_options(options);
   //for(i = 0; i < list->numRows; i++){
   //   printf("x[%d] = %lf\n", i+1, x[i]);
