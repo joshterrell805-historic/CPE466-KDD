@@ -9,7 +9,6 @@
 #include <string.h>
 //#include <bsd/stdlib.h>
 #include "hashtable.h"
-#include "mkl.h"
 #include "getRank.h"
 #include "benchmark.h"
 #include "read_options.h"

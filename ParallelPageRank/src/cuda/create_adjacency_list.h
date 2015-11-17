@@ -7,11 +7,11 @@
 #include <stdlib.h>
 
 typedef struct AdjacencyList {
-  MKL_INT *rowind;
-  MKL_INT *colind;
+  int *rowind;
+  int *colind;
   double  *values;
-  MKL_INT nnz;
-  MKL_INT numRows;
+  int nnz;
+  int numRows;
   // for unmapping AdjacencyList to original node numbers
   int *unmap;
 } AdjacencyList;
@@ -100,8 +100,8 @@ AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
 
   AdjacencyList *list = (AdjacencyList*)malloc(sizeof(AdjacencyList));
   list->values  = (double*)calloc(g->edges, sizeof(double));
-  list->rowind  = (int*)calloc(g->edges, sizeof(MKL_INT));
-  list->colind  = (int*)calloc(g->edges, sizeof(MKL_INT));
+  list->rowind  = (int*)calloc(g->edges, sizeof(int));
+  list->colind  = (int*)calloc(g->edges, sizeof(int));
   list->nnz     = g->edges;
   list->numRows = g->nodes;
 
