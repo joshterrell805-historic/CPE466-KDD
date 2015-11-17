@@ -36,10 +36,11 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
    double *one = (double*)malloc(sizeof(double)*(numRow));
    double *d = (double*)malloc(numRow*sizeof(double));
    double *dev_one, *dev_d, *dev_Avals;
-   int *dev_csrRowInd, *dev_colind, *dev_rowind, *csrRowInd;
+   int *dev_csrRowInd, *dev_colind, *dev_rowind;
+ //  int *csrRowInd;
    int i;
 
-   csrRowInd = (int*)malloc(sizeof(int)*(numRow+1));
+//   csrRowInd = (int*)malloc(sizeof(int)*(numRow+1));
 
    //Convert rowInd vector to CSR format
    cudaMalloc(&dev_rowind, sizeof(int)*(nnz));
@@ -54,11 +55,11 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
       exit(2);
    }
    printf("after coo2csr.\n");
-   FILE *fileCSR = fopen("newCSRarray.txt", "w");
-   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int)*(numRow+1), cudaMemcpyDeviceToHost);
-   for(i = 0; i < numRow + 1; i++) {
-      fprintf(fileCSR,"%d\n", csrRowInd[i]);
-   }
+//   FILE *fileCSR = fopen("newCSRarray.txt", "w");
+//   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int)*(numRow+1), cudaMemcpyDeviceToHost);
+//   for(i = 0; i < numRow + 1; i++) {
+//      fprintf(fileCSR,"%d\n", csrRowInd[i]);
+//   }
 
 
    ones(one, numRow);
@@ -165,31 +166,41 @@ void getRank(double *Pvals, double *x, int *rowind, int *colind, int numRows, in
       exit(2);
    }
 
-
+   int *csrRowInd = (int*) malloc(sizeof(int)*(numRows+1));
+   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int) *(numRows + 1), cudaMemcpyDeviceToHost);
    //while (error>tol) {
    printf("Before While loop.\n");
-   FILE *file;
-   file = fopen("cudaCSR.txt", "w");
-   for (i = 0; i < nnz; i++) {
-      fprintf(file, "Pvals[%d] = %lf.\n", i, Pvals[i]);
-   } 
+//   FILE *file;
+//   file = fopen("cudaCSR.txt", "w");
+//   for (i = 0; i < numRows; i++) {
+//      printf("csrRowInd[%d] = %d\t", i, csrRowInd[i]);
+//      printf("x = %lf, y = %lf\n", x[i], y[i]);
+//   }
+//   for (i = 0; i < nnz; i++) {
+//      fprintf(file, "Pvals[%d] = %lf.\n", i, Pvals[i]);
+//   } 
    i = 0;
-   while(i++<500){
+//   int j;
+   while(i++<20){
       printf("i = %d.\n", i);
       beta = (double)((1-dP)/(numRows));
       printf("Before cusparseDcsrmv.\n");
       cusparseDcsrmv(handle, transa, numRows, numRows, nnz, &alpha, descr, dev_Pvals,
                      dev_csrRowInd, dev_colind, dev_x, &beta, dev_y);
-      printf("After cusparseDCsrmv.\n");
+      printf("After cusparseDCsrmv.\n\n\n\n");
       cudaMemcpy(x, dev_x, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
       cudaMemcpy(y, dev_y, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
+//   for (j = 0; j < numRows; j++) {
+//      printf("csrRowInd[%d] = %d\t", j, csrRowInd[j]);
+//      printf("x = %lf, y = %lf\n", x[j], y[j]);
+//   }
       //error = getError(x, y, numRows);
       cudaMemcpy(dev_x, dev_y, numRows*sizeof(double), cudaMemcpyDeviceToDevice);
       ones(y, numRows);
       //printf("error: %lf\n", error);
    }
    printf("After while loop.\n");
-   cudaMemcpy(x, dev_y, sizeof(double)*numRows, cudaMemcpyDeviceToHost);
+   cudaMemcpy(x, dev_x, sizeof(double)*numRows, cudaMemcpyDeviceToHost);
    cudaFree(dev_x);
    cudaFree(dev_y);
    cudaFree(dev_Pvals);
