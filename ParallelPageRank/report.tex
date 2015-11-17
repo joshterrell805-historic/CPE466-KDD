@@ -163,12 +163,12 @@ To convert a dataset, run
 python3 reformat.py source_file.csv > output_filename.txt
 \end{lstlisting}
 
-This will create a file compatible with the C code, along with a Python pickle named unmap.pickle which contains mappings from the node numbers in the new file to the node names in the old file, along with the file load time in the Python code.
+This will create a file compatible with the C code, along with a Python pickle named source_file.csv.pickle which contains mappings from the node numbers in the new file to the node names in the old file, along with the file load time in the Python code.
 
 Next, run the ranker script as described below, then convert the
 results back to the named-node format with
 \begin{lstlisting}
-python3 unformat.py < ranker_results.txt > results.txt
+python3 unformat.py source_file.csv.pickle < ranker_results.txt > results.txt
 \end{lstlisting}
 
 \subsection{Compile}

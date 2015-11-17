@@ -23,7 +23,7 @@ class Unformat:
 if (__name__ == "__main__"):
     import sys
     formatter = Unformat()
-    with open("unmap.pickle", 'rb') as data:
+    with open(sys.argv[1], 'rb') as data:
         formatter.data = pickle.load(data)
         formatter.unmap = formatter.data["unmap"]
     formatter.unformat()

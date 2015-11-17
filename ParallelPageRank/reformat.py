@@ -60,5 +60,5 @@ if (__name__ == "__main__"):
         filename = sys.argv[1]
     with open(filename) as file:
         formatter.reformat(file)
-    with open("unmap.pickle", "wb") as data:
+    with open(filename + ".pickle", "wb") as data:
         pickle.dump({"unmap": formatter.unmap, "loadtime": formatter.loadtime}, data)
