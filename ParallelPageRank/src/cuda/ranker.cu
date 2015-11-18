@@ -21,6 +21,11 @@ typedef struct {
 } pair;
 int compar(const void *left, const void *right) {
   double diff = ((pair *) right)->score - ((pair *) left)->score;
+  if (diff == 0) {
+    // Make diff non-zero
+    diff = ((pair *) left)->node - ((pair *) right)->node;
+  }
+
   if (diff < 0) {
     return -1;
   } else {
@@ -35,8 +40,6 @@ int main(int argc, char **argv) {
   Options* options = create_options(argc, argv);
   if (options->grumpy) {
     printf("Get off my lawn!\n");
-  } else {
-    printf("Hello World!\n");
   }
 
   printf("Filename: %s\n", options->filename);
@@ -58,37 +61,24 @@ int main(int argc, char **argv) {
   Benchmark benchRank = startBenchmark();
   getRank(list->values, x, list->rowind, list->colind, list->numRows,
          list->nnz, options->tol, options->dP);
-  for(i = 0; i < list->numRows; i++) {
-     printf("x[%d] = %lf\n",i, x[i]);
-   }
+
   printf("Done computing page rank (%.2fms)\n",
   msSinceBenchmark(&benchRank));
   free_options(options);
-  //for(i = 0; i < list->numRows; i++){
-  //   printf("x[%d] = %lf\n", i+1, x[i]);
-  //}
 
   /*********** sort page rank and print results ***********/
 
   pair *nodeStructs = (pair *) malloc(sizeof(pair) * list->numRows);
   //#pragma omp parallel for simd
-  printf("before nodestruct stuff.\n");
   for (i = 0; i < list->numRows; i++) {
-    printf("nodeStructs[%d].node = %d\t", i, nodeStructs[i].node);
-    printf("nodeStructs[%d].score = %lf\n", i, nodeStructs[i].score);
-    printf("x[%d] = %lf.\n", i, x[i]);
-    printf("Attempting to print list->unmap[%d].\n",i);
-    printf("list->unmap[%d] = %d\n", i, list->unmap[i]);
     nodeStructs[i].node = list->unmap[i];
     nodeStructs[i].score = x[i];
   }
   int (*compare) (const void *, const void*);
   compare = compar;
-  printf("right before qsosrt.\n");
   qsort(nodeStructs, list->numRows, sizeof(pair), compare);
 
   FILE *fid = fopen("output.out", "w");
-  printf("file printing stufff now.\n");
   for (i = 0; i < list->numRows; i++) {
     fprintf(fid, "Node %i ranked %f\n", nodeStructs[i].node,
         nodeStructs[i].score);

@@ -86,6 +86,7 @@ AdjacencyList* create_adjacency_list(char* filename) {
   destroyMap(buildState.undense); buildState.undense = 0;
   free(buildState.unsortedAdjList); buildState.unsortedAdjList = 0;
   // don't free buildState.unmap, adj list owns it now.
+  list->unmap = buildState.unmap;
 
   if (munmap(dataset.data, dataset.length)) {
     printf("Failed to free mmaped data.\n");

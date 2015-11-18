@@ -20,6 +20,14 @@ class Reformat:
             return number
 
     def convert_nodes(self, nodelist):
+        nodes = set()
+        for (left, right) in nodelist:
+            nodes.add(left)
+            nodes.add(right)
+        ordered_nodes = sorted(list(nodes))
+        for node in ordered_nodes:
+            self.get_nodeid(node)
+
         return [(self.get_nodeid(left), self.get_nodeid(right)) for (left, right) in nodelist]
 
     def parse_line(self, line):

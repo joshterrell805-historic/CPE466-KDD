@@ -20,8 +20,14 @@ typedef struct {
   int node;
   double score;
 } pair;
+
 int compar(const void *left, const void *right) {
   double diff = ((pair *) right)->score - ((pair *) left)->score;
+  if (diff == 0) {
+    // Make diff non-zero
+    diff = ((pair *) left)->node - ((pair *) right)->node;
+  }
+
   if (diff < 0) {
     return -1;
   } else {
@@ -83,7 +89,7 @@ int main(int argc, char **argv) {
         nodeStructs[i].score);
   }
   fclose(fid);
-   free(nodeStructs);
+  free(nodeStructs);
   free_adjacency_list(list);
   free(x);
   return 0;
