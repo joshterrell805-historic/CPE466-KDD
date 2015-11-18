@@ -1,4 +1,4 @@
-MIC OFFLOAD DATA
+MIC OFFLOAD TIMING AND DATA
 wiki-Vote output file: wiki-Vote_mic_off.out
 Filename: wiki-Vote.txt
 Data loaded (0.02ms)
@@ -20,7 +20,7 @@ edges: 3356824, nodes 410236
 Done creating sparse matrix (397.42ms)
 Done computing page rank in (734.82ms)
 
-Slashdot and livejournal seg faults
+Slashdot and livejournal seg faults :(
 Filename: soc-sign-Slashdot081106.txt
 Data loaded (10.40ms)
 Segmentation fault (core dumped)
@@ -30,3 +30,32 @@ Data loaded (0.02ms)
 edges: 68993773, nodes 4847571
 Done creating sparse matrix (8805.41ms)
 offload error: process on the device 0 was terminated by signal 11 (SIGSEGV)
+
+CPU TIMING AND DATA
+wiki-Vote output file: wiki-Vote_CPU.out
+Filename: wiki-Vote.txt
+Data loaded (0.02ms)
+Edges: 103689, Nodes 7115
+Done creating sparse matrix (10.28ms)
+Done computing page rank in 31 iterations (6.43ms)
+
+p2p-Gnutella05 output file: p2p-Gnutella05_CPU.out
+Filename: p2p-Gnutella05.txt
+Data loaded (0.01ms)
+Edges: 31839, Nodes 8846
+Done creating sparse matrix (3.38ms)
+Done computing page rank in 16 iterations (2.43ms)
+
+amazon0505 output file: amazon0505_CPU.out
+Filename: amazon0505
+Data loaded (0.03ms)
+Edges: 3356824, Nodes 410236
+Done creating sparse matrix (405.61ms)
+Done computing page rank in 138 iterations (2638.63ms)
+
+soc-LiveJournal1.txt output file: soc-LiveJournal1_CPU.out
+Filename: soc-LiveJournal1.txt
+Data loaded (0.01ms)
+Edges: 68993773, Nodes 4847571
+Done creating sparse matrix (8855.87ms)
+Done computing page rank in 108 iterations (53298.82ms)
