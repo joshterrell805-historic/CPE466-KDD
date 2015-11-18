@@ -1,0 +1,7 @@
+MIC OFFLOAD DATA
+wiki-Vote output file: wiki-Vote_mic_off.out
+Filename: wiki-Vote.txt
+Data loaded (0.02ms)
+edges: 103689, nodes 7115
+Done creating sparse matrix (10.14ms)
+Done computing page rank in (327.65ms)
