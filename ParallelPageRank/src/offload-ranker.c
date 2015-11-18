@@ -200,15 +200,18 @@ int main(int argc, char **argv) {
    for(i = 0; i<numRows; i++){
       x[i] = (double) 1/numRows;
    }
+  Benchmark benchRank = startBenchmark();
 #pragma offload target(mic)\
-   in(numRows, nnz, tol)\
+   in(numRows, nnz, tol)\  
    in(values [0:nnz])\
    in(x [0:numRows])\
    out(x [0:numRows])\
    in(rowind [0:nnz])\
    in(colind [0:nnz])
    getRank(values, x, rowind, colind, &numRows, &nnz, tol, dP);
-   printf("result: it did things...\n");
+   printf("Done computing page rank in (%.2fms)\n",
+       msSinceBenchmark(&benchRank));
+
  //  for(i = 0; i<numRows; i++){
  //     printf("x[%d] = %lf\n", i+1, x[i]);
  //  }
