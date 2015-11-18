@@ -78,7 +78,6 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
    cudaMemcpy(one, dev_one, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
    cudaMemcpy(d, dev_d, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
 
-   FILE *f1 = fopen("d.txt", "w");
    for (i = 0; i< nnz; i++){
          if (d[rowind[i]] && Avals[i]) {
             Avals[i] = dP/d[rowind[i]];
@@ -159,17 +158,12 @@ void getRank(double *Pvals, double *x, int *rowind, int *colind, int numRows, in
    
    i = 0;
 //   while (error>tol) {
-   while(i++<500){
+   while(i++<50){
       //i++;
       beta[0] = (double)((1-dP)/(numRows));
       cusparseDcsrmv(handle, transa, numRows, numRows, nnz, alpha, descr, dev_Pvals,
                      dev_csrRowInd, dev_colind, dev_x, beta, dev_y);
      // error = cublasDnrm2(numRows, dev_y, 1);
-//      cudaMemcpy(x, dev_x, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
-//      cudaMemcpy(y, dev_y, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
-//   for (j = 0; j < numRows; j++) {
-//   }
-      //error = getError(x, y, numRows);
       cudaMemcpy(dev_x, dev_y, numRows*sizeof(double), cudaMemcpyDeviceToDevice);
       cudaMemcpy(dev_y, y, sizeof(double) * numRows, cudaMemcpyHostToDevice);
    }

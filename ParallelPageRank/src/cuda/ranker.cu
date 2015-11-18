@@ -21,11 +21,6 @@ typedef struct {
 } pair;
 int compar(const void *left, const void *right) {
   double diff = ((pair *) right)->score - ((pair *) left)->score;
-  if (diff == 0) {
-    // Make diff non-zero
-    diff = ((pair *) left)->node - ((pair *) right)->node;
-  }
-
   if (diff < 0) {
     return -1;
   } else {
@@ -53,17 +48,16 @@ int main(int argc, char **argv) {
 
   makeP(list->values, list->rowind, list->numRows, list->colind, list->nnz,
       options->dP);
+  Benchmark benchRank = startBenchmark();
   double *x = (double *) malloc(sizeof(double) * list->numRows);
   //#pragma omp parallel for simd
   for(i = 0; i < list->numRows; i++){
     x[i] = (double) 1 / list->numRows;
   }
-  Benchmark benchRank = startBenchmark();
   getRank(list->values, x, list->rowind, list->colind, list->numRows,
          list->nnz, options->tol, options->dP);
 
-  printf("Done computing page rank (%.2fms)\n",
-  msSinceBenchmark(&benchRank));
+  printf("Done computing page rank (%.2fms)\n", msSinceBenchmark(&benchRank));
   free_options(options);
 
   /*********** sort page rank and print results ***********/
@@ -76,7 +70,9 @@ int main(int argc, char **argv) {
   }
   int (*compare) (const void *, const void*);
   compare = compar;
+  Benchmark benchSort = startBenchmark();
   qsort(nodeStructs, list->numRows, sizeof(pair), compare);
+  printf("Done Sorting Output(%.2fms)\n", msSinceBenchmark(&benchSort));
 
   FILE *fid = fopen("output.out", "w");
   for (i = 0; i < list->numRows; i++) {
