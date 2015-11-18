@@ -59,46 +59,59 @@
 \section{Introduction}
 
 \section{Implementation Overview}
-The previous implementation of pagerank represented the graph in structs and used threads to parallelize computation. To further increase performance, we vectorized the pagerank computation and used matrix math libraries for the Xenon Phi and GPU implementations.
+The previous implementation of pagerank represented the graph in structs and used threads to parallelize computation. To further increase performance, we vectorized the pagerank computation and used matrix math libraries for the Xeon Phi and GPU implementations.
 
 \subsection{The non-zero transition probability problem}
-A problem with vectorizing the pagerank algorithm is that without any memory optimizations, a NxN (N=node count) matrix must be created to represent the \textit{transition probability matrix, \textbf{P}}. There is a non-zero probability of transitioning from any node to any other node, so \textbf{P} is throughly dense. For the \textit{live journal} dataset, we simply could not represent a 4Mx4M matrix in memory, so we got creative.
+A problem with vectorizing the pagerank algorithm is that without any memory optimizations, an $N\times N$ (where $N$ is node count) matrix must be created to represent the \textit{transition probability matrix}, $P$. There is a non-zero probability of transitioning from any node to any other node, so $P$ is throughly dense. For the \textit{live journal} dataset, we simply could not represent a $4\text{M} \times 4\text{M}$ matrix in memory, so we got creative.
 
-The equation for the original transition probability matrix is defined below, where P\textsubscript{ij} is the value of the row i and column j representing the probability of transitioning from node i to node j.
+The equation for the original transition probability matrix is \vref{dense_p}, where $P_{ij}$ is the value of the row $i$ and column $j$ representing the probability of transitioning from node $i$ to node $j$.
 
-\begin{lstlisting}
-P(*\textsubscript{ij}*) = (1-d)/N + d / out_degree(i)   if i->j is an edge
-P(*\textsubscript{ij}*) = (1-d)/N                       if i->j is not an edge
-P(*\textsubscript{ij}*) = 1/N                           if i is a sink node
-\end{lstlisting}
 
-In order to represent the matrix as a sparse matrix, we subtracted (1-d)/N from every cell in the matrix to set one of the above cases to zero. We also set each row to zero if it was a sink node so that the definition of \textbf{P} changed to as is described below:
+\begin{equation}
+\label{dense_p}
+P_{ij} = 
+\begin{cases}
+  \frac{1-d}{N} + \frac{d}{\operatorname{outdegree}(i)} & \text{if $i\rightarrow j$ is an edge}\\
+  \frac{1-d}{N}                                          & \text{if $i\rightarrow j$ is not an edge}\\
+  \frac{1}{N}                                            & \text{if $i$ is a sink node}
+\end{cases}
+\end{equation}
 
-\begin{lstlisting}
-P(*\textsubscript{ij}*) = d / out_degree(i)   if i->j is an edge
-P(*\textsubscript{ij}*) = 0                   otherwise
-\end{lstlisting}
 
-The problem with modifying \textbf{P} like this is that \textbf{P} has a completely different value than it should. Multiplying \textbf{\Pi\textsuperscript{T}P} no longer yields the next \Pi{} for the iteration. When making these modifications, we had to adjust the equation for the iteration from
+In order to represent the matrix as a sparse matrix, we subtracted $\frac{1-d}{N}$ from every cell in the matrix to set one of the above cases to zero. We also set each row to zero if it was a sink node so that the definition of $P$ changed to \vref{sparse_p}
 
-\begin{lstlisting}
-(*\Pi*) = (*P\textsuperscript{T}\Pi*)
-\end{lstlisting}
+\begin{equation}
+\label{sparse_p}
+P_{ij} = 
+\begin{cases}
+\frac{d}{\operatorname{outdegree}(i)}                   & \text{if $i\rightarrow j$ is an edge}\\
+0                                                        & \text{otherwise}
+\end{cases}
+\end{equation}
 
-to
+The problem with modifying $P$ like this is that $P$ has a completely different value than it should. Multiplying $\Pi^T P$ no longer yields the next $\Pi$ for the iteration. When making these modifications, we had to adjust the equation for the iteration from \vref{basic_iter} to \vref{combine_iter}
 
-\begin{lstlisting}
-(*\Pi*) = (*P\textsuperscript{T}\Pi{} + (1-d)/N\cdot\Sigma(\Pi) + d/N\cdot\Pi\textsuperscript{T}S*)
-\end{lstlisting}
+\begin{equation}
+\label{basic_iter}
+  \Pi = P^T \Pi
+\end{equation}
 
-where S is a vector such that
+\begin{equation}
+\label{combine_iter}
+  \Pi = P^T \Pi + \frac{1-d}{N\cdot \Sigma \Pi} + \frac{d}{N \cdot \Pi^T S}
+\end{equation}
 
-\begin{lstlisting}
-Si = 1   if row i of P is a sink node
-Si = 0   otherwise
-\end{lstlisting}
+where $S$ is a vector such that \vref{s_cond} holds.
 
-Not only did this solve the problem of representing a NxN matrix, but by reducing the matrix to (E=edge count) cells of a sparse matrix, we accidently, conviniently, and significantly reduced the number of operations to be computed on every iteration, assuming nodes have far less out edges than nodes on the graph.
+\begin{equation}
+\label{s_cond}
+  \begin{cases}
+    S_i = 1 & \text{if row $i$ of $P$ is a sink node}\\
+    S_i = 0 & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+Not only did this solve the problem of representing a $N\times N$ matrix, but by reducing the matrix to $E$ (where $E$ is edge count) cells of a sparse matrix, we accidently, conviniently, and significantly reduced the number of operations to be computed on every iteration, assuming nodes have far fewer out edges than the number of nodes on the graph.
 
 \subsection{Memory movement}
 In our previous implementation, we parsed the datasets in python and used cffi to pass data to c to construct the graph. We optimized the load significantly by performing all the dataset reading in c. Our program performs a mmap of the file into memory then, rather than splitting the file into many substrings, we use c string traversal to construct the graph. This results in much less writing to memory and no allocation after the parsing has begun.
@@ -145,8 +158,17 @@ node_from<tab>node_to
 
 All datasets not in the above format must be converted to this format using the conversion script \texttt{reformat.py}.
 
+To convert a dataset, run
 \begin{lstlisting}
-TODO conversion script instructions.
+python3 reformat.py source_file.csv > output_filename.txt
+\end{lstlisting}
+
+This will create a file compatible with the C code, along with a Python pickle named source_file.csv.pickle which contains mappings from the node numbers in the new file to the node names in the old file, along with the file load time in the Python code.
+
+Next, run the ranker script as described below, then convert the
+results back to the named-node format with
+\begin{lstlisting}
+python3 unformat.py source_file.csv.pickle < ranker_results.txt > results.txt
 \end{lstlisting}
 
 \subsection{Compile}

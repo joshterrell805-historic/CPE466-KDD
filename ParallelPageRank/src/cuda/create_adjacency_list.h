@@ -7,11 +7,11 @@
 #include <stdlib.h>
 
 typedef struct AdjacencyList {
-  MKL_INT *rowind;
-  MKL_INT *colind;
+  int *rowind;
+  int *colind;
   double  *values;
-  MKL_INT nnz;
-  MKL_INT numRows;
+  int nnz;
+  int numRows;
   // for unmapping AdjacencyList to original node numbers
   int *unmap;
 } AdjacencyList;
@@ -68,11 +68,11 @@ AdjacencyList* create_adjacency_list(char* filename) {
   printf("Edges: %d, Nodes %d\n", graph.edges, graph.nodes);
 
   buildState.undense = createMap(3 * graph.nodes);
-  buildState.unmap = calloc(graph.nodes, sizeof(int));
+  buildState.unmap = (int*)calloc(graph.nodes, sizeof(int));
   buildState.denseId = 0;
   buildState.sparseEdgeIndex = 0;
   buildState.end = dataset.data + dataset.length;
-  buildState.unsortedAdjList = malloc(graph.edges * sizeof(AdjacencyCell));
+  buildState.unsortedAdjList = (AdjacencyCell*)malloc(graph.edges * sizeof(AdjacencyCell));
 
   Benchmark benchSparse = startBenchmark(); 
   while(buildState.curr < buildState.end) {
@@ -86,7 +86,6 @@ AdjacencyList* create_adjacency_list(char* filename) {
   destroyMap(buildState.undense); buildState.undense = 0;
   free(buildState.unsortedAdjList); buildState.unsortedAdjList = 0;
   // don't free buildState.unmap, adj list owns it now.
-  list->unmap = buildState.unmap;
 
   if (munmap(dataset.data, dataset.length)) {
     printf("Failed to free mmaped data.\n");
@@ -99,10 +98,10 @@ AdjacencyList* create_adjacency_list(char* filename) {
 AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
   sort_adjacency_list(bs->unsortedAdjList, g->edges);
 
-  AdjacencyList *list = malloc(sizeof(AdjacencyList));
-  list->values  = calloc(g->edges, sizeof(double));
-  list->rowind  = calloc(g->edges, sizeof(MKL_INT));
-  list->colind  = calloc(g->edges, sizeof(MKL_INT));
+  AdjacencyList *list = (AdjacencyList*)malloc(sizeof(AdjacencyList));
+  list->values  = (double*)calloc(g->edges, sizeof(double));
+  list->rowind  = (int*)calloc(g->edges, sizeof(int));
+  list->colind  = (int*)calloc(g->edges, sizeof(int));
   list->nnz     = g->edges;
   list->numRows = g->nodes;
 
@@ -128,7 +127,7 @@ RawDataset read_dataset(char* filename) {
   int fd = open(filename, O_RDONLY);
 
   Benchmark benchMmap = startBenchmark(); 
-  ds.data = mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE,
+  ds.data = (char*)mmap(NULL, finfo.st_size + 1, PROT_READ | PROT_WRITE,
       MAP_PRIVATE, fd, 0);
   ds.data[finfo.st_size] = '\0';
   printf("Data loaded (%.2fms)\n", msSinceBenchmark(&benchMmap));

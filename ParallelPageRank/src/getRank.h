@@ -11,7 +11,7 @@
 
 #include "mkl.h"
 void makeP(double *Avals, MKL_INT *rowind, MKL_INT *numRow, MKL_INT *colind, MKL_INT *nnz,  double dP);
-void getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, double dP);
+int getRank(double *Pvals, double *x, MKL_INT *rowind, MKL_INT *colind, MKL_INT *numRows, MKL_INT *nnz, double tol, double dP);
 //void makeSinks(MKL_INT *rowind, MKL_INT *colind, float *d, MKL_INT numRow);
 double sum(double *x, int N);
 void ones(double *a, int N);

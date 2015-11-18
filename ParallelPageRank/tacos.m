@@ -1,12 +1,31 @@
 clear all
 dP = .95; %Random jump probability
-n = 6; %number of nodes
 tol = 1e-4; %error tol and dP for testing (Lupo said use these)
-probDistA = zeros(n, 10);
-probDistB = zeros(n, 10);
 %Adjacency Matrix Representation of the tree
+iterations = 1000
 A = [0 1 0 0 0 0; 0 0 1 1 1 0 ; 0 1 0 1 1 0; 0 1 1 0 1 0; 0 1 1 1 0 1;
     0 0 0 0 0 0];
+n = 100
+A = rand(n, n)>.8;
+%A(1, :) = 0;
+%A(12, :) = 0;
+%A(34, :) = 0;
+%A(77, :) = 0;
+%A(78, :) = 0;
+%A(96, :) = 0;
+
+n = length(A(:, 1)); %number of nodes
+
+for i = 1:n
+  if (i == 1)
+    A(i, 2) = 1;
+  else
+    A(i, i-1) = 1;
+  end
+end
+
+probDistA = zeros(n, 10);
+probDistB = zeros(n, 10);
 
 %Make a random nxn adjacency matix
 %A = rand(n, n)>.8;
@@ -30,9 +49,9 @@ for i = 1:n
     else
         for j = 1:n
             if A(i, j) == 1
-                P(i, j) = dP*1/d(i) + (1-dP)*1/n;
+                P(i, j) = dP/d(i) + (1-dP)/n;
             else
-                P(i, j) = (1-dP)*1/n;
+                P(i, j) = (1-dP)/n;
             end
         end
      end
@@ -50,7 +69,7 @@ end
 % Execute iterative scheme
 %NEW WAY
  toAdd = ((1-dP)/n)*sum(probDistA(:, 1));
- toAdd = toAdd + sum(sink .* probDistA(:, 1)) * dP/n;
+ toAdd = toAdd + sink' * probDistA(:, 1) * dP/n;
  probDistA(:, 2) = P2'*probDistA(:, 1)+toAdd ;
 % toAdd = (1-dP)/n*sum(probDistA(:, 2))+sink*dP/n*sum(probDistA(:,2));
 i = 2;
@@ -60,20 +79,26 @@ error = 10;
 %while(i<n+1) 
 %toAddA = ((1-dP)/n)*sum(probDistA(:, 1));
 %toAdd = toAddA + sum(sink .* probDistA(:, 2)) * dP/n;
-toAdd = (1-dP)/n;
-while(norm(probDistA(:, i-1)-probDistA(:, i)) >tol)
+%while(norm(probDistA(:, i-1)-probDistA(:, i)) >tol)
+while(i < 1000)
 %while(i<n+1);
+    toAdd = ((1-dP)/n)*sum(probDistA(:, i));
+    %toAdd = toAdd + sink' * probDistA(:, i) * dP/n;
     probDistA(:, i+1) = P2'*probDistA(:, i) + toAdd;
+    if (sum(probDistA(:, i)) < 0.99)
+      fprintf('loosing page rank (%d=%f)\n', i, sum(probDistA(:, i)))
+      return
+    end
  %  error = abs(probDistA(1, i+1)-probDistA(1, i));
    i = i +1;
 end
 saveiL = i-1;
 %OLD WAY
-probDistB(:, 2) = probDistB(:, 1)'*P;
+probDistB(:, 2) = P' * probDistB(:, 1);
 i = 2;
-while(abs(norm(probDistB(:, i-1)-probDistB(:, i))) >tol)
-%    probDistA(:, i+1) = probDistA(:, i)'*(A*dPd' +v);
-    probDistB(:, i+1) = probDistB(:, i)'*P;
+while(i < iterations)
+%while(abs(norm(probDistB(:, i-1)-probDistB(:, i))) >tol)
+    probDistB(:, i+1) = P' * probDistB(:, i);
     i = i +1;
 end
 saveiM = i-1;
@@ -94,7 +119,6 @@ while(i<=n)
 M = probDistB(:, saveiM);
 Msort = sort(M, 1);
 i = 1;
-j = 0;
 while(i<=n)
     ind = find(M == Msort(i, 1));
         for j = 0:length(ind)-1
@@ -108,6 +132,7 @@ rankL_rankM = [L M]
 new_Old = [sortOrderL' sortOrderM']
 for i = 1:n
     if sortOrderM(i) ~= sortOrderL(i)
+        fprintf('(%d) %f != %f\n', i, L(i), M(i))
         disp('IT DIDNT WORK')
         break;
     end

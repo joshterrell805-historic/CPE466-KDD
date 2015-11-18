@@ -21,7 +21,7 @@
 \RequirePackage{amssymb}
 
 % Number only referenced equations
-\RequirePackage{autonum}
+% \RequirePackage{autonum}
 
 % Fancy tables & pretty tables
 \RequirePackage{array}

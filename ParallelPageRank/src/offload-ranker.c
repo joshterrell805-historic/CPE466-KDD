@@ -80,7 +80,6 @@ int main(int argc, char **argv) {
   if (grumpy) {
     printf("Get off my lawn!\n");
   } else {
-    printf("Hello World!\n");
   }
 
   printf("Filename: %s\n", filename);

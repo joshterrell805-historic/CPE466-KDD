@@ -37,7 +37,6 @@ int main(int argc, char **argv) {
   if (options->grumpy) {
     printf("Get off my lawn!\n");
   } else {
-    printf("Hello World!\n");
   }
 
   printf("Filename: %s\n", options->filename);
@@ -56,9 +55,11 @@ int main(int argc, char **argv) {
   for(i = 0; i < list->numRows; i++){
     x[i] = (double) 1 / list->numRows;
   }
-  getRank(list->values, x, list->rowind, list->colind, &list->numRows,
-      &list->nnz, options->tol, options->dP);
-  printf("result: it did things...\n");
+  Benchmark benchRank = startBenchmark();
+  int iterations = getRank(list->values, x, list->rowind, list->colind, \
+      &list->numRows, &list->nnz, options->tol, options->dP);
+  printf("Done computing page rank in %i iterations (%.2fms)\n",
+      iterations, msSinceBenchmark(&benchRank));
   free_options(options);
   //for(i = 0; i < list->numRows; i++){
   //   printf("x[%d] = %lf\n", i+1, x[i]);
