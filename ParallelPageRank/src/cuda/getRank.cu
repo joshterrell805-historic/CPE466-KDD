@@ -2,7 +2,6 @@
 #include "getRank.h"
 #include "/usr/include/cuda/cuda_runtime.h"
 #include <cublas.h>
-#include <cublas_api.h>
 #include <cusparse.h>
 
 void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double dP){
@@ -37,11 +36,11 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
    double *d = (double*)malloc(numRow*sizeof(double));
    double *dev_one, *dev_d, *dev_Avals;
    int *dev_csrRowInd, *dev_colind, *dev_rowind;
- //  int *csrRowInd;
+   int *csrRowInd;
    int i;
 
-//   csrRowInd = (int*)malloc(sizeof(int)*(numRow+1));
-
+   csrRowInd = (int*)malloc(sizeof(int)*(numRow+1));
+   dP = .95;
    //Convert rowInd vector to CSR format
    cudaMalloc(&dev_rowind, sizeof(int)*(nnz));
    cudaMalloc(&dev_csrRowInd, sizeof(int)*(numRow+1));
@@ -55,11 +54,12 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
       exit(2);
    }
    printf("after coo2csr.\n");
-//   FILE *fileCSR = fopen("newCSRarray.txt", "w");
-//   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int)*(numRow+1), cudaMemcpyDeviceToHost);
-//   for(i = 0; i < numRow + 1; i++) {
-//      fprintf(fileCSR,"%d\n", csrRowInd[i]);
-//   }
+   FILE *fileCSR = fopen("newCSRarray.txt", "w");
+   cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int)*(numRow+1), cudaMemcpyDeviceToHost);
+   for(i = 0; i < numRow + 1; i++) {
+      fprintf(fileCSR,"%d\n", csrRowInd[i]);
+   }
+   fclose(fileCSR);
 
 
    ones(one, numRow);
@@ -91,12 +91,14 @@ void makeP(double *Avals, int *rowind, int numRow, int *colind, int nnz, double 
    cudaMemcpy(one, dev_one, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
    cudaMemcpy(d, dev_d, sizeof(double) * (numRow), cudaMemcpyDeviceToHost);
 
+   FILE *f1 = fopen("d.txt", "w");
    for (i = 0; i< nnz; i++){
          if (d[rowind[i]] && Avals[i]) {
             Avals[i] = dP/d[rowind[i]];
          }
-//         fprintf(f1, "P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
+         fprintf(f1, "P[%d, %d] = %lf\n", rowind[i]+1, colind[i]+1, Avals[i]);
    }
+   fclose(f1);
    cudaFree(dev_rowind);
    cudaFree(dev_colind);
    cudaFree(dev_Avals);
@@ -139,9 +141,14 @@ void getRank(double *Pvals, double *x, int *rowind, int *colind, int numRows, in
    double *dev_x;
    double *dev_Pvals;
    int *dev_rowind, *dev_csrRowInd, *dev_colind;
+
    int i;
    double *y = (double*)malloc(sizeof(double)*numRows);
-   double alpha = 1, beta;
+   double *alpha, *beta;
+   alpha = (double*) malloc(sizeof(double));
+   beta = (double*) malloc(sizeof(double));
+   alpha[0] = 1;
+
    //double error = 10.0;
 
    ones(y, numRows);
@@ -158,9 +165,15 @@ void getRank(double *Pvals, double *x, int *rowind, int *colind, int numRows, in
    cudaMemcpy(dev_rowind, rowind, sizeof(double)*(nnz), cudaMemcpyHostToDevice);
    cudaMemcpy(dev_colind, colind, sizeof(double)*(nnz), cudaMemcpyHostToDevice);
    cudaMemcpy(dev_Pvals, Pvals, sizeof(double)*(nnz), cudaMemcpyHostToDevice);
+   FILE *filenew;
+   filenew = fopen("check.txt", "w");
+   
+   fprintf(filenew, "NumRows = %d\t nnz = %d\n", numRows, nnz);
+   //status = cusparseXcoo2csr(handle, dev_rowind, nnz, numRow, dev_csrRowInd, idxBase);
 
    status = cusparseXcoo2csr(handle, dev_rowind, nnz, numRows, dev_csrRowInd, idxBase);
-   
+   fprintf(filenew, "status = %d\n", status);
+   fclose(filenew);
    if (status != CUSPARSE_STATUS_SUCCESS) {
       perror("FAILURE to set csr row indices.");
       exit(2);
@@ -168,37 +181,43 @@ void getRank(double *Pvals, double *x, int *rowind, int *colind, int numRows, in
 
    int *csrRowInd = (int*) malloc(sizeof(int)*(numRows+1));
    cudaMemcpy(csrRowInd, dev_csrRowInd, sizeof(int) *(numRows + 1), cudaMemcpyDeviceToHost);
-   //while (error>tol) {
+   
    printf("Before While loop.\n");
-//   FILE *file;
-//   file = fopen("cudaCSR.txt", "w");
-//   for (i = 0; i < numRows; i++) {
-//      printf("csrRowInd[%d] = %d\t", i, csrRowInd[i]);
-//      printf("x = %lf, y = %lf\n", x[i], y[i]);
-//   }
-//   for (i = 0; i < nnz; i++) {
-//      fprintf(file, "Pvals[%d] = %lf.\n", i, Pvals[i]);
-//   } 
+   FILE *file;
+   FILE *file2;
+   file = fopen("cudaCSR.txt", "w");
+   file2 = fopen("csrRowInd.txt", "w");
+   for (i = 0; i < numRows + 1; i++) {
+      fprintf(file2,"%d\n", csrRowInd[i]);
+   }
+   for (i = 0; i < nnz; i++) {
+      fprintf(file, "Pvals[%d] = %lf.\n", i, Pvals[i]);
+   } 
    i = 0;
 //   int j;
-   while(i++<20){
+//   while (error>tol) {
+   while(i++<500){
+      //i++;
       printf("i = %d.\n", i);
-      beta = (double)((1-dP)/(numRows));
+      beta[0] = (double)((1-dP)/(numRows));
       printf("Before cusparseDcsrmv.\n");
-      cusparseDcsrmv(handle, transa, numRows, numRows, nnz, &alpha, descr, dev_Pvals,
-                     dev_csrRowInd, dev_colind, dev_x, &beta, dev_y);
+      cusparseDcsrmv(handle, transa, numRows, numRows, nnz, alpha, descr, dev_Pvals,
+                     dev_csrRowInd, dev_colind, dev_x, beta, dev_y);
       printf("After cusparseDCsrmv.\n\n\n\n");
-      cudaMemcpy(x, dev_x, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
-      cudaMemcpy(y, dev_y, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
+     // error = cublasDnrm2(numRows, dev_y, 1);
+//      cudaMemcpy(x, dev_x, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
+//      cudaMemcpy(y, dev_y, sizeof(double)*(numRows), cudaMemcpyDeviceToHost);
 //   for (j = 0; j < numRows; j++) {
 //      printf("csrRowInd[%d] = %d\t", j, csrRowInd[j]);
 //      printf("x = %lf, y = %lf\n", x[j], y[j]);
 //   }
       //error = getError(x, y, numRows);
       cudaMemcpy(dev_x, dev_y, numRows*sizeof(double), cudaMemcpyDeviceToDevice);
-      ones(y, numRows);
+      cudaMemcpy(dev_y, y, sizeof(double) * numRows, cudaMemcpyHostToDevice);
       //printf("error: %lf\n", error);
    }
+   fclose(file);
+   fclose(file2);
    printf("After while loop.\n");
    cudaMemcpy(x, dev_x, sizeof(double)*numRows, cudaMemcpyDeviceToHost);
    cudaFree(dev_x);
@@ -241,5 +260,8 @@ double getError(double *v1, double *v2, int size){
       v1[i] = v1[i]-v2[i];
    }
    result = 10; // not using this function to terminate while loop currently.
+   double *dev_v1;
+   cudaMalloc(&dev_v1, sizeof(double)*size);
+
    return result;
 }

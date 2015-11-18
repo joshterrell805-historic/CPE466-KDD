@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
   getRank(list->values, x, list->rowind, list->colind, list->numRows,
          list->nnz, options->tol, options->dP);
   for(i = 0; i < list->numRows; i++) {
-     printf("x[%d] = %lf\n",i, x[i]);
+     printf("x[%d] = %.12lf\n",i, x[i]);
    }
   printf("Done computing page rank (%.2fms)\n",
   msSinceBenchmark(&benchRank));
@@ -74,11 +74,11 @@ int main(int argc, char **argv) {
   //#pragma omp parallel for simd
   printf("before nodestruct stuff.\n");
   for (i = 0; i < list->numRows; i++) {
-    printf("nodeStructs[%d].node = %d\t", i, nodeStructs[i].node);
-    printf("nodeStructs[%d].score = %lf\n", i, nodeStructs[i].score);
-    printf("x[%d] = %lf.\n", i, x[i]);
-    printf("Attempting to print list->unmap[%d].\n",i);
-    printf("list->unmap[%d] = %d\n", i, list->unmap[i]);
+//    printf("nodeStructs[%d].node = %d\t", i, nodeStructs[i].node);
+//    printf("nodeStructs[%d].score = %lf\n", i, nodeStructs[i].score);
+    printf("x[%d] = %.12lf.\n", i, x[i]);
+//    printf("Attempting to print list->unmap[%d].\n",i);
+//    printf("list->unmap[%d] = %d\n", i, list->unmap[i]);
     nodeStructs[i].node = list->unmap[i];
     nodeStructs[i].score = x[i];
   }
