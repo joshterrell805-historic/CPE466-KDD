@@ -97,7 +97,8 @@ AdjacencyList* create_adjacency_list(char* filename) {
 }
 
 AdjacencyList* actually_create_adj_list(BuildState* bs, Graph* g) {
-  sort_adjacency_list(bs->unsortedAdjList, g->edges);
+  //only the CUDA version needs sorting
+  //sort_adjacency_list(bs->unsortedAdjList, g->edges);
 
   AdjacencyList *list = malloc(sizeof(AdjacencyList));
   list->values  = calloc(g->edges, sizeof(double));
