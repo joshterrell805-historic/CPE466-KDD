@@ -34,6 +34,10 @@ def error_rate(expected, actual):
     return 1 - accuracy(expected, actual)
 
 def hunk(data, hunksize):
+    if hunksize == 0:
+        return [data]
+    if hunksize == -1:
+        return [[i] for i in data]
     hunkable = list(data)
     random.shuffle(hunkable)
     hunks = []
