@@ -21,9 +21,9 @@ class TestSampling(unittest.TestCase):
 
     def test_recall(self):
         # The values in the training set
-        expected = ['a', 'b', 'a', 'b', 'a']
+        expected = ['a', 'b', 'a', 'b', 'a', 'c']
         # The results from the classifier
-        actual = ['a', 'b', 'a', 'a', 'b']
+        actual = ['a', 'b', 'a', 'a', 'b', 'd']
         # As though we're asking the question "does record belong in class a?"
         positive = 'a'
         result = sampling.recall(expected, actual, positive)
@@ -31,6 +31,7 @@ class TestSampling(unittest.TestCase):
         TN = 1
         FP = 1
         FN = 1
+        irrelevant = 1
         self.assertEqual(result, TP/(TP+FN))
 
     def test_pf(self):
