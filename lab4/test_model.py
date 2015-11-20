@@ -182,10 +182,6 @@ class TestModel(unittest.TestCase):
                         ("Liberal", Label("Obama")),
                         ("Moderate", Label("Obama")),
                         ("Conservative", Label("McCain")))))
-        try:
-            tree.classify(['Male', -1, -1], ['Gender', 'Ideology', 'c'])
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertEqual(
-                    str(e),
-                    'Datapoint has invalid value for "Ideology"')
+
+        result = tree.classify(['Male', -1, -1], ['Gender', 'Ideology', 'c'])
+        self.assertIsNone(result)

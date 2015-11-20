@@ -20,7 +20,8 @@ class Node:
         for value, child in self.edges.items():
             if x[column_index] == value:
                 return child.classify(x, feature_names)
-        raise Exception('Datapoint has invalid value for "{}"'.format(self.name))
+        return None
+        # raise Exception('Datapoint has invalid value for "{}"'.format(self.name))
 
     def __eq__(self, other):
         return (isinstance(other, __class__) and
