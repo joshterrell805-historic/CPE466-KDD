@@ -7,9 +7,9 @@ class TestC45(unittest.TestCase):
         self.d = [([1, 2], 1),
                   ([2, 2], 1),
                   ([2, 1], 2)]
-        self.attr = ["color", "shape"]
+        self.attr = list(enumerate(["color", "shape"]))
 
-    @unittest.skip("Need attributes to behave")
+    # @unittest.skip("broken")
     def test_basic(self):
         d = [([3,        "false",        "traditional",        "South"],        "Not Visited"),
              ([3,        "true",        "traditional",        "South"],        "Visited"),
@@ -28,9 +28,10 @@ class TestC45(unittest.TestCase):
              ([4,        "false",        "traditional",        "North"],        "Not Visited"),
              ([4,        "true",        "open",                "North"],       "Not Visited")]
 
-        attributes = ["Location", "Bedrooms", "Basement", "Floorplan"]
-        threshold = 0.8
-        result = c45.run(d, attributes, threshold)
+        attributes = ["Bedrooms", "Basement", "Floorplan", "Location"]
+        threshold = 0
+        result = c45.run(d, list(enumerate(attributes)), threshold)
+        print(result)
         expected = Node("Location",
                         ("North", Label("Not Visited")),
                         ("South", Node("Bedrooms",
@@ -42,17 +43,16 @@ class TestC45(unittest.TestCase):
                                        (4, Label("Visited")))))
         self.assertEqual(result, expected)
 
-    @unittest.skip("Need attributes to behave")
+    # @unittest.skip("Need attributes to behave")
     def test_small_run(self):
-        result = c45.run(self.d, [0,1], 0)
+        result = c45.run(self.d, self.attr, 0)
         self.assertEqual(result, Node("shape",
                                       (1, Label(2)),
                                       (2, Label(1))))
-        print(result)
 
     def test_splitting_select(self):
-        splitting = c45.select_splitting_attribute_idx(self.d, len(self.attr), 0.1)
-        self.assertEqual(splitting, 1)
+        splitting = c45.select_splitting_attribute_heading(self.d, self.attr, 0.1)
+        self.assertEqual(splitting, (1, "shape"))
 
     def test_entropy(self):
         self.assertAlmostEqual(c45.entropy(self.d), 0.9182958)
