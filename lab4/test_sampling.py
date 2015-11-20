@@ -86,13 +86,14 @@ class TestSampling(unittest.TestCase):
         data = [(['a', 'f'], 'o'),
                 (['b', 'g'], 'm'),
                 (['a', 'g'], 'm'),
-                (['a', 'g'], 'o')]
-        hunks = sampling.hunk(data, 2)
+                (['a', 'g'], 'o'),
+                (['a', 'g'], 'p'),
+                (['g', 'a'], 'n')]
+        hunks = sampling.hunk(data, 3)
         for hunk in hunks:
             self.assertEqual(len(hunk), 2)
             for row in hunk:
-                if row in data:
-                    data.remove(row)
+                data.remove(row)
         self.assertEqual(len(data), 0)
 
     def test_other_hunk_sizes(self):
@@ -104,6 +105,11 @@ class TestSampling(unittest.TestCase):
         self.assertEqual(len(hunks), 1)
         hunks = sampling.hunk(data, -1)
         self.assertEqual(len(hunks), 4)
+        hunks = sampling.hunk(data, 3)
+        for hunk in hunks:
+            for row in hunk:
+                data.remove(row)
+        self.assertEqual(len(data), 0)
         
     def test_pull_each(self):
         data = list(range(10))
