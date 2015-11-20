@@ -1,5 +1,6 @@
 ## Lab4: C.45 Decision Trees
 Team: Andrew Gilbert, Josh Terrell
+Emails: apgilber@calpoly.edu, jmterrel@calpoly.edu
 
 
 **Important: Run everything from the project's root directory**
