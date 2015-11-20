@@ -31,5 +31,5 @@ def main(to_classify_csv, decision_tree_xml, restrictionstxt, has_label_column):
         print('Confusion matrix:')
         print(sampling.confusion_matrix(labels, predicted_classes))
     else:
-        for c in predicted_classes:
-            print(c)
+        for i in range(len(predicted_classes)):
+            print(data[i][0], predicted_classes[i])
