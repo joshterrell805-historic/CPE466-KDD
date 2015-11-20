@@ -23,7 +23,9 @@ def run(d, attributes, threshold):
                 for value in domain_Ag:
                     Dv = [t for t in d if attrib(t)[Ag] == value]
                     if len(Dv) > 0:
-                        nodes.append((value, run(Dv, list(set(attributes) - set([splitting_attr])), threshold)))
+                        reduced_attrs = list(attributes)
+                        reduced_attrs.remove(splitting_attr)
+                        nodes.append((value, run(Dv, reduced_attrs, threshold)))
                 return Node(splitting_attr[1], *nodes)
 
 def select_splitting_attribute_heading(d, attrs, threshold):
