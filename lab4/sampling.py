@@ -1,4 +1,5 @@
 import random
+import tabulate
 
 def precision(expected, actual, positive):
     # expected = correct label
@@ -50,3 +51,15 @@ def pull_each(data):
     of each element paired with a list containing all the other
     elements of data"""
     return ((i, [j for j in data if j != i]) for i in data)
+
+def confusion_matrix(expected, actual):
+    expected_classes = set(expected)
+    actual_classes = set(actual)
+    return tabulate.tabulate(
+        [[''] + ['pred_{}'.format(ac) for ac in actual_classes]] +
+        [['true_{}'.format(ec)] + [
+            sum(1 for a,e in zip(actual,expected) if a == ac and e == ec)
+            for ac in actual_classes
+        ] for ec in expected_classes],
+        tablefmt='psql'
+    )
