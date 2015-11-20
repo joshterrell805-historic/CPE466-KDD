@@ -20,12 +20,16 @@ def main(to_classify_csv, decision_tree_xml, restrictionstxt, has_label_column):
 
     predicted_classes = [tree.classify(x[0], cols) for x in data]
     labels = [x[1] for x in data]
-    print('Records:', len(data))
-    print('Correctly classified:',
-          sum(1 for p,l in zip(predicted_classes, labels) if p==l))
-    print('Incorrectly classified:',
-          sum(1 for p,l in zip(predicted_classes, labels) if p!=l))
-    print('Accuracy:', sampling.accuracy(labels, predicted_classes))
-    print('Error:', sampling.error_rate(labels, predicted_classes))
-    print('Confusion matrix:')
-    print(sampling.confusion_matrix(labels, predicted_classes))
+    if has_label_column:
+        print('Records:', len(data))
+        print('Correctly classified:',
+              sum(1 for p,l in zip(predicted_classes, labels) if p==l))
+        print('Incorrectly classified:',
+              sum(1 for p,l in zip(predicted_classes, labels) if p!=l))
+        print('Accuracy:', sampling.accuracy(labels, predicted_classes))
+        print('Error:', sampling.error_rate(labels, predicted_classes))
+        print('Confusion matrix:')
+        print(sampling.confusion_matrix(labels, predicted_classes))
+    else:
+        for c in predicted_classes:
+            print(c)
