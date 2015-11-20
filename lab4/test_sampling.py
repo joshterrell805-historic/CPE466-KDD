@@ -95,3 +95,12 @@ class TestSampling(unittest.TestCase):
                     data.remove(row)
         self.assertEqual(len(data), 0)
         
+    def test_pull_each(self):
+        data = list(range(10))
+        itr = sampling.pull_each(data)
+        for (i, rest) in itr:
+            self.assertIn(i, data)
+            self.assertNotIn(i, rest)
+            for n in data:
+                self.assertTrue((n in rest) or n == i)
+

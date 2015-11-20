@@ -40,3 +40,9 @@ def hunk(data, hunksize):
     for start in range(0, len(data), hunksize):
         hunks.append(hunkable[start:start + hunksize])
     return hunks
+
+def pull_each(data):
+    """ Returns an iterator over data which returns pairs consisting
+    of each element paired with a list containing all the other
+    elements of data"""
+    return ((i, [j for j in data if j != i]) for i in data)
