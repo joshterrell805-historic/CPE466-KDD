@@ -121,3 +121,71 @@ class TestModel(unittest.TestCase):
                         ("Conservative", Label("McCain")))))
         xml_tree = model.stringify_tree(tree)
         self.assertEqual(tree, model.build_tree(xml_tree))
+
+    def test_classify_success(self):
+        tree = Node("Gender",
+                ("Female", Node("Bush Approval",
+                        ("Approve", Label("McCain")),
+                        ("Disapprove", Label("Obama")))),
+                ("Male", Node("Ideology",
+                        ("Liberal", Label("Obama")),
+                        ("Moderate", Label("Obama")),
+                        ("Conservative", Label("McCain")))))
+
+        c = tree.classify(['Female', 'Approve', None],
+                          ['Gender', 'Bush Approval', 'Ideology'])
+        self.assertEqual(c, 'McCain')
+        # same but dif order of features
+        c = tree.classify(['Approve', 'Female', None],
+                          ['Bush Approval', 'Gender', 'Ideology'])
+        self.assertEqual(c, 'McCain')
+        # dif last node
+        c = tree.classify(['Disapprove', 'Female', None],
+                          ['Bush Approval', 'Gender', 'Ideology'])
+        self.assertEqual(c, 'Obama')
+        # dif first node
+        c = tree.classify([None, 'Male', 'Liberal'],
+                          ['Bush Approval', 'Gender', 'Ideology'])
+        self.assertEqual(c, 'Obama')
+
+    def test_classify_feature_names_do_not_match_tree(self):
+        tree = Node("Gender",
+                ("Female", Node("Bush Approval",
+                        ("Approve", Label("McCain")),
+                        ("Disapprove", Label("Obama")))),
+                ("Male", Node("Ideology",
+                        ("Liberal", Label("Obama")),
+                        ("Moderate", Label("Obama")),
+                        ("Conservative", Label("McCain")))))
+
+        try:
+            tree.classify(['Male', -1, -1], ['a', 'b', 'c'])
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertEqual(
+                    str(e),
+                    'Datapoint does not fit tree: "Gender" not in features')
+        try:
+            tree.classify(['Male', 'Liberal', -1], ['Gender', 'b', 'c'])
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertEqual(
+                    str(e),
+                    'Datapoint does not fit tree: "Ideology" not in features')
+
+    def test_classify_invalid_value_for_column(self):
+        tree = Node("Gender",
+                ("Female", Node("Bush Approval",
+                        ("Approve", Label("McCain")),
+                        ("Disapprove", Label("Obama")))),
+                ("Male", Node("Ideology",
+                        ("Liberal", Label("Obama")),
+                        ("Moderate", Label("Obama")),
+                        ("Conservative", Label("McCain")))))
+        try:
+            tree.classify(['Male', -1, -1], ['Gender', 'Ideology', 'c'])
+            self.assertTrue(False)
+        except Exception as e:
+            self.assertEqual(
+                    str(e),
+                    'Datapoint has invalid value for "Ideology"')

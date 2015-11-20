@@ -9,6 +9,20 @@ class Node:
             label = 1
             self.edges[edge[name]] = edge[label]
 
+    def classify(self, x, feature_names):
+        """X: array of rows (arrays)"""
+        # TODO vectorizing would be smart.. but more work atm
+        try:
+            column_index = feature_names.index(self.name)
+        except:
+            raise Exception('Datapoint does not fit tree: "{}" not in features'
+                            .format(self.name))
+
+        for value, child in self.edges.items():
+            if x[column_index] == value:
+                return child.classify(x, feature_names)
+        raise Exception('Datapoint has invalid value for "{}"'.format(self.name))
+
     def __eq__(self, other):
         return (isinstance(other, __class__) and
                 self.name == other.name and
@@ -25,6 +39,9 @@ class Label:
                 self.category == other.category)
     def __str__(self):
         return "label<{}>".format(self.category)
+
+    def classify(self, x, feature_names):
+        return self.category
 
 def build_tree(xml_str):
     xml_tree = ET.fromstring(xml_str)
