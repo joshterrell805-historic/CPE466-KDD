@@ -10,7 +10,6 @@ class Node:
             self.edges[edge[name]] = edge[label]
 
     def classify(self, x, feature_names):
-        """X: array of rows (arrays)"""
         # TODO vectorizing would be smart.. but more work atm
         try:
             column_index = feature_names.index(self.name)
