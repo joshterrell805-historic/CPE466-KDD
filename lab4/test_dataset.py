@@ -14,7 +14,7 @@ Vote
         cols, data = dataset.read(self.dataset_str)
         self.assertEqual(cols, ['Political Party', 'Ideology',
         'Race', 'Gender', 'Religion', 'Family Income', 'Education',
-        'Age', 'Region', 'Bush Approval', 'Vote'])
+        'Age', 'Region', 'Bush Approval'])
         self.assertEqual(data,
                 [(["Independent","Moderate","White", "Male", "Catholic",
                     "30000-49999","College","45-64","Northeast",
@@ -29,7 +29,7 @@ Vote
     def test_read_dataset_with_restrictions(self):
         cols, data = dataset.read(self.dataset_str, [0,1,0,0,1,0,0,0,0,0,1])
         self.assertEqual(cols, ['Political Party', 'Gender',
-                                'Bush Approval', 'Vote'])
+                                'Bush Approval'])
         self.assertEqual(data,
                 [(["Independent","Male","Approve"],"McCain"),
                  (["Republican","Female","Approve"],"Obama"),

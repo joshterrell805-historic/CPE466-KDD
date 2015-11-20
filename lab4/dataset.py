@@ -18,7 +18,7 @@ def read(raw, restrictions=None):
         attrs = [c for i,c in enumerate(row[:-1]) if restrictions[i]]
         rows.append((attrs, row[-1]))
 
-    cols = [c for i,c in enumerate(cols) if i + 1 == len(cols) \
+    cols = [c for i,c in enumerate(cols[:-1]) if i + 1 == len(cols) \
             or restrictions[i]]
 
     return cols, rows
