@@ -13,6 +13,8 @@ class Node:
         return (isinstance(other, __class__) and
                 self.name == other.name and
                 self.edges == other.edges)
+    def __str__(self):
+        return "node<{}, {}>".format(self.name, str({name : str(label) for name, label in self.edges.items()}))
 
 class Label:
     def __init__(self, category):
@@ -21,6 +23,8 @@ class Label:
     def __eq__(self, other):
         return (isinstance(other, __class__) and
                 self.category == other.category)
+    def __str__(self):
+        return "label<{}>".format(self.category)
 
 def build_tree(xml_str):
     xml_tree = ET.fromstring(xml_str)
