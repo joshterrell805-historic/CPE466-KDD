@@ -31,7 +31,7 @@ class TestC45(unittest.TestCase):
         attributes = ["Bedrooms", "Basement", "Floorplan", "Location"]
         threshold = 0
         result = c45.run(d, list(enumerate(attributes)), threshold)
-        print(result)
+        #print(result)
         expected = Node("Location",
                         ("North", Label("Not Visited")),
                         ("South", Node("Bedrooms",

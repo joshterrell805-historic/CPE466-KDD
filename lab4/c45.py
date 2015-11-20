@@ -5,18 +5,18 @@ import itertools
 def run(d, attributes, threshold):
     maybeLeaf = has_single_class(d)
     if maybeLeaf:
-        print("Found only one class")
+        #print("Found only one class")
         return maybeLeaf
     elif len(attributes) == 0:
-        print("No attributes left")
+        #print("No attributes left")
         return Leaf(find_most_frequent_label(d))
     else:
             splitting_attr = select_splitting_attribute_heading(d, list(attributes), threshold)
             if not splitting_attr:
-                print("No attribute suitable to split from {}".format(str(attributes)))
+                #print("No attribute suitable to split from {}".format(str(attributes)))
                 return Label(find_most_frequent_label(d))
             else:
-                print("Splitting on ", splitting_attr)
+                #print("Splitting on ", splitting_attr)
                 Ag = splitting_attr[0]
                 domain_Ag = set(attrib(t)[Ag] for t in d)
                 nodes = []
