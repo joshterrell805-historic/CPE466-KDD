@@ -22,3 +22,10 @@ def read(raw, restrictions=None):
             or restrictions[i]]
 
     return cols, rows
+
+def restrictions_from_text(text):
+    if text == None:
+        return None
+    else:
+        return [False if x == '0' else True \
+                for x in restrictionstxt.read().split(',')]

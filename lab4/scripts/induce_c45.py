@@ -8,11 +8,7 @@ from model import Label, Node, stringify_tree
 @click.argument('TrainingSetCSV', type=click.File('r'))
 @click.argument('RestrictionsTXT', required=False, type=click.File('r'))
 def main(domainxml, trainingsetcsv, restrictionstxt):
-    if restrictionstxt == None:
-        restrictions = None
-    else:
-        restrictions = [False if x == '0' else True \
-                for x in restrictionstxt.read().split(',')]
+    restrictions = dataset.restrictions_from_text(restrictionstxt)
 
     cols, data = dataset.read(trainingsetcsv.read(), restrictions)
     # call train function with:
