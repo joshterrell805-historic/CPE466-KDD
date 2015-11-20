@@ -3,6 +3,7 @@ Team: Andrew Gilbert, Josh Terrell
 
 
 **Important: Run everything from the project's root directory**
+
 Note: All build executables (induceC45, classier, and validation) have help
 funcitons. E.g `induceC45 --help`.
 
