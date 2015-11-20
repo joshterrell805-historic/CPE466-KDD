@@ -81,4 +81,17 @@ class TestSampling(unittest.TestCase):
         # As though we're asking the question "does record belong in class a?"
         result = sampling.error_rate(expected, actual)
         self.assertEqual(result, 1 - 3/5)
+
+    def test_hunk_data(self):
+        data = [(['a', 'f'], 'o'),
+                (['b', 'g'], 'm'),
+                (['a', 'g'], 'm'),
+                (['a', 'g'], 'o')]
+        hunks = sampling.hunk(data, 2)
+        for hunk in hunks:
+            self.assertEqual(len(hunk), 2)
+            for row in hunk:
+                if row in data:
+                    data.remove(row)
+        self.assertEqual(len(data), 0)
         

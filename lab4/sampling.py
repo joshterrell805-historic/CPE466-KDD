@@ -1,3 +1,5 @@
+import random
+
 def precision(expected, actual, positive):
     # expected = correct label
     # actual = predicted label
@@ -30,3 +32,11 @@ def accuracy(expected, actual):
 
 def error_rate(expected, actual):
     return 1 - accuracy(expected, actual)
+
+def hunk(data, hunksize):
+    hunkable = list(data)
+    random.shuffle(hunkable)
+    hunks = []
+    for start in range(0, len(data), hunksize):
+        hunks.append(hunkable[start:start + hunksize])
+    return hunks
