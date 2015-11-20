@@ -62,7 +62,7 @@ class TestSampling(unittest.TestCase):
         FN = 1
         precision = TP/(TP+FP)
         recall = TP/(TP+FN)
-        self.assertEqual(result, 2 * precision * recall / (precision * recall))
+        self.assertEqual(result, 2 * precision * recall / (precision + recall))
 
     def test_accuracy(self):
         # The values in the training set

@@ -19,7 +19,7 @@ def pf(expected, actual, positive):
 def f_measure(expected, actual, positive):
     prec = precision(expected, actual, positive)
     rec = recall(expected, actual, positive)
-    return (2 * prec * rec) / (prec * rec)
+    return (2 * prec * rec) / (prec + rec)
 
 def accuracy(expected, actual):
     paired = list(zip(expected, actual))
