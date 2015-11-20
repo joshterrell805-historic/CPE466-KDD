@@ -11,7 +11,7 @@ from model import Label, Node, stringify_tree
 def main(domainxml, trainingsetcsv, manifold_value, restrictionstxt):
     restrictions = dataset.restrictions_from_text(restrictionstxt)
 
-    cols, data = dataset.read(trainingsetcsv.read(), restrictions)
+    cols, data = dataset.read(trainingsetcsv.read(), True, restrictions)
     expected, actual = sampling.cross_validate(data, list(cols), manifold_value)
     print(expected)
     print(actual)
