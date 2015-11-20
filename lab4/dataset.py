@@ -1,11 +1,19 @@
-def read(raw, restrictions=None):
+def read(raw, has_label=True, restrictions=None):
     row_strs = list(raw.strip().splitlines())
     cols = row_strs[0].split(',')
 
     if restrictions == None:
-        restrictions = [True] * (len(cols) - 1)
-    elif len(restrictions) + 1 != len(cols):
-        raise Exception('len(restrictions) != #features')
+        if has_label:
+            restrictions = [True] * (len(cols) - 1)
+        else:
+            restrictions = [True] * len(cols)
+    else:
+        if has_label:
+            if len(restrictions) + 1 != len(cols):
+                raise Exception('len(restrictions) != #features')
+        else:
+            if len(restrictions) != len(cols):
+                raise Exception('len(restrictions) != #features')
 
     pluralities = [int(x) for x in row_strs[1].split(',')]
     for i,p in enumerate(pluralities):
@@ -15,11 +23,17 @@ def read(raw, restrictions=None):
     rows = []
     for row in row_strs[3:]:
         row = row.split(',')
-        attrs = [c for i,c in enumerate(row[:-1]) if restrictions[i]]
-        rows.append((attrs, row[-1]))
+        if has_label:
+            attrs = [c for i,c in enumerate(row[:-1]) if restrictions[i]]
+            rows.append((attrs, row[-1]))
+        else:
+            attrs = [c for i,c in enumerate(row) if restrictions[i]]
+            rows.append((attrs, None))
 
-    cols = [c for i,c in enumerate(cols[:-1]) if i + 1 == len(cols) \
-            or restrictions[i]]
+    if has_label:
+        cols = [c for i,c in enumerate(cols[:-1]) if restrictions[i]]
+    else:
+        cols = [c for i,c in enumerate(cols) if restrictions[i]]
 
     return cols, rows
 

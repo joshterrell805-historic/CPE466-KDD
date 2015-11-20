@@ -8,13 +8,15 @@ import sampling
 @click.argument('to_classify_CSV', type=click.File('r'))
 @click.argument('decision_tree_XML', type=click.File('r'))
 @click.argument('RestrictionsTXT', required=False, type=click.File('r'))
-def main(to_classify_csv, decision_tree_xml, restrictionstxt):
+@click.option('--has_label_column/--no_has_label_column', is_flag=True, default=True)
+def main(to_classify_csv, decision_tree_xml, restrictionstxt, has_label_column):
     # how are we supposed to determine if this has a label column or not?
     # I guess we could look at the number of unique edge labels in decision tree
     #   to determine features/
     tree = model.build_tree(decision_tree_xml.read())
     restrictions = dataset.restrictions_from_text(restrictionstxt)
-    cols, data = dataset.read(to_classify_csv.read(), restrictions)
+    cols, data = dataset.read(to_classify_csv.read(), has_label_column,
+            restrictions)
 
     predicted_classes = [tree.classify(x[0], cols) for x in data]
     labels = [x[1] for x in data]
