@@ -1,0 +1,30 @@
+Overall confusion matrix:
++-------------+-------------+------------+-----------+
+|             | pred_McCain | pred_Obama | pred_None |
+| true_McCain | 273         | 340        | 44        |
+| true_Obama  | 363         | 7830       | 150       |
++-------------+-------------+------------+-----------+
+
+Overall recall:
+0.9385113268608414
+
+Overall precision:
+0.9583843329253366
+
+Overall pf:
+0.5546492659053833
+
+Overall f-measure:
+0.9483437291830679
+
+Overall accuracy:
+0.9003333333333333
+
+Average accuracy:
+0.9003333333333332
+
+Overall error rate:
+0.09966666666666668
+
+Average error rate:
+0.09966666666666668
