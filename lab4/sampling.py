@@ -1,5 +1,7 @@
 import random
 import tabulate
+import c45
+import itertools
 
 def precision(expected, actual, positive):
     # expected = correct label
@@ -64,3 +66,20 @@ def confusion_matrix(expected, actual):
         ] for ec in expected_classes],
         tablefmt='psql'
     )
+
+def cross_validate(data, attributes, manifold):
+    print(data)
+    hunks = hunk(data, manifold)
+    itr = pull_each(hunks)
+    actual = []
+    expected = []
+    for elem, rest in itr:
+        print("start_run")
+        print(attributes)
+        tree = c45.run(elem, list(enumerate(attributes)), 0.05)
+        print(tree)
+        results = [tree.classify(r[0], attributes) for r in itertools.chain(*rest)]
+        correct = [r[1] for r in itertools.chain(*rest)]
+        actual.extend(results)
+        expected.extend(correct)
+    return (expected, actual)
