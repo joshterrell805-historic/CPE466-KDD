@@ -1,10 +1,11 @@
 import reader
-import kmeans
+import Clusterer from kmeans_clusterer
 import formatter
+from sklearn.pipeline import Pipeline
 
 def main(datafile, k):
     data = reader.read_restricted(datafile)
-    clusterer = kmeans.Clusterer(k)
-    clusterer.data = data
-    clusters = clusterer.cluster()
+    pipeline = Pipeline(steps=[('cluster', Clusterer(kmeans=k))])
+    pipeline.fit()
+    clusters = pipeline.cluster()
     print(formatter.format(clusters))
