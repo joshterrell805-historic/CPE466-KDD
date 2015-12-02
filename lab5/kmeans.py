@@ -24,3 +24,9 @@ def main(datafile, k):
     pipeline.fit(data)
     clf = pipeline.get_params()['clf']
     print('\n'.join(str(c) for c in clf.clusters_))
+    dump_graph(data, clf.assignments_)
+
+def dump_graph(X, assignments_):
+    X = pd.DataFrame(X)
+    X['assignment'] = assignments_
+    X.to_csv('graph.csv')
