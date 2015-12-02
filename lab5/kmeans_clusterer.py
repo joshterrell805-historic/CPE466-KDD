@@ -22,7 +22,7 @@ class KMeans(BaseEstimator, ClassifierMixin):
         self.clusters_ = self.clusters(X, centroids, assignments)
 
     def select_centroids(self, X):
-        indexes = np.random.randint(0, X.shape[0], self.k)
+        indexes = np.random.choice(X.shape[0], size=self.k, replace=False)
         return X[indexes]
 
     def converged(self, X, centroids, assignments):
