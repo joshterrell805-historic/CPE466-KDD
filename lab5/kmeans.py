@@ -1,8 +1,11 @@
-from kmeans_clusterer import Clusterer
 import formatter
+import numpy as np
+import numpy.random
 from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
+
+from kmeans_clusterer import KMeans
 
 @click.command()
 @click.argument('datafile', type=click.File('r'))
@@ -11,7 +14,12 @@ def main(datafile, k):
     header = datafile.readline()
     collist = [i for (i, toggle) in zip(count(), header.split()) if toggle == "0"]
     data = pd.read_csv(datafile, usecols = collist)
-    pipeline = Pipeline(steps=[('cluster', Clusterer(kmeans=k))])
+
+    pipeline = Pipeline([('clf', KMeans())])
+    pipeline.set_params(**{
+        'clf__k': k,
+        'clf__delta_sse': 4,
+    })
     pipeline.fit(data)
-    clusters = pipeline.cluster(data)
-    print(formatter.format(clusters))
+    clf = pipeline.get_params()['clf']
+    print('\n'.join(str(c) for c in clf.clusters_))
