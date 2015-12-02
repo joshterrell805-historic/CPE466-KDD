@@ -4,6 +4,7 @@ import numpy.random
 from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
+import click
 
 from kmeans_clusterer import KMeans
 
