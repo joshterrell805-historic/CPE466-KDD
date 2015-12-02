@@ -20,11 +20,12 @@ def main(datafile, threshold):
     pipeline.set_params(**{
     })
     pipeline.fit(data)
-    clf = pipeline.get_params()['clf']
-    clusters = clf.hierarchy_.clusters
-    print('dumping')
-    print('\n'.join(c.to_str(i) for i,c in enumerate(clusters)))
-    dump_graph(clusters)
+
+    if threshold != None:
+        clf = pipeline.get_params()['clf']
+        clusters = clf.hierarchy_.cut(threshold)
+        print('\n'.join(c.to_str(i) for i,c in enumerate(clusters)))
+        dump_graph(clusters)
 
 def dump_graph(clusters):
     cluster_points = [c.get_points() for c in clusters]

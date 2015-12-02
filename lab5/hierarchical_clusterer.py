@@ -28,7 +28,6 @@ class Hierarchical(BaseEstimator, ClassifierMixin):
             clusters[closest_pair[0]],
             clusters[closest_pair[1]]
         ])
-        print(len(clusters))
         del clusters[closest_pair[1]]
         del clusters[closest_pair[0]]
         return clusters + [merged]
@@ -56,7 +55,14 @@ Avg Dist. to Center: {}
         pass
 
     def cut(self, threshold):
-        pass
+        if len(self.clusters) == 1:
+            return self.clusters
+        else:
+            if self.clusters[0].dist(self.clusters[1]) >= threshold:
+                return self.clusters[0].cut(threshold) +\
+                        self.clusters[1].cut(threshold)
+            else:
+                return [self]
 
     def dist(self, cluster):
         return euclidean(self.center(), cluster.center())
