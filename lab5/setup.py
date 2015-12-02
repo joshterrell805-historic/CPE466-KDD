@@ -6,7 +6,8 @@ setup(
         'click',
         'numpy',
         'pandas',
-        'scikit-learn'
+        'scipy',
+        'scikit-learn',
     ],
     setup_requires=[
     ],
@@ -14,7 +15,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'kmeans = kmeans:main'
+            'kmeans = kmeans:main',
+            'hierarchical= hierarchical:main'
         ]
     }
 )
