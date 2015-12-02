@@ -21,8 +21,10 @@ def main(datafile, threshold):
     })
     pipeline.fit(data)
 
+    clf = pipeline.get_params()['clf']
+    #print(hierarchy.to_xml())
+
     if threshold != None:
-        clf = pipeline.get_params()['clf']
         clusters = clf.hierarchy_.cut(threshold)
         print('\n'.join(c.to_str(i) for i,c in enumerate(clusters)))
         dump_graph(clusters)
