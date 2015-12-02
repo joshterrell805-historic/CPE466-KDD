@@ -1,4 +1,5 @@
 import numpy as np
+import xml.etree.ElementTree as ET
 from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -44,15 +45,42 @@ Avg Dist. to Center: {}
 """
 
     @classmethod
-    def from_xml(cls):
-        #return Hierarchy()
-        pass
+    def from_xml(cls, xml):
+        ret = cls()
+        ret.clusters = [cls.from_xml(child) for child in list(xml)]
+        count = len(ret.clusters)
+        if count == 2:
+            ret.height = xml.get("height")
+        elif count == 0:
+            ret.data = xml.get("data")
+            ret.clusters = [ret.data]
+        else:
+            raise Exception("Invalid xml: too many child nodes")
+        return ret
 
     def __init__(self, clusters, k=0):
         self.clusters = clusters
 
-    def to_xml(self):
-        pass
+    def to_xml(self, parent=None):
+        count = len(self.clusters)
+        tree = None
+
+        if count == 2:
+            if parent != None:
+                me = ET.SubElement(parent, "node")
+            else:
+                me = ET.Element("tree")
+                tree = ET.ElementTree(element=me)
+
+            me.set("height", str(self.height))
+            for child in self.clusters:
+                child.to_xml(me)
+        elif count == 1:
+            me = ET.SubElement(parent, "leaf")
+            me.set("data", str(self.clusters[0]))
+        else:
+            raise Exception("Incorrect number of child nodes")
+        return tree
 
     def cut(self, threshold):
         if len(self.clusters) == 1:
