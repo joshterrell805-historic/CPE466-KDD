@@ -14,7 +14,8 @@ from kmeans_clusterer import KMeans
 def main(datafile, k):
     header = datafile.readline()
     collist = [i for i, toggle in enumerate(header.split(',')) if toggle != "0"]
-    data = pd.read_csv(datafile, usecols = collist).as_matrix()
+    datafile.seek(0)
+    data = pd.read_csv(datafile, usecols=collist).as_matrix()
 
     pipeline = Pipeline([('clf', KMeans())])
     pipeline.set_params(**{

@@ -14,6 +14,7 @@ from hierarchical_clusterer import Hierarchical
 def main(datafile, threshold):
     header = datafile.readline()
     collist = [i for i, toggle in enumerate(header.split(',')) if toggle != "0"]
+    datafile.seek(0)
     data = pd.read_csv(datafile, usecols = collist).as_matrix()
 
     pipeline = Pipeline([('clf', Hierarchical())])
