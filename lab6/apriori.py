@@ -16,7 +16,7 @@ def find_frequent_itemsets(data, minSup):
         count = []
         for i, row in data.iterrows():
             for j, candidate in enumerate(candidates):
-                if subseteq(candidate, row):
+                if subset(candidate, row):
                     count[j] += 1
         F_k_next = []
         tossed = []
@@ -53,3 +53,17 @@ def find_association_rules(freq_sets, minConf):
         for i in s:
             rules.append((symdiff(s, set(i)), i))
 
+def candidate_generate(F, k):
+    candidates = set()
+    for f_1 in F:
+        for f_2 in F:
+            c = union(f_1, f_2)
+            if len(c) == k + 1:
+                flag = True
+                subs = [symdiff(c, set(i)) for i in sup]
+                for sub in subs:
+                    if not sub in F:
+                        flag = False
+                        break
+                if flag == True:
+                    candidates.add(c)
