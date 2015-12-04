@@ -84,7 +84,7 @@ Avg Dist. to Center: {}
 
     def cut(self, threshold):
         if len(self.clusters) == 1:
-            return self.clusters
+            return [self]
         else:
             if self.clusters[0].dist(self.clusters[1]) >= threshold:
                 return self.clusters[0].cut(threshold) +\
