@@ -48,5 +48,8 @@ def find_association_rules(freq_sets, minConf):
     This function returns a list of pairs representing the association
     rules discovered.
     """
-    pass
+    rules = []
+    for s in freq_sets:
+        for i in s:
+            rules.append((symdiff(s, set(i)), i))
 
