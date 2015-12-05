@@ -87,6 +87,9 @@ def find_association_rules(data, freq_sets, minConf):
         for i in s:
             l = s - {i}
             r = i
-            if support(s, data)/support(l, data) >= minConf:
-                rules.append((l, r))
+            sup_l = support(l, data)
+            sup = support(s, data)
+            conf = sup/sup_l
+            if conf >= minConf:
+                rules.append((l, r, sup, conf))
     return rules
