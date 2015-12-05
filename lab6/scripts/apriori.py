@@ -7,7 +7,8 @@ import csv
 @click.argument('datafile', type=click.File('r'))
 @click.argument('min_sup', type=click.FLOAT)
 @click.argument('min_conf', type=click.FLOAT)
-def main(datafile, min_sup, min_conf):
+@click.option('--name-file', type=click.File('r'), default=None)
+def main(datafile, min_sup, min_conf, name_file):
     # Expects the sparse vector format data
     reader = csv.reader(datafile)
     data = []
