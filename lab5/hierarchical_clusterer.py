@@ -46,41 +46,46 @@ Avg Dist. to Center: {}
 
     @classmethod
     def from_xml(cls, xml):
-        ret = cls()
-        ret.clusters = [cls.from_xml(child) for child in list(xml)]
-        count = len(ret.clusters)
-        if count == 2:
-            ret.height = xml.get("height")
-        elif count == 0:
-            ret.data = xml.get("data")
-            ret.clusters = [ret.data]
-        else:
-            raise Exception("Invalid xml: too many child nodes")
-        return ret
+        if xml.tag == 'node' or xml.tag == 'tree':
+            children = list(xml)
+            if xml.tag == 'tree' and len(list(xml)) == 1:
+                return Cluster.from_xml(list(xml)[0])
+            else:
+                return Cluster([cls.from_xml(child) for child in children])
+        if xml.tag == 'leaf':
+            data = xml.get('data').replace('[', '').replace(']', '')
+            array = np.fromstring(data, sep=', ')
+            return Cluster([array])
 
     def __init__(self, clusters, k=0):
         self.clusters = clusters
 
-    def to_xml(self, parent=None):
-        count = len(self.clusters)
-        tree = None
+    def height(self):
+        return 0 if len(self.clusters) == 1 else\
+                self.clusters[0].dist(self.clusters[1])
 
-        if count == 2:
-            if parent != None:
-                me = ET.SubElement(parent, "node")
-            else:
+    def to_xml(self, parent=None):
+        tree = -1
+        if len(self.clusters) == 2:
+            if parent == None:
                 me = ET.Element("tree")
                 tree = ET.ElementTree(element=me)
-
-            me.set("height", str(self.height))
+            else:
+                me = ET.SubElement(parent, "node")
+            me.set("height", str(self.height()))
             for child in self.clusters:
                 child.to_xml(me)
-        elif count == 1:
+        elif len(self.clusters) == 1:
+            if parent == None:
+                parent = ET.Element("tree")
+                parent.set("height", '0.0')
             me = ET.SubElement(parent, "leaf")
-            me.set("data", str(self.clusters[0]))
+            me.set("data", str(self.clusters[0].tolist()))
+            tree = parent
         else:
             raise Exception("Incorrect number of child nodes")
-        return tree
+
+        return tree.getroot() if parent == None else tree
 
     def cut(self, threshold):
         if len(self.clusters) == 1:
@@ -137,4 +142,15 @@ Avg Dist. to Center: {}
                 for row in data['points'].tolist()
             )
         )
-        
+
+    def is_eq(self, l, r):
+        if l is Cluster:
+            return l == r
+        else:
+            return np.array_equal(l, r)
+
+    def __eq__(self, other):
+        return len(self.clusters) == len(other.clusters) and \
+               self.is_eq(self.clusters[0], other.clusters[0]) and \
+               (True if len(self.clusters) == 1 else \
+               self.is_eq(self.clusters[1], other.clusters[1]))
