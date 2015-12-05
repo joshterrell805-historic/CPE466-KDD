@@ -5,28 +5,41 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 import click
+import os
+import xml.etree.ElementTree as ET
 
-from hierarchical_clusterer import Hierarchical
+from hierarchical_clusterer import Hierarchical, Cluster
 
 @click.command()
 @click.argument('datafile', type=click.File('r'))
 @click.argument('threshold', required=False, type=click.FLOAT)
 def main(datafile, threshold):
-    header = datafile.readline()
-    collist = [i for i, toggle in enumerate(header.split(',')) if toggle != "0"]
-    datafile.seek(0)
-    data = pd.read_csv(datafile, usecols = collist).as_matrix()
+    filename = 'out{}{}.hrc'.format(os.sep, os.path.basename(datafile.name))
 
-    pipeline = Pipeline([('clf', Hierarchical())])
-    pipeline.set_params(**{
-    })
-    pipeline.fit(data)
+    if not os.path.isfile(filename):
+        header = datafile.readline()
+        collist = [i for i, toggle in enumerate(header.split(',')) if toggle != "0"]
+        datafile.seek(0)
+        data = pd.read_csv(datafile, usecols = collist).as_matrix()
 
-    clf = pipeline.get_params()['clf']
-    #print(hierarchy.to_xml())
+        pipeline = Pipeline([('clf', Hierarchical())])
+        pipeline.set_params(**{
+        })
+        pipeline.fit(data)
+
+        clf = pipeline.get_params()['clf']
+        hierarchy = clf.hierarchy_
+
+        with open(filename, 'wb') as fh:
+            fh.write(ET.tostring(hierarchy.to_xml()))
+    else:
+        with open(filename, 'rb') as fh:
+            hierarchy = Cluster.from_xml(ET.parse(fh).getroot())
+
+    #print(ET.tostring(hierarchy.to_xml()))
 
     if threshold != None:
-        clusters = clf.hierarchy_.cut(threshold)
+        clusters = hierarchy.cut(threshold)
         print('\n'.join(c.to_str(i) for i,c in enumerate(clusters)))
         dump_graph(clusters)
 
