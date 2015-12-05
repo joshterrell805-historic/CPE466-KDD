@@ -26,14 +26,16 @@ def main(datafile, min_sup, min_conf, name_file):
         data.append(frozenset(r))
     freq_sets = apriori.find_frequent_itemsets(data, max_val + 1, min_sup)
     rules = apriori.find_association_rules(data, freq_sets, min_conf)
-    for i, r in enumerate(rules):
-        print("Rule {}:     {}  ---> {}    [sup={} conf={}]".format(i, ", ".join(str(i) for i in r[0]), r[1], r[2] * 100, r[3] * 100))
     if name_file:
         reader = csv.reader(name_file)
         lookup = {int(l[0]) : l[1] + l[2] for l in reader}
-        print("Skyline frequent itemsets")
+        print("\n##Skyline frequent itemsets\n~~~")
         for i, s in enumerate(freq_sets):
             print("Itemset {}:\n\tContains: {}\n\tSupport: {}".format(i, ", ".join(lookup[p] for p in s), apriori.support(s, data)))
-        print("Skyline association rules")
+        print("~~~\n\n##Skyline association rules\n~~~")
         for i, r in enumerate(rules):
             print("Rule {}:\n\tLHS: {}\n\tRHS: {}\n\tSupport: {}\n\tConfidence: {}".format(i, ", ".join(lookup[p] for p in r[0]), lookup[r[1]], r[2] * 100, r[3] * 100))
+        print("~~~")
+    else:
+        for i, r in enumerate(rules):
+            print("Rule {}:     {}  ---> {}    [sup={} conf={}]".format(i, ", ".join(str(i) for i in r[0]), r[1], r[2] * 100, r[3] * 100))

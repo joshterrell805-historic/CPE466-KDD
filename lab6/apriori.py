@@ -35,7 +35,7 @@ def find_frequent_itemsets(data, max_val, minSup):
         F.extend(tossed_subsets)
         k += 1
         F_k = frozenset(F_k_next)
-    return F
+    return [i for i in F if len(i) > 1]
 
 def support(cols, data):
     supporting = sum(1 for row in data if subset(cols, row))
@@ -82,8 +82,6 @@ def find_association_rules(data, freq_sets, minConf):
     """
     rules = []
     for s in freq_sets:
-        if len(s) < 2:
-            continue
         for i in s:
             l = s - {i}
             r = i

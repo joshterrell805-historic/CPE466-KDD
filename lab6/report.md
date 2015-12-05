@@ -1,105 +1,73 @@
+
 #data/1000/1000-out1.csv
 1000 rows from data/1000/1000-out1.csv with `min_sup`=0.01 and `min_conf=0.65
 
 ##Skyline frequent itemsets
 ~~~
 Itemset 0:
-	Contains: AlmondBear Claw
-	Support: 0.026
-Itemset 1:
-	Contains: ChocolateMeringue
-	Support: 0.038
-Itemset 2:
-	Contains: GanacheCookie
-	Support: 0.044
-Itemset 3:
-	Contains: VanillaMeringue
-	Support: 0.047
-Itemset 4:
-	Contains: AlmondTart
-	Support: 0.041
-Itemset 5:
-	Contains: AlmondCroissant
-	Support: 0.049
-Itemset 6:
-	Contains: BlueberryDanish
-	Support: 0.055
-Itemset 7:
-	Contains: PecanTart
-	Support: 0.04
-Itemset 8:
-	Contains: VanillaEclair
-	Support: 0.037
-Itemset 9:
-	Contains: ChocolateCroissant
-	Support: 0.042
-Itemset 10:
-	Contains: ChocolateEclair
-	Support: 0.034
-Itemset 11:
 	Contains: NapoleonCake, ApricotTart
 	Support: 0.01
-Itemset 12:
+Itemset 1:
 	Contains: NapoleonCake, HotCoffee
 	Support: 0.01
-Itemset 13:
+Itemset 2:
 	Contains: MarzipanCookie, TuileCookie
 	Support: 0.053
-Itemset 14:
+Itemset 3:
 	Contains: OrangeJuice, TruffleCake
 	Support: 0.01
-Itemset 15:
+Itemset 4:
 	Contains: NapoleonCake, StrawberryCake
 	Support: 0.049
-Itemset 16:
+Itemset 5:
 	Contains: LemonCake, LemonTart
 	Support: 0.04
-Itemset 17:
+Itemset 6:
 	Contains: TruffleCake, AppleCroissant
 	Support: 0.01
-Itemset 18:
+Itemset 7:
 	Contains: BottledWater, BerryTart
 	Support: 0.034
-Itemset 19:
+Itemset 8:
 	Contains: TruffleCake, BerryTart
 	Support: 0.013
-Itemset 20:
+Itemset 9:
 	Contains: CheeseCroissant, OrangeJuice
 	Support: 0.038
-Itemset 21:
+Itemset 10:
 	Contains: CheeseCroissant, RaspberryCookie
 	Support: 0.01
-Itemset 22:
+Itemset 11:
 	Contains: GongolaisCookie, BerryTart
 	Support: 0.012
-Itemset 23:
+Itemset 12:
 	Contains: OrangeJuice, RaspberryCookie
 	Support: 0.011
-Itemset 24:
+Itemset 13:
 	Contains: TruffleCake, GongolaisCookie
 	Support: 0.058
-Itemset 25:
+Itemset 14:
 	Contains: ApricotCroissant, BlueberryTart, HotCoffee
 	Support: 0.032
-Itemset 26:
+Itemset 15:
 	Contains: CoffeeEclair, SingleEspresso, BlackberryTart
 	Support: 0.023
-Itemset 27:
+Itemset 16:
 	Contains: ChocolateCake, CasinoCake, ChocolateCoffee
 	Support: 0.038
-Itemset 28:
+Itemset 17:
 	Contains: ChocolateTart, WalnutCookie, VanillaFrappuccino
 	Support: 0.018
-Itemset 29:
+Itemset 18:
 	Contains: CherryTart, ApricotDanish, OperaCake
 	Support: 0.038
-Itemset 30:
+Itemset 19:
 	Contains: CherrySoda, AppleDanish, AppleTart, AppleCroissant
 	Support: 0.031
-Itemset 31:
+Itemset 20:
 	Contains: AlmondTwist, CoffeeEclair, ApplePie, HotCoffee
 	Support: 0.024
-Itemset 32:
+Itemset 21:
 	Contains: LemonLemonade, RaspberryLemonade, GreenTea, RaspberryCookie, LemonCookie
 	Support: 0.019
 ~~~
@@ -254,81 +222,45 @@ Rule 27:
 ##Skyline frequent itemsets
 ~~~
 Itemset 0:
-	Contains: AlmondBear Claw
-	Support: 0.0428
-Itemset 1:
-	Contains: ChocolateMeringue
-	Support: 0.0452
-Itemset 2:
-	Contains: GanacheCookie
-	Support: 0.0388
-Itemset 3:
-	Contains: VanillaMeringue
-	Support: 0.0398
-Itemset 4:
-	Contains: AlmondTart
-	Support: 0.0386
-Itemset 5:
-	Contains: AlmondCroissant
-	Support: 0.0456
-Itemset 6:
-	Contains: BlueberryDanish
-	Support: 0.04
-Itemset 7:
-	Contains: PecanTart
-	Support: 0.0444
-Itemset 8:
-	Contains: ApricotTart
-	Support: 0.0422
-Itemset 9:
-	Contains: VanillaEclair
-	Support: 0.046
-Itemset 10:
-	Contains: ChocolateCroissant
-	Support: 0.0432
-Itemset 11:
-	Contains: ChocolateEclair
-	Support: 0.0382
-Itemset 12:
 	Contains: CheeseCroissant, OrangeJuice
 	Support: 0.043
-Itemset 13:
+Itemset 1:
 	Contains: MarzipanCookie, TuileCookie
 	Support: 0.0496
-Itemset 14:
+Itemset 2:
 	Contains: TruffleCake, GongolaisCookie
 	Support: 0.0472
-Itemset 15:
+Itemset 3:
 	Contains: NapoleonCake, StrawberryCake
 	Support: 0.0422
-Itemset 16:
+Itemset 4:
 	Contains: LemonCake, LemonTart
 	Support: 0.0336
-Itemset 17:
+Itemset 5:
 	Contains: BottledWater, BerryTart
 	Support: 0.0366
-Itemset 18:
+Itemset 6:
 	Contains: ApricotCroissant, BlueberryTart, HotCoffee
 	Support: 0.0328
-Itemset 19:
+Itemset 7:
 	Contains: CoffeeEclair, SingleEspresso, BlackberryTart
 	Support: 0.0286
-Itemset 20:
+Itemset 8:
 	Contains: ChocolateCake, CasinoCake, ChocolateCoffee
 	Support: 0.0312
-Itemset 21:
+Itemset 9:
 	Contains: ChocolateTart, WalnutCookie, VanillaFrappuccino
 	Support: 0.0266
-Itemset 22:
+Itemset 10:
 	Contains: CherryTart, ApricotDanish, OperaCake
 	Support: 0.0408
-Itemset 23:
+Itemset 11:
 	Contains: CherrySoda, AppleDanish, AppleTart, AppleCroissant
 	Support: 0.0228
-Itemset 24:
+Itemset 12:
 	Contains: AlmondTwist, CoffeeEclair, ApplePie, HotCoffee
 	Support: 0.0308
-Itemset 25:
+Itemset 13:
 	Contains: LemonLemonade, RaspberryLemonade, GreenTea, RaspberryCookie, LemonCookie
 	Support: 0.0212
 ~~~
@@ -483,81 +415,45 @@ Rule 27:
 ##Skyline frequent itemsets
 ~~~
 Itemset 0:
-	Contains: AlmondBear Claw
-	Support: 0.04425
-Itemset 1:
-	Contains: ChocolateMeringue
-	Support: 0.0445
-Itemset 2:
-	Contains: GanacheCookie
-	Support: 0.0433
-Itemset 3:
-	Contains: VanillaMeringue
-	Support: 0.0424
-Itemset 4:
-	Contains: AlmondTart
-	Support: 0.04055
-Itemset 5:
-	Contains: AlmondCroissant
-	Support: 0.04205
-Itemset 6:
-	Contains: BlueberryDanish
-	Support: 0.04115
-Itemset 7:
-	Contains: PecanTart
-	Support: 0.04155
-Itemset 8:
-	Contains: ApricotTart
-	Support: 0.04275
-Itemset 9:
-	Contains: VanillaEclair
-	Support: 0.0427
-Itemset 10:
-	Contains: ChocolateCroissant
-	Support: 0.0446
-Itemset 11:
-	Contains: ChocolateEclair
-	Support: 0.0426
-Itemset 12:
 	Contains: CheeseCroissant, OrangeJuice
 	Support: 0.0439
-Itemset 13:
+Itemset 1:
 	Contains: MarzipanCookie, TuileCookie
 	Support: 0.04855
-Itemset 14:
+Itemset 2:
 	Contains: TruffleCake, GongolaisCookie
 	Support: 0.04335
-Itemset 15:
+Itemset 3:
 	Contains: NapoleonCake, StrawberryCake
 	Support: 0.04455
-Itemset 16:
+Itemset 4:
 	Contains: LemonCake, LemonTart
 	Support: 0.037
-Itemset 17:
+Itemset 5:
 	Contains: BottledWater, BerryTart
 	Support: 0.0357
-Itemset 18:
+Itemset 6:
 	Contains: ApricotCroissant, BlueberryTart, HotCoffee
 	Support: 0.0326
-Itemset 19:
+Itemset 7:
 	Contains: CoffeeEclair, SingleEspresso, BlackberryTart
 	Support: 0.02695
-Itemset 20:
+Itemset 8:
 	Contains: ChocolateCake, CasinoCake, ChocolateCoffee
 	Support: 0.0339
-Itemset 21:
+Itemset 9:
 	Contains: ChocolateTart, WalnutCookie, VanillaFrappuccino
 	Support: 0.02825
-Itemset 22:
+Itemset 10:
 	Contains: CherryTart, ApricotDanish, OperaCake
 	Support: 0.041
-Itemset 23:
+Itemset 11:
 	Contains: CherrySoda, AppleDanish, AppleTart, AppleCroissant
 	Support: 0.021
-Itemset 24:
+Itemset 12:
 	Contains: AlmondTwist, CoffeeEclair, ApplePie, HotCoffee
 	Support: 0.0281
-Itemset 25:
+Itemset 13:
 	Contains: LemonLemonade, RaspberryLemonade, GreenTea, RaspberryCookie, LemonCookie
 	Support: 0.0204
 ~~~
@@ -712,81 +608,45 @@ Rule 27:
 ##Skyline frequent itemsets
 ~~~
 Itemset 0:
-	Contains: AlmondBear Claw
-	Support: 0.04244
-Itemset 1:
-	Contains: ChocolateMeringue
-	Support: 0.041933333333333336
-Itemset 2:
-	Contains: GanacheCookie
-	Support: 0.04324
-Itemset 3:
-	Contains: VanillaMeringue
-	Support: 0.04238666666666667
-Itemset 4:
-	Contains: AlmondTart
-	Support: 0.04204
-Itemset 5:
-	Contains: AlmondCroissant
-	Support: 0.04273333333333333
-Itemset 6:
-	Contains: BlueberryDanish
-	Support: 0.04409333333333333
-Itemset 7:
-	Contains: PecanTart
-	Support: 0.04337333333333333
-Itemset 8:
-	Contains: ApricotTart
-	Support: 0.04236
-Itemset 9:
-	Contains: VanillaEclair
-	Support: 0.04252
-Itemset 10:
-	Contains: ChocolateCroissant
-	Support: 0.04324
-Itemset 11:
-	Contains: ChocolateEclair
-	Support: 0.04237333333333333
-Itemset 12:
 	Contains: CheeseCroissant, OrangeJuice
 	Support: 0.04306666666666667
-Itemset 13:
+Itemset 1:
 	Contains: MarzipanCookie, TuileCookie
 	Support: 0.05092
-Itemset 14:
+Itemset 2:
 	Contains: TruffleCake, GongolaisCookie
 	Support: 0.04392
-Itemset 15:
+Itemset 3:
 	Contains: NapoleonCake, StrawberryCake
 	Support: 0.043146666666666667
-Itemset 16:
+Itemset 4:
 	Contains: LemonCake, LemonTart
 	Support: 0.036853333333333335
-Itemset 17:
+Itemset 5:
 	Contains: BottledWater, BerryTart
 	Support: 0.0378
-Itemset 18:
+Itemset 6:
 	Contains: ApricotCroissant, BlueberryTart, HotCoffee
 	Support: 0.032826666666666664
-Itemset 19:
+Itemset 7:
 	Contains: CoffeeEclair, SingleEspresso, BlackberryTart
 	Support: 0.0272
-Itemset 20:
+Itemset 8:
 	Contains: ChocolateCake, CasinoCake, ChocolateCoffee
 	Support: 0.03338666666666667
-Itemset 21:
+Itemset 9:
 	Contains: ChocolateTart, WalnutCookie, VanillaFrappuccino
 	Support: 0.02676
-Itemset 22:
+Itemset 10:
 	Contains: CherryTart, ApricotDanish, OperaCake
 	Support: 0.041106666666666666
-Itemset 23:
+Itemset 11:
 	Contains: CherrySoda, AppleDanish, AppleTart, AppleCroissant
 	Support: 0.020586666666666666
-Itemset 24:
+Itemset 12:
 	Contains: AlmondTwist, CoffeeEclair, ApplePie, HotCoffee
 	Support: 0.02792
-Itemset 25:
+Itemset 13:
 	Contains: LemonLemonade, RaspberryLemonade, GreenTea, RaspberryCookie, LemonCookie
 	Support: 0.020733333333333333
 ~~~
