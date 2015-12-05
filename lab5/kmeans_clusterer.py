@@ -3,7 +3,7 @@ from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 class KMeans(BaseEstimator, ClassifierMixin):
-    def __init__(self, k=3, delta_sse=0.1):
+    def __init__(self, k=3, delta_sse=0.01):
         self.k = k
 
     def fit(self, X, y=None):
