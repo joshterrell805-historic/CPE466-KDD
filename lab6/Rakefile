@@ -1,0 +1,9 @@
+parameters = [ %w[1000 data/1000/1000-out1.csv 0.01 0.65],
+               %w[5000 data/5000/5000-out1.csv 0.01 0.7],
+               %w[20000 data/20000/20000-out1.csv 0.01 0.7],
+               %w[75000 data/75000/75000-out1.csv 0.01 0.7]
+]
+parameters.each do |params|
+  puts "##{params[1]}\n#{params[0]} rows from #{params[1]} with `min_sup`=#{params[2]} and `min_conf=#{params[3]}"
+  system 'apriori', params[1], params[2], params[3], '--name-file', 'goods.csv'
+end
