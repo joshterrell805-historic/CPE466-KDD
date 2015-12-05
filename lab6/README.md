@@ -16,6 +16,7 @@ pip install --upgrade -e .
 
 ### Find association rules
 Our rule mining script uses the out1 format (the sparse matrix representation).
+Note that it accepts both `min_sup` and `min_conf` as actual decimals (i.e., 0.01 is 1%).
 ```
 apriori [options] <data.csv> <min_sup> <min_conf>
 ```
