@@ -36,7 +36,7 @@ def main(datafile, threshold):
         with open(filename, 'rb') as fh:
             hierarchy = Cluster.from_xml(ET.parse(fh).getroot())
 
-    #print(ET.tostring(hierarchy.to_xml()))
+    print(ET.tostring(hierarchy.to_xml()).decode('utf-8'))
 
     if threshold != None:
         clusters = hierarchy.cut(threshold)
