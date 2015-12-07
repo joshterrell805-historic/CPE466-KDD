@@ -1,5 +1,5 @@
 if (!exists('raw_dataset')) {
-  raw_dataset <- read.csv('data/weather/USW00093209.dly.csv')
+  raw_dataset <- read.csv('../data/weather/USW00093209.dly.csv')
   raw_dataset <- raw_dataset[raw_dataset$YEAR >= 2010,]
 
   shaped <- reshape(
@@ -9,8 +9,8 @@ if (!exists('raw_dataset')) {
       direction="wide")
   shaped$date <- ISOdate(shaped$YEAR, shaped$MONTH, shaped$DAY)
 
-  if (file.exists('clusters.csv')) {
-    raw_clusters <- read.csv('clusters.csv')
+  if (file.exists('../clusters.csv')) {
+    raw_clusters <- read.csv('../clusters.csv')
     shaped$cluster <- factor(raw_clusters$cluster)
 
     cluster_names <- unique(raw_clusters)
