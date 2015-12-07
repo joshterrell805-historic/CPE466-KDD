@@ -12,12 +12,9 @@ import click
 @click.argument('datafile', type=click.File('r'))
 @click.argument('k', type=click.INT)
 def main(datafile, k):
-    #usecols=None
-    #data = pd.read_csv(datafile, usecols=usecols)
-    #.as_matrix()
+    data = pd.read_csv(datafile, sep=' ')
 
-    #matrix = data.as_matrix()
-    matrix = np.random.rand(30,4)
+    matrix = data.as_matrix()
     pipeline = Pipeline([('scaler', RobustScaler()), ('clusterer', DBSCAN())])
     pipeline.set_params(**{
         'clusterer__eps': 1.0,
