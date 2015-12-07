@@ -14,7 +14,7 @@ $<.each do |line|
 
   values = []
   (21..(line.length - 8)).step(8) do |i|
-    value = line[i..i + 4].to_f/254
+    value = line[i..i + 4].to_f
     if value == -9999
       next
     end
