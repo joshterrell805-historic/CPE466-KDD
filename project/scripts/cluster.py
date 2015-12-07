@@ -3,6 +3,7 @@ import numpy as np
 import numpy.random
 from sklearn.pipeline import Pipeline
 from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import RobustScaler
 import numpy as np
 import pandas as pd
 import click
@@ -17,14 +18,14 @@ def main(datafile, k):
 
     #data.as_matrix()
     data = np.random.rand(30,4)
-    pipeline = Pipeline([('clst', DBSCAN())])
+    pipeline = Pipeline([('scaler', RobustScaler()), ('clusterer', DBSCAN())])
     pipeline.set_params(**{
-        'clst__eps': 0.5,
-        'clst__min_samples': 5,
+        'clusterer__eps': 0.5,
+        'clusterer__min_samples': 5,
     })
     pipeline.fit(data)
-    clst = pipeline.get_params()['clst']
-    dump_graph(data, clst.labels_)
+    clusterer = pipeline.get_params()['clusterer']
+    dump_graph(data, clusterer.labels_)
 
 def dump_graph(X, labels_):
     X = pd.DataFrame(X)
