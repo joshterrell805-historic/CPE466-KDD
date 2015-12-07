@@ -22,9 +22,10 @@ def main(datafile, k):
     })
     pipeline.fit(matrix)
     clusterer = pipeline.get_params()['clusterer']
-    dump_graph(data, clusterer.labels_)
+    dump_graph(clusterer.labels_)
 
-def dump_graph(X, labels_):
+def dump_graph(labels_):
+    X = pd.DataFrame()
     X['cluster'] = labels_
     X.to_csv('clusters.csv')
 
