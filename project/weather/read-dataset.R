@@ -15,7 +15,7 @@ if (!exists('raw_dataset')) {
 
     cluster_names <- unique(raw_clusters)
     cluster_sizes <- sapply(cluster_names, function(cluster) {
-      sum(d$cluster == cluster)
+      sum(raw_clusters$cluster == cluster)
     })
   }
 
