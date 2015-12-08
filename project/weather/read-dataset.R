@@ -16,6 +16,17 @@ if (!exists('raw_dataset')) {
   shaped$date <- ISOdate(shaped$YEAR, shaped$MONTH, shaped$DAY)
   idvars <- c(idvars, "date")
 
+# shaped$VALUE.TMAX_SMA_3 <- sma(shaped, "VALUE.TMAX", 3)
+# value_cols <- c(value_cols, "VALUE.TMAX_SMA_3")
+# shaped$VALUE.TMIN_SMA_3 <- sma(shaped, "VALUE.TMIN", 3)
+# value_cols <- c(value_cols, "VALUE.TMIN_SMA_3")
+# shaped$VALUE.TMAX_SMA_5 <- sma(shaped, "VALUE.TMAX", 5)
+# value_cols <- c(value_cols, "VALUE.TMAX_SMA_5")
+# shaped$VALUE.TMIN_SMA_5 <- sma(shaped, "VALUE.TMIN", 5)
+# value_cols <- c(value_cols, "VALUE.TMIN_SMA_5")
+shaped$VALUE.SPREAD <- shaped$VALUE.TMAX - shaped$VALUE.TMIN
+value_cols <- c(value_cols, "VALUE.SPREAD")
+
 #  vals <- sapply(shaped$VALUE.PRCP, log)
 #  vals[shaped$VALUE.PRCP == 0] <- 0
 #  shaped$VALUE.PRCP <- vals

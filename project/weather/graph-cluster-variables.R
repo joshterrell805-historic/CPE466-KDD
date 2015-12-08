@@ -10,4 +10,5 @@ graph <- ggplot(data, aes(cluster, VALUE)) +
   geom_boxplot(aes(fill=factor(cluster))) +
   facet_wrap(~ ELEMENT)
 
+ggsave("kmeans--count.png", width=16, height=9)
 print(graph)
