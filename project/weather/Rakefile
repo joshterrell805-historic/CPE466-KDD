@@ -29,8 +29,8 @@ file "changes.pdf" => ["clusters.csv", "graph-cluster-variables.R", "read-datase
   mv "Rplots.pdf", "changes.pdf"
 end
 
-file "clusters.csv" => "input_for_clustering.csv" do
   sh "cluster input_for_clustering.csv 1"
+file "clusters.csv" => ["input_for_clustering.csv", "Rakefile"] do
 end
 
 file "input_for_clustering.csv" => ["prepare-data.R", "read-dataset.R"] do
