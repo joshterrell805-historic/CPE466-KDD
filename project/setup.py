@@ -11,7 +11,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-           'cluster = scripts.cluster:main'
+           'cluster = scripts.cluster:main',
+           'cluster2 = scripts.cluster2:main'
         ]
     }
 )
