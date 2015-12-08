@@ -6,7 +6,7 @@ CLOBBER << "changes.pdf"
 CLEAN << "clusters.csv"
 CLEAN << "input_for_clustering.csv"
 
-task default: DIR
+task default: ["graph.pdf", "changes.pdf"]
 
 task "show" => DIR do
   spawn "evince", File.join(DIR, "graph.pdf")
@@ -19,12 +19,12 @@ file DIR => ["graph.pdf", "changes.pdf"] do
   cp "graph.pdf", File.join(DIR, "graph.pdf")  
 end
 
-file "graph.pdf" => ["clusters.csv", "graph.R"] do
+file "graph.pdf" => ["clusters.csv", "graph.R", "read-dataset.R"] do
   sh "R -f graph.R"
   mv "Rplots.pdf", "graph.pdf"
 end
 
-file "changes.pdf" => ["clusters.csv", "graph-cluster-variables.R"] do
+file "changes.pdf" => ["clusters.csv", "graph-cluster-variables.R", "read-dataset.R"] do
   sh "R -f graph-cluster-variables.R"
   mv "Rplots.pdf", "changes.pdf"
 end
@@ -33,6 +33,6 @@ file "clusters.csv" => "input_for_clustering.csv" do
   sh "cluster input_for_clustering.csv"
 end
 
-file "input_for_clustering.csv" => "prepare-data.R" do
+file "input_for_clustering.csv" => ["prepare-data.R", "read-dataset.R"] do
   sh "R -f prepare-data.R"
 end
