@@ -30,7 +30,7 @@ file "changes.pdf" => ["clusters.csv", "graph-cluster-variables.R", "read-datase
 end
 
 file "clusters.csv" => "input_for_clustering.csv" do
-  sh "cluster input_for_clustering.csv"
+  sh "cluster input_for_clustering.csv 1"
 end
 
 file "input_for_clustering.csv" => ["prepare-data.R", "read-dataset.R"] do
