@@ -10,9 +10,8 @@ import click
 
 @click.command()
 @click.argument('datafile', type=click.File('r'))
-@click.argument('eps', type=click.FLOAT, default=1.0)
-@click.argument('min_samples', type=click.INT, default=5)
-def main(datafile, eps, min_samples):
+@click.argument('k', type=click.INT, default=2)
+def main(datafile, k):
     data = pd.read_csv(datafile, sep=' ')
 
     matrix = data.as_matrix()
@@ -23,7 +22,7 @@ def main(datafile, eps, min_samples):
     #    'clusterer__min_samples': min_samples,
     #})
     pipeline.set_params(**{
-        'clusterer__n_clusters': 2,
+        'clusterer__n_clusters': k,
     })
     pipeline.fit(matrix)
     clusterer = pipeline.get_params()['clusterer']

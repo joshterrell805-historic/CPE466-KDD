@@ -4,8 +4,8 @@ source('read-data.R')
 
 # for printing only
 data <- raw_dataset
-#data <- data[data$timestamp > as.POSIXct("2015-02-01 12:00:00", tz = "UTC"),]
-#data <- data[data$timestamp < as.POSIXct("2015-07-04 12:00:00", tz = "UTC"),]
+#data <- data[data$timestamp > as.POSIXct("2015-04-01 12:00:00", tz = "UTC"),]
+#data <- data[data$timestamp < as.POSIXct("2015-08-01 12:00:00", tz = "UTC"),]
 
 graph <- ggplot(data=data) +
     geom_point(mapping=aes(x=timestamp, y=price, color=cluster), size=1)# +

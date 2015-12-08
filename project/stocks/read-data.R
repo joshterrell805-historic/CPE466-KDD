@@ -1,4 +1,4 @@
-raw_dataset <- read.csv('../data/stocks/COKE.labeled.csv', sep=',')
+raw_dataset <- read.csv('../data/stocks/AAPL.labeled.csv', sep=',')
 print(colnames(raw_dataset))
 raw_dataset$timestamp <-
     as.POSIXlt(raw_dataset$timestamp, origin="1970-01-01")
